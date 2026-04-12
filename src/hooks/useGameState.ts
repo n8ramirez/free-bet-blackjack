@@ -401,7 +401,7 @@ export function useGameState() {
     canDoubleNow,
     canSplitNow,
     isFreeDouble:    !!(activeHand && canFreeDouble(activeHand)),
-    isFreeSplit:     !!(activeHand && canSplit(activeHand) && !isTenValuePair(activeHand)),
+    isFreeSplit:     !!(activeHand && canSplit(activeHand) && !isTenValuePair(activeHand) && engine.playerHands.length < 4),
     isGameOver:      state.phase === 'betting' && state.bankrollCents < Math.min(...CHIPS),
     pendingDealerTurn,
     addChip, clearBet, reBet, deal, hit, stand, double, split, newHand, resetGame,
