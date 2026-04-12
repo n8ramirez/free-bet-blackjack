@@ -49,16 +49,16 @@ export function ActionBar({
   return (
     <div className="grid grid-cols-2 gap-2.5 px-4 pt-4 pb-6">
       <ActionBtn
-        label="Hit"
-        onClick={onHit}
-        disabled={!canHit}
-        color="bg-sky-700 hover:bg-sky-600"
-      />
-      <ActionBtn
         label="Stand"
         onClick={onStand}
         disabled={!canStand}
         color="bg-rose-700 hover:bg-rose-600"
+      />
+      <ActionBtn
+        label="Hit"
+        onClick={onHit}
+        disabled={!canHit}
+        color="bg-emerald-600 hover:bg-emerald-500"
       />
       <ActionBtn
         label="Double"

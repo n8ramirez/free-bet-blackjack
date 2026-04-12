@@ -25,7 +25,7 @@ export function CardHand({
   const showAll  = !hideSecond
 
   const totalLabel = bj
-    ? 'BJ'
+    ? 'BLACKJACK'
     : push22
     ? `${total}`
     : bust
