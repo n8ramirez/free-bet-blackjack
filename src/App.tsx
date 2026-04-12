@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { ActionBar } from './components/ActionBar'
+import { RulesModal } from './components/RulesModal'
 import { handTotals, isBlackjack } from './engine'
 
 export default function App() {
   const game = useGameState()
+  const [showRules, setShowRules] = useState(false)
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -63,9 +66,11 @@ export default function App() {
 
   return (
     <div className="h-[100dvh] bg-felt flex flex-col overflow-hidden">
+      {showRules && <RulesModal onClose={() => setShowRules(false)} />}
 
       {/* ── Top bar ─────────────────────────────────────────────── */}
-      <div className="flex-none flex justify-between items-center px-5 py-3 bg-felt-light border-b border-felt-border">
+      <div className="flex-none grid grid-cols-3 items-center px-5 py-3 bg-felt-light border-b border-felt-border">
+        {/* Left — Bankroll */}
         <div>
           <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
           <div className="text-white font-bold text-xl font-game">
@@ -73,20 +78,33 @@ export default function App() {
           </div>
         </div>
 
-        <div className="text-center">
+        {/* Center — always perfectly centered */}
+        <div className="flex flex-col items-center">
           <div className="text-white text-[9px] uppercase tracking-widest">Free Bet</div>
-          <div className="text-amber-400 font-bold text-sm">Blackjack</div>
+          <div className="relative flex items-center justify-center">
+            <div className="text-amber-400 font-bold text-sm">Blackjack</div>
+            <button
+              onClick={() => setShowRules(true)}
+              className="absolute left-full ml-2 w-6 h-6 rounded-full border-2 border-sky-300 text-sky-300
+                hover:border-sky-200 hover:text-sky-200 transition-colors
+                flex items-center justify-center text-[12px] font-bold leading-none"
+            >
+              i
+            </button>
+          </div>
         </div>
 
-        {(isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
-          <div className="text-right">
-            <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
-            <div className="text-amber-400 font-bold text-xl font-game">
-              ${game.engine.playerHands[0].betCents / 100}
-            </div>
-          </div>
-        )}
-        {isBetting && <div className="w-16" />}
+        {/* Right — Bet (always rendered to hold the column width) */}
+        <div className="text-right">
+          {(isDealing || isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
+            <>
+              <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
+              <div className="text-amber-400 font-bold text-xl font-game">
+                ${game.engine.playerHands[0].betCents / 100}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* ── Dealer area ─────────────────────────────────────────── */}
