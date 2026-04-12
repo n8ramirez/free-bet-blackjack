@@ -13,14 +13,15 @@ type ActionBarProps = {
 }
 
 type BtnProps = {
-  label:     string
-  onClick:   () => void
-  disabled?: boolean
-  free?:     boolean  // highlight with yellow ring when action is free
-  color:     string   // Tailwind bg/shadow classes
+  label:      string
+  onClick:    () => void
+  disabled?:  boolean
+  free?:      boolean
+  freeVariant?: 'gold' | 'purple'
+  color:      string
 }
 
-function ActionBtn({ label, onClick, disabled, free, color }: BtnProps) {
+function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color }: BtnProps) {
   const btn = (
     <button
       onClick={onClick}
@@ -41,9 +42,10 @@ function ActionBtn({ label, onClick, disabled, free, color }: BtnProps) {
   )
 
   if (free) {
+    const baseBg = freeVariant === 'purple' ? 'bg-violet-600' : 'bg-amber-500'
     return (
-      <div className="relative rounded-xl p-[4px] overflow-hidden bg-amber-500">
-        {/* Spinning bright highlight over the gold base */}
+      <div className={`relative rounded-xl p-[4px] overflow-hidden ${baseBg}`}>
+        {/* Spinning bright highlight over the base color */}
         <div
           className="absolute inset-[-200%] animate-spin-border pointer-events-none"
           style={{ background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.25) 40deg, rgba(255,255,255,0.7) 60deg, rgba(255,255,255,0.25) 80deg, transparent 120deg)' }}
@@ -85,6 +87,7 @@ export function ActionBar({
       <ActionBtn
         label="Split"
         free={isFreeSplit}
+        freeVariant="purple"
         onClick={onSplit}
         disabled={!canSplit}
         color="bg-violet-700 hover:bg-violet-600"

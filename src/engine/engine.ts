@@ -160,6 +160,8 @@ export function resolveRound(state: GameState): HandResult[] {
   for (const hand of state.playerHands) {
     // Split hands and split-ace hands are never eligible for the 3:2 blackjack bonus
     const playerBlackjack = !hand.isSplitAce && !hand.isSplit && isBlackjack(hand.cards)
+    // Split hand with a natural 21 — wins at 1:1 (beats dealer 21, loses to dealer BJ, pushes on dealer 22)
+    const splitNatural    = !hand.isSplitAce && !!hand.isSplit && isBlackjack(hand.cards)
 
     // Player's actual money at risk on this hand
     const baseRisk = hand.freeSplit ? 0 : hand.betCents
@@ -197,6 +199,11 @@ export function resolveRound(state: GameState): HandResult[] {
 
     if (dealerTotal > 21) {
       results.push({ result: 'win', payoutCents: winAmount, reason: 'dealer bust' })
+      continue
+    }
+
+    if (splitNatural) {
+      results.push({ result: 'win', payoutCents: winAmount, reason: 'blackjack' })
       continue
     }
 
