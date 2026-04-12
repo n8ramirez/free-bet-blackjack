@@ -76,6 +76,7 @@ export type UIState = {
   dealerRevealed:    boolean
   revealCount:       number   // 0-4: how many cards have been shown during 'dealing' phase
   dealerRevealCount: number   // how many dealer cards are visible during 'dealer-turn' phase
+  dealerStartDelay:  number   // extra ms before dealer animation begins (e.g. after a double)
 }
 
 function initial(): UIState {
@@ -90,6 +91,7 @@ function initial(): UIState {
     dealerRevealed:    false,
     revealCount:       0,
     dealerRevealCount: 0,
+    dealerStartDelay:  0,
   }
 }
 
@@ -161,7 +163,7 @@ export function useGameState() {
   const [state, setState] = useState<UIState>(initial)
 
   // Destructured here so both the effect deps and derived-values section can use them
-  const { phase, revealCount, engine, activeHandIndex, dealerRevealCount } = state
+  const { phase, revealCount, engine, activeHandIndex, dealerRevealCount, dealerStartDelay } = state
 
   // -- Dealing animation timer --
   // Cards are revealed one at a time: player[0] → dealer[0] → player[1] → dealer[1]
@@ -196,6 +198,8 @@ export function useGameState() {
     if (phase !== 'dealer-turn') return
 
     const totalCards = engine.dealer.cards.length
+    // Only apply the extra delay on the very first tick (dealerRevealCount starts at 2)
+    const extraDelay = dealerRevealCount === 2 ? dealerStartDelay : 0
 
     if (dealerRevealCount >= totalCards) {
       // All cards showing — wait for the last flip then resolve the round
@@ -205,7 +209,7 @@ export function useGameState() {
           if (s.phase !== 'dealer-turn') return s
           return finishFromDealerTurn(s)
         })
-      }, flipMs)
+      }, flipMs + extraDelay)
       return () => clearTimeout(t)
     }
 
@@ -213,9 +217,9 @@ export function useGameState() {
     const delay = dealerRevealCount === 2 ? 313 + 300 : 375 + 300
     const t = setTimeout(() => {
       setState(s => s.phase === 'dealer-turn' ? { ...s, dealerRevealCount: s.dealerRevealCount + 1 } : s)
-    }, delay)
+    }, delay + extraDelay)
     return () => clearTimeout(t)
-  }, [phase, dealerRevealCount])
+  }, [phase, dealerRevealCount, dealerStartDelay])
 
   // -- Betting phase --
 
@@ -298,7 +302,10 @@ export function useGameState() {
       playerDouble(engine, s.activeHandIndex)
 
       const base = { ...s, engine, bankrollCents: s.bankrollCents - cost }
-      return advanceFrom(base, engine, s.activeHandIndex)
+      const next = advanceFrom(base, engine, s.activeHandIndex)
+      // Add delay before dealer hole card flips so it doesn't overlap the double card animation
+      if (next.phase === 'dealer-turn') return { ...next, dealerStartDelay: 450 }
+      return next
     })
   }, [])
 
