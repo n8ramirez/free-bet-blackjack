@@ -52,7 +52,9 @@ export function CardHand({
     if (r.result === 'push') return 'PUSH'
     if (r.payoutCents === 0) return r.result === 'loss' ? 'FREE LOSS' : ''
     const dollars = Math.abs(r.payoutCents) / 100
-    const fmt = dollars % 1 === 0 ? `$${dollars}` : `$${dollars.toFixed(2)}`
+    const fmt = dollars % 1 === 0
+      ? `$${dollars.toLocaleString()}`
+      : `$${dollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     return r.result === 'win' ? `+${fmt}` : `-${fmt}`
   }
 

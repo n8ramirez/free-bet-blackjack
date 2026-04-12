@@ -49,11 +49,14 @@ export default function App() {
     else if (netCents < 0)           { bannerTitle = 'Dealer Wins';      bannerTitleColor = 'text-red-400'   }
     else                             { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
   }
-  const formatNet = (cents: number) => {
+  const fmtDollars = (cents: number) => {
     const d = Math.abs(cents) / 100
-    const s = d % 1 === 0 ? `$${d}` : `$${d.toFixed(2)}`
-    return cents > 0 ? `+${s}` : `-${s}`
+    const s = d % 1 === 0
+      ? `$${d.toLocaleString()}`
+      : `$${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    return cents >= 0 ? s : `-${s}`
   }
+  const formatNet = (cents: number) => (cents > 0 ? '+' : '') + fmtDollars(cents)
   const bannerAmount      = isOver && netCents !== 0 ? formatNet(netCents) : ''
   const bannerAmountColor = netCents >= 0 ? 'text-emerald-400' : 'text-red-300'
 
@@ -100,7 +103,7 @@ export default function App() {
             <>
               <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
               <div className="text-amber-400 font-bold text-xl font-game">
-                ${game.engine.playerHands[0].betCents / 100}
+                ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
               </div>
             </>
           )}
@@ -234,11 +237,7 @@ export default function App() {
             {/* Net result summary */}
             <div className={`text-2xl font-bold font-game
               ${netCents > 0 ? 'text-amber-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
-              {netCents > 0
-                ? `+$${netCents / 100}`
-                : netCents < 0
-                ? `-$${Math.abs(netCents) / 100}`
-                : 'Push'}
+              {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
             {/* Dealer total */}
             {dealerTotalVisible && (

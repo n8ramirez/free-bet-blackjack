@@ -26,7 +26,11 @@ export function BetPanel({
         <div className="text-white text-[10px] uppercase tracking-widest mb-1">Current Bet</div>
         <div className={`text-3xl font-bold font-game transition-colors
           ${pendingBetCents > 0 ? 'text-amber-400' : 'text-stone-600'}`}>
-          {pendingBetCents > 0 ? `$${betDollars % 1 === 0 ? betDollars : betDollars.toFixed(2)}` : '—'}
+          {pendingBetCents > 0
+            ? (betDollars % 1 === 0
+              ? `$${betDollars.toLocaleString()}`
+              : `$${betDollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+            : '—'}
         </div>
         {belowMin && (
           <div className="text-red-400 text-xs mt-1">Minimum bet is $5</div>
@@ -75,7 +79,7 @@ export function BetPanel({
             className="flex-1 py-3 rounded-xl bg-stone-700 hover:bg-stone-600
               text-stone-300 text-sm font-semibold active:scale-95 transition-all"
           >
-            Rebet ${lastBetCents / 100}
+            Rebet ${(lastBetCents / 100).toLocaleString()}
           </button>
         ) : null}
 
