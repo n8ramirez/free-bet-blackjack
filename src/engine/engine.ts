@@ -7,6 +7,7 @@ export type Hand = {
   freeDouble?: boolean
   isSplitAce?: boolean
   freeSplit?: boolean
+  isSplit?: boolean  // true for any hand that originated from a split
 }
 
 export type GameState = {
@@ -114,8 +115,9 @@ export function playerSplit(state: GameState, handIndex: number) {
   const cardB = hand.cards[1]
   // replace original hand with first card, deal one to each new hand
   hand.cards = [cardA]
+  hand.isSplit = true
   const isTenValueSplit = TEN_VALUE_RANKS.has(cardRank(cardA))
-  const newHand: Hand = { cards: [cardB], betCents: hand.betCents, freeSplit: !isTenValueSplit }
+  const newHand: Hand = { cards: [cardB], betCents: hand.betCents, freeSplit: !isTenValueSplit, isSplit: true }
   // if splitting aces, mark isSplitAce true
   const r = cardRank(cardA)
   if (r === 'A') {
@@ -156,8 +158,8 @@ export function resolveRound(state: GameState): HandResult[] {
   const dealer22 = dealerTotal === 22
 
   for (const hand of state.playerHands) {
-    // Split-ace hands receiving a 10-value card are 21, not blackjack
-    const playerBlackjack = !hand.isSplitAce && isBlackjack(hand.cards)
+    // Split hands and split-ace hands are never eligible for the 3:2 blackjack bonus
+    const playerBlackjack = !hand.isSplitAce && !hand.isSplit && isBlackjack(hand.cards)
 
     // Player's actual money at risk on this hand
     const baseRisk = hand.freeSplit ? 0 : hand.betCents

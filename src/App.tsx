@@ -189,7 +189,7 @@ export default function App() {
         )}
 
         {/* Player-turn phase */}
-        {isPlayerTurn && (
+        {isPlayerTurn && !game.pendingDealerTurn && (
           <ActionBar
             canHit={true}
             canStand={true}

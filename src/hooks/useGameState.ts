@@ -77,6 +77,7 @@ export type UIState = {
   revealCount:       number   // 0-4: how many cards have been shown during 'dealing' phase
   dealerRevealCount: number   // how many dealer cards are visible during 'dealer-turn' phase
   dealerStartDelay:  number   // extra ms before dealer animation begins (e.g. after a double)
+  pendingDealerTurn: boolean  // true while waiting to transition to dealer-turn (keeps hole card hidden)
 }
 
 function initial(): UIState {
@@ -92,6 +93,7 @@ function initial(): UIState {
     revealCount:       0,
     dealerRevealCount: 0,
     dealerStartDelay:  0,
+    pendingDealerTurn: false,
   }
 }
 
@@ -163,7 +165,7 @@ export function useGameState() {
   const [state, setState] = useState<UIState>(initial)
 
   // Destructured here so both the effect deps and derived-values section can use them
-  const { phase, revealCount, engine, activeHandIndex, dealerRevealCount, dealerStartDelay } = state
+  const { phase, revealCount, engine, activeHandIndex, dealerRevealCount, dealerStartDelay, pendingDealerTurn } = state
 
   // -- Dealing animation timer --
   // Cards are revealed one at a time: player[0] → dealer[0] → player[1] → dealer[1]
@@ -220,6 +222,20 @@ export function useGameState() {
     }, delay + extraDelay)
     return () => clearTimeout(t)
   }, [phase, dealerRevealCount, dealerStartDelay])
+
+  // -- Pending dealer turn (delayed after double) --
+  // Stays in player-turn phase so the hole card remains hidden until the double card finishes flipping
+  useEffect(() => {
+    if (!pendingDealerTurn || phase !== 'player-turn') return
+    const t = setTimeout(() => {
+      setState(s => {
+        if (!s.pendingDealerTurn) return s
+        const engine = cloneEngine(s.engine)
+        return startDealerTurn({ ...s, pendingDealerTurn: false }, engine)
+      })
+    }, 450)
+    return () => clearTimeout(t)
+  }, [pendingDealerTurn, phase])
 
   // -- Betting phase --
 
@@ -302,10 +318,17 @@ export function useGameState() {
       playerDouble(engine, s.activeHandIndex)
 
       const base = { ...s, engine, bankrollCents: s.bankrollCents - cost }
-      const next = advanceFrom(base, engine, s.activeHandIndex)
-      // Add delay before dealer hole card flips so it doesn't overlap the double card animation
-      if (next.phase === 'dealer-turn') return { ...next, dealerStartDelay: 450 }
-      return next
+
+      // Find the next playable hand WITHOUT calling advanceFrom (which would call dealerPlay
+      // and mutate the engine, causing dealer drawn cards to flash face-up during the delay)
+      let nextIdx = s.activeHandIndex + 1
+      while (nextIdx < engine.playerHands.length && handIsDone(engine.playerHands[nextIdx])) nextIdx++
+
+      if (nextIdx >= engine.playerHands.length) {
+        // No more hands — would go to dealer-turn, but delay so double card finishes flipping first
+        return { ...base, pendingDealerTurn: true }
+      }
+      return { ...base, activeHandIndex: nextIdx }
     })
   }, [])
 
@@ -375,6 +398,7 @@ export function useGameState() {
     isFreeDouble:    !!(activeHand && canFreeDouble(activeHand)),
     isFreeSplit:     !!(activeHand && canSplit(activeHand) && !isTenValuePair(activeHand)),
     isGameOver:      state.phase === 'betting' && state.bankrollCents < Math.min(...CHIPS),
+    pendingDealerTurn,
     addChip, clearBet, reBet, deal, hit, stand, double, split, newHand, resetGame,
   }
 }
