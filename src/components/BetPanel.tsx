@@ -44,7 +44,7 @@ export function BetPanel({
               onClick={() => onAddChip(cents)}
               disabled={!canAfford}
               className={`
-                w-14 h-14 rounded-full border-[3px] font-bold text-xs text-white
+                w-14 h-14 rounded-full border-[4px] border-dashed font-bold text-xs text-white
                 ${bg} ${border}
                 shadow-[0_5px_0px_rgba(0,0,0,0.5)]
                 active:shadow-[0_1px_0px_rgba(0,0,0,0.5)]
