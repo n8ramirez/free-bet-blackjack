@@ -123,7 +123,7 @@ export default function App() {
         ) : (
           <>
             <div className="text-stone-400 text-[9px] uppercase tracking-widest pb-1">
-              Blackjack Pays 3 to 2 &nbsp;( 1 to 1 on Splits )
+              Blackjack Pays 3 to 2
             </div>
             <div className="border-t border-felt-dark w-full opacity-40" />
             <div className="text-stone-400 text-[9px] uppercase tracking-widest pt-1">
