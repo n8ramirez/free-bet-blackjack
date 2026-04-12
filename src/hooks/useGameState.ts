@@ -13,8 +13,8 @@ import {
 // ---------------------------------------------------------------------------
 export const STARTING_BANKROLL = 50_000          // $500 in cents
 export const MIN_BET            = 500             // $5 in cents
-export const CHIPS              = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000]
-export const CHIP_LABELS        = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K']
+export const CHIPS              = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 500_000]
+export const CHIP_LABELS        = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K', '$5K']
 export const CHIP_COLORS = [
   { bg: 'bg-red-600',    border: 'border-red-400',    shadow: 'shadow-red-900/60'    },
   { bg: 'bg-blue-600',   border: 'border-blue-400',   shadow: 'shadow-blue-900/60'   },
@@ -24,6 +24,7 @@ export const CHIP_COLORS = [
   { bg: 'bg-amber-500',  border: 'border-amber-300',  shadow: 'shadow-amber-900/60'  },
   { bg: 'bg-orange-600', border: 'border-orange-400', shadow: 'shadow-orange-900/60' },
   { bg: 'bg-slate-800',  border: 'border-slate-400',  shadow: 'shadow-slate-900/60'  },
+  { bg: 'bg-cyan-700',   border: 'border-cyan-400',   shadow: 'shadow-cyan-900/60'   },
 ]
 
 // ---------------------------------------------------------------------------
