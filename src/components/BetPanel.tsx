@@ -29,7 +29,7 @@ export function BetPanel({
           {pendingBetCents > 0 ? `$${betDollars % 1 === 0 ? betDollars : betDollars.toFixed(2)}` : '—'}
         </div>
         {belowMin && (
-          <div className="text-red-400 text-xs mt-1">Minimum bet is $15</div>
+          <div className="text-red-400 text-xs mt-1">Minimum bet is $5</div>
         )}
       </div>
 

@@ -177,6 +177,12 @@ export default function App() {
         {isBetting && game.isGameOver && (
           <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-8">
             <div className="text-stone-300 text-lg font-bold">Out of chips!</div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-stone-400 uppercase tracking-widest text-[10px]">Peak Bankroll</span>
+              <span className="text-amber-400 font-bold font-game">
+                ${(game.peakBankrollCents / 100).toLocaleString()}
+              </span>
+            </div>
             <button
               onClick={game.resetGame}
               className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500

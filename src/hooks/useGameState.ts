@@ -12,7 +12,7 @@ import {
 // Constants
 // ---------------------------------------------------------------------------
 export const STARTING_BANKROLL = 50_000          // $500 in cents
-export const MIN_BET            = 1_500           // $15 in cents
+export const MIN_BET            = 500             // $5 in cents
 export const CHIPS              = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000]
 export const CHIP_LABELS        = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K']
 export const CHIP_COLORS = [
@@ -69,6 +69,7 @@ export type UIState = {
   phase:           Phase
   engine:          GameState
   bankrollCents:   number   // chips NOT currently at risk
+  peakBankrollCents: number // highest bankroll reached this game
   pendingBetCents: number   // bet being constructed in betting phase
   lastBetCents:    number   // previous round's bet (for rebet)
   activeHandIndex: number
@@ -85,6 +86,7 @@ function initial(): UIState {
     phase:           'betting',
     engine:          createGameState(),
     bankrollCents:   STARTING_BANKROLL,
+    peakBankrollCents: STARTING_BANKROLL,
     pendingBetCents: 0,
     lastBetCents:    0,
     activeHandIndex: 0,
@@ -129,10 +131,11 @@ function finishFromDealerTurn(base: UIState): UIState {
 
   return {
     ...base,
-    phase:          'round-over',
-    bankrollCents:  bankroll,
+    phase:             'round-over',
+    bankrollCents:     bankroll,
+    peakBankrollCents: Math.max(base.peakBankrollCents, bankroll),
     results,
-    dealerRevealed: true,
+    dealerRevealed:    true,
   }
 }
 
@@ -363,9 +366,10 @@ export function useGameState() {
       if (s.phase !== 'round-over') return s
       return {
         ...initial(),
-        engine:        { ...s.engine, playerHands: [], dealer: { cards: [], betCents: 0 } },
-        bankrollCents: s.bankrollCents,
-        lastBetCents:  s.lastBetCents,
+        engine:            { ...s.engine, playerHands: [], dealer: { cards: [], betCents: 0 } },
+        bankrollCents:     s.bankrollCents,
+        peakBankrollCents: s.peakBankrollCents,
+        lastBetCents:      s.lastBetCents,
       }
     })
   }, [])
