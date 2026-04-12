@@ -21,24 +21,39 @@ type BtnProps = {
 }
 
 function ActionBtn({ label, onClick, disabled, free, color }: BtnProps) {
-  return (
+  const btn = (
     <button
       onClick={onClick}
       disabled={disabled}
       className={`
         flex flex-col items-center justify-center gap-0.5
-        py-4 rounded-xl font-bold text-white transition-all
+        py-4 font-bold text-white transition-all
         shadow-[0_4px_0px_rgba(0,0,0,0.4)]
         active:shadow-[0_1px_0px_rgba(0,0,0,0.4)]
         active:translate-y-[3px]
+        ${free ? 'relative w-full rounded-[8px]' : 'rounded-xl'}
         ${color}
         ${disabled ? 'opacity-30 cursor-not-allowed' : 'active:scale-[0.97]'}
-        ${free ? 'ring-2 ring-amber-400' : ''}
       `}
     >
       <span className="text-base leading-none">{label}</span>
     </button>
   )
+
+  if (free) {
+    return (
+      <div className="relative rounded-xl p-[4px] overflow-hidden bg-amber-500">
+        {/* Spinning bright highlight over the gold base */}
+        <div
+          className="absolute inset-[-200%] animate-spin-border pointer-events-none"
+          style={{ background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.25) 40deg, rgba(255,255,255,0.7) 60deg, rgba(255,255,255,0.25) 80deg, transparent 120deg)' }}
+        />
+        {btn}
+      </div>
+    )
+  }
+
+  return btn
 }
 
 export function ActionBar({

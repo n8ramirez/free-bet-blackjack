@@ -136,7 +136,7 @@ export default function App() {
       {/* ── Player area ─────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col items-center justify-center py-4 min-h-0">
         {game.engine.playerHands.length > 0 ? (
-          <div className={`flex gap-3 ${multiHand ? 'overflow-x-auto px-4' : ''}`}>
+          <div className={`flex gap-3 ${multiHand ? 'overflow-x-auto px-4 py-2' : ''}`}>
             {game.engine.playerHands.map((hand, i) => {
               const active  = isPlayerTurn && i === game.activeHandIndex
               const dimmed  = isPlayerTurn && !active

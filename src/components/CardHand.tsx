@@ -57,7 +57,7 @@ export function CardHand({
   }
 
   const ringClass = isActive
-    ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-felt rounded-xl'
+    ? 'ring-2 ring-sky-300 ring-offset-2 ring-offset-felt rounded-xl'
     : ''
 
   return (
