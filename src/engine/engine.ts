@@ -167,12 +167,12 @@ export function resolveRound(state: GameState): HandResult[] {
     // Total action paid out on a win
     const winAmount = (hand.doubled ? 2 : 1) * hand.betCents
 
-    if (playerBlackjack && !dealerBlackjack) {
+    if (playerBlackjack) {
       results.push({ result: 'win', payoutCents: Math.round(hand.betCents * 1.5), reason: 'blackjack' })
       continue
     }
 
-    if (dealerBlackjack && !playerBlackjack) {
+    if (dealerBlackjack) {
       results.push({ result: 'loss', payoutCents: playerRisk ? -playerRisk : 0, reason: 'dealer blackjack' })
       continue
     }
