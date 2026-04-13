@@ -182,8 +182,11 @@ export function resolveRound(state: GameState): HandResult[] {
     }
 
     if (dealer22) {
+      const { total: playerTotal } = handTotals(hand.cards)
       if (playerBlackjack) {
         results.push({ result: 'win', payoutCents: Math.round(hand.betCents * 1.5), reason: 'blackjack vs dealer 22' })
+      } else if (playerTotal > 21) {
+        results.push({ result: 'loss', payoutCents: playerRisk ? -playerRisk : 0, reason: 'bust' })
       } else {
         results.push({ result: 'push', payoutCents: 0, reason: 'dealer 22 push' })
       }
