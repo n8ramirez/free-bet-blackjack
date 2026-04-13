@@ -71,11 +71,13 @@ export function LeaderboardModal({ entries, highlightIndex, onClose }: Props) {
                         ${isHighlight ? 'text-amber-300' : 'text-stone-200'}`}>
                         {entry.name}
                       </div>
-                      <div className="text-stone-500 text-[10px]">{entry.date}</div>
+                      <div className="text-stone-500 text-[10px]">
+                        {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : ''}
+                      </div>
                     </div>
                     <div className={`font-bold text-sm font-game flex-shrink-0
                       ${isHighlight ? 'text-amber-400' : 'text-emerald-400'}`}>
-                      {formatDollars(entry.peakBankrollCents)}
+                      {formatDollars(entry.peak_bankroll_cents)}
                     </div>
                   </div>
                 )
