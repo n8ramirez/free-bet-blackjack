@@ -35,7 +35,7 @@ export function LeaderboardModal({ entries, highlightIndex, onClose }: Props) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-700">
           <div>
             <div className="text-white text-[9px] uppercase tracking-widest">All Time</div>
-            <div className="text-amber-400 font-bold text-base">Leaderboard</div>
+            <div className="text-amber-400 font-bold text-base">Peak Bankroll Leaderboard</div>
           </div>
           <button
             onClick={onClose}
