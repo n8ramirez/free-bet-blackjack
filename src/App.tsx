@@ -1,14 +1,63 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
+import { LeaderboardModal } from './components/LeaderboardModal'
+import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
+import {
+  getLeaderboard, getQualifyingRank, addToLeaderboard,
+  type LeaderboardEntry,
+} from './hooks/useLeaderboard'
 
 export default function App() {
   const game = useGameState()
   const [showRules, setShowRules] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showHighScoreEntry, setShowHighScoreEntry] = useState(false)
+  const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([])
+  const [highlightIndex, setHighlightIndex] = useState<number | undefined>(undefined)
+  const [highScoreHandled, setHighScoreHandled] = useState(false)
+  const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
+
+  // When game ends, fetch the leaderboard to check if the score qualifies
+  useEffect(() => {
+    if (game.isGameOver && !highScoreHandled) {
+      setHighScoreHandled(true)
+      getLeaderboard().then(entries => {
+        setLeaderboardEntries(entries)
+        const rank = getQualifyingRank(game.peakBankrollCents, entries)
+        if (rank !== null) {
+          setQualifyingRank(rank)
+          setShowHighScoreEntry(true)
+        }
+      })
+    }
+    if (!game.isGameOver) {
+      setHighScoreHandled(false)
+    }
+  }, [game.isGameOver, game.peakBankrollCents, highScoreHandled])
+
+  async function handleHighScoreSubmit(name: string) {
+    const { entries, newIndex } = await addToLeaderboard(name, game.peakBankrollCents)
+    setLeaderboardEntries(entries)
+    setHighlightIndex(newIndex)
+    setShowHighScoreEntry(false)
+    setShowLeaderboard(true)
+  }
+
+  function handleHighScoreSkip() {
+    setShowHighScoreEntry(false)
+  }
+
+  async function handleOpenLeaderboard() {
+    const entries = await getLeaderboard()
+    setLeaderboardEntries(entries)
+    setHighlightIndex(undefined)
+    setShowLeaderboard(true)
+  }
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -70,6 +119,21 @@ export default function App() {
   return (
     <div className="h-[100dvh] bg-felt flex flex-col overflow-hidden">
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
+      {showLeaderboard && (
+        <LeaderboardModal
+          entries={leaderboardEntries}
+          highlightIndex={highlightIndex}
+          onClose={() => { setShowLeaderboard(false); setHighlightIndex(undefined) }}
+        />
+      )}
+      {showHighScoreEntry && qualifyingRank !== null && (
+        <HighScoreModal
+          peakBankrollCents={game.peakBankrollCents}
+          rank={qualifyingRank}
+          onSubmit={handleHighScoreSubmit}
+          onSkip={handleHighScoreSkip}
+        />
+      )}
 
       {/* ── Top bar ─────────────────────────────────────────────── */}
       <div className="flex-none grid grid-cols-3 items-center px-5 py-3 bg-felt-light border-b border-felt-border">
@@ -85,6 +149,14 @@ export default function App() {
         <div className="flex flex-col items-center">
           <div className="text-white text-[9px] uppercase tracking-widest">Free Bet</div>
           <div className="relative flex items-center justify-center">
+            <button
+              onClick={handleOpenLeaderboard}
+              className="absolute right-full mr-2 w-6 h-6 rounded-full border-2 border-amber-400 text-amber-400
+                hover:border-amber-300 hover:text-amber-300 transition-colors
+                flex items-center justify-center text-[11px] font-bold leading-none"
+            >
+              ★
+            </button>
             <div className="text-amber-400 font-bold text-sm">Blackjack</div>
             <button
               onClick={() => setShowRules(true)}
