@@ -153,9 +153,16 @@ export default function App() {
               onClick={handleOpenLeaderboard}
               className="absolute right-full mr-2 w-6 h-6 rounded-full border-2 border-amber-400 text-amber-400
                 hover:border-amber-300 hover:text-amber-300 transition-colors
-                flex items-center justify-center text-[11px] font-bold leading-none"
+                flex items-center justify-center"
             >
-              ★
+              <svg viewBox="0 0 14 11" width="11" height="9" fill="currentColor">
+                {/* 2nd place block (left) */}
+                <rect x="0" y="4" width="4" height="7" rx="0.5" />
+                {/* 1st place block (center) */}
+                <rect x="5" y="1" width="4" height="10" rx="0.5" />
+                {/* 3rd place block (right) */}
+                <rect x="10" y="6" width="4" height="5" rx="0.5" />
+              </svg>
             </button>
             <div className="text-amber-400 font-bold text-sm">Blackjack</div>
             <button
