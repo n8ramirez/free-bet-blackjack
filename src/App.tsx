@@ -207,7 +207,7 @@ export default function App() {
       )}
 
       {/* ── Dealer area ─────────────────────────────────────────── */}
-      <div className={`flex-1 flex flex-col items-center min-h-0 ${isQuadrant ? 'justify-start pt-[60px]' : 'justify-center py-4'}`}>
+      <div className={`flex-1 flex flex-col items-center min-h-0 ${isQuadrant ? 'justify-start pt-[45px]' : 'justify-center py-4'}`}>
         {dealerHand.cards.length > 0 ? (
           <CardHand
             hand={dealerHand}
@@ -225,7 +225,7 @@ export default function App() {
       </div>
 
       {/* ── Divider / Round result banner ───────────────────────── */}
-      <div className={`flex-none flex flex-col items-center w-full ${isQuadrant ? '-mt-[200px] pb-[50px]' : ''}`}>
+      <div className={`flex-none flex flex-col items-center w-full ${isQuadrant ? '-mt-[200px] pb-[32px]' : ''}`}>
         {isOver ? (
           <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
             <div className={`text-2xl font-bold font-game tracking-wide ${bannerTitleColor}`}>
