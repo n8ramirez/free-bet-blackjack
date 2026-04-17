@@ -225,7 +225,7 @@ export default function App() {
       </div>
 
       {/* ── Divider / Round result banner ───────────────────────── */}
-      <div className={`flex-none flex flex-col items-center w-full ${isQuadrant ? '-mt-[185px] pb-[12px]' : ''}`}>
+      <div className={`flex-none flex flex-col items-center w-full ${isQuadrant ? '-mt-[240px] pb-[32px]' : ''}`}>
         {isOver ? (
           <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
             <div className={`text-2xl font-bold font-game tracking-wide ${bannerTitleColor}`}>
@@ -248,7 +248,7 @@ export default function App() {
       {/* ── Player area ─────────────────────────────────────────── */}
       <div className={`flex-1 flex flex-col items-center min-h-0 w-full ${isQuadrant ? 'justify-start pt-0 -mt-[20px]' : 'justify-center py-4'}`}>
         {debugSplit ? (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1 w-full px-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
             {[
               { cards: ['8♠', 'K♦'], betCents: 50000, freeSplit: true,  isSplit: true },
               { cards: ['8♥', '5♦', '3♣'], betCents: 50000, freeSplit: true,  isSplit: true },
@@ -269,7 +269,7 @@ export default function App() {
           </div>
         ) : game.engine.playerHands.length > 0 ? (
           isQuadrant ? (
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1 w-full px-4">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
               {game.engine.playerHands.map((hand, i) => {
                 const active = isPlayerTurn && i === game.activeHandIndex
                 const dimmed = isPlayerTurn && !active
@@ -290,7 +290,7 @@ export default function App() {
               })}
             </div>
           ) : multiHand ? (
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1 w-full px-4">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
               {game.engine.playerHands.map((hand, i) => {
                 const active = isPlayerTurn && i === game.activeHandIndex
                 const dimmed = isPlayerTurn && !active
