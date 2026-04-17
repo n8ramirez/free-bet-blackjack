@@ -21,6 +21,15 @@ export default function App() {
   const [highlightIndex, setHighlightIndex] = useState<number | undefined>(undefined)
   const [highScoreHandled, setHighScoreHandled] = useState(false)
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
+  const [debugSplit, setDebugSplit] = useState(false)
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.shiftKey && e.key === 'D') setDebugSplit(v => !v)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   // When game ends, fetch the leaderboard to check if the score qualifies
   useEffect(() => {
@@ -75,7 +84,8 @@ export default function App() {
     ? game.dealerRevealCount
     : undefined
 
-  const multiHand = game.engine.playerHands.length > 1
+  const multiHand  = game.engine.playerHands.length > 1
+  const isQuadrant = debugSplit || game.engine.playerHands.length >= 3
 
   // Net result across all hands for the round-over summary
   const netCents = game.results.reduce((sum, r) => sum + r.payoutCents, 0)
@@ -106,8 +116,6 @@ export default function App() {
     return cents >= 0 ? s : `-${s}`
   }
   const formatNet = (cents: number) => (cents > 0 ? '+' : '') + fmtDollars(cents)
-  const bannerAmount      = isOver && netCents !== 0 ? formatNet(netCents) : ''
-  const bannerAmountColor = netCents >= 0 ? 'text-emerald-400' : 'text-red-300'
 
   // Dealer total visible only when revealed
   const dealerHand = game.engine.dealer
@@ -199,7 +207,7 @@ export default function App() {
       )}
 
       {/* ── Dealer area ─────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col items-center justify-center py-4 min-h-0">
+      <div className={`flex-1 flex flex-col items-center min-h-0 ${isQuadrant ? 'justify-start pt-[60px]' : 'justify-center py-4'}`}>
         {dealerHand.cards.length > 0 ? (
           <CardHand
             hand={dealerHand}
@@ -217,17 +225,12 @@ export default function App() {
       </div>
 
       {/* ── Divider / Round result banner ───────────────────────── */}
-      <div className="flex-none flex flex-col items-center w-full">
+      <div className={`flex-none flex flex-col items-center w-full ${isQuadrant ? '-mt-[200px] pb-[50px]' : ''}`}>
         {isOver ? (
           <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
             <div className={`text-2xl font-bold font-game tracking-wide ${bannerTitleColor}`}>
               {bannerTitle}
             </div>
-            {bannerAmount && (
-              <div className={`text-sm font-semibold ${bannerAmountColor}`}>
-                {bannerAmount}
-              </div>
-            )}
           </div>
         ) : (
           <>
@@ -243,26 +246,82 @@ export default function App() {
       </div>
 
       {/* ── Player area ─────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col items-center justify-center py-4 min-h-0">
-        {game.engine.playerHands.length > 0 ? (
-          <div className={`flex gap-3 ${multiHand ? 'overflow-x-auto px-4 py-2' : ''}`}>
-            {game.engine.playerHands.map((hand, i) => {
-              const active  = isPlayerTurn && i === game.activeHandIndex
-              const dimmed  = isPlayerTurn && !active
-              return (
+      <div className={`flex-1 flex flex-col items-center min-h-0 w-full ${isQuadrant ? 'justify-start pt-2' : 'justify-center py-4'}`}>
+        {debugSplit ? (
+          <div className="grid grid-cols-2 gap-3 w-full px-4">
+            {[
+              { cards: ['8♠', 'K♦'], betCents: 50000, freeSplit: true,  isSplit: true },
+              { cards: ['8♥', '5♦', '3♣'], betCents: 50000, freeSplit: true,  isSplit: true },
+              { cards: ['8♣', 'J♠'], betCents: 50000, freeSplit: false, isSplit: true },
+              { cards: ['8♦', '7♥', '2♠'], betCents: 50000, freeSplit: true,  isSplit: true },
+            ].map((hand, i) => (
+              <div key={i} className="flex items-start justify-center pt-3">
                 <CardHand
-                  key={i}
                   hand={hand}
-                  label={multiHand ? `Hand ${i + 1}` : 'You'}
-                  isActive={active}
-                  isDimmed={dimmed}
-                  result={isOver ? game.results[i] : undefined}
-                  hasFreeBet={!!(hand.freeSplit || hand.freeDouble)}
-                  visibleCount={playerVisibleCount}
+                  label={`Hand ${i + 1}`}
+                  isSplit
+                  isActive={i === 0}
+                  isDimmed={i !== 0}
+                  hasFreeBet={!!hand.freeSplit}
                 />
-              )
-            })}
+              </div>
+            ))}
           </div>
+        ) : game.engine.playerHands.length > 0 ? (
+          isQuadrant ? (
+            <div className="grid grid-cols-2 gap-3 w-full px-4">
+              {game.engine.playerHands.map((hand, i) => {
+                const active = isPlayerTurn && i === game.activeHandIndex
+                const dimmed = isPlayerTurn && !active
+                return (
+                  <div key={i} className="flex items-start justify-center pt-3">
+                    <CardHand
+                      hand={hand}
+                      label={`Hand ${i + 1}`}
+                      isActive={active}
+                      isDimmed={dimmed}
+                      isSplit
+                      result={isOver ? game.results[i] : undefined}
+                      hasFreeBet={!!(hand.freeSplit || hand.freeDouble)}
+                      visibleCount={playerVisibleCount}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          ) : multiHand ? (
+            <div className="grid grid-cols-2 gap-3 w-full px-4">
+              {game.engine.playerHands.map((hand, i) => {
+                const active = isPlayerTurn && i === game.activeHandIndex
+                const dimmed = isPlayerTurn && !active
+                return (
+                  <div key={i} className="flex items-start justify-center pt-3">
+                    <CardHand
+                      hand={hand}
+                      label={`Hand ${i + 1}`}
+                      isActive={active}
+                      isDimmed={dimmed}
+                      isSplit
+                      result={isOver ? game.results[i] : undefined}
+                      hasFreeBet={!!(hand.freeSplit || hand.freeDouble)}
+                      visibleCount={playerVisibleCount}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <CardHand
+                hand={game.engine.playerHands[0]}
+                label="You"
+                isActive={isPlayerTurn}
+                result={isOver ? game.results[0] : undefined}
+                hasFreeBet={!!(game.engine.playerHands[0].freeSplit || game.engine.playerHands[0].freeDouble)}
+                visibleCount={playerVisibleCount}
+              />
+            </div>
+          )
         ) : null}
       </div>
 

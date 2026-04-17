@@ -8,6 +8,7 @@ type CardHandProps = {
   hideTotal?:     boolean   // hide the total badge (e.g. dealer before reveal)
   isActive?:      boolean   // highlight this hand
   isDimmed?:      boolean   // non-active hand in a split
+  isSplit?:       boolean   // hand is part of a split — stack cards with overlap
   result?:        HandResult
   hasFreeBet?:    boolean    // show free-bet lammer (free split or free double)
   showPushOn22?:  boolean    // treat dealer 22 as push instead of bust
@@ -15,7 +16,7 @@ type CardHandProps = {
 }
 
 export function CardHand({
-  hand, label, hideSecond, hideTotal, isActive, isDimmed, result, hasFreeBet, showPushOn22, visibleCount,
+  hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result, hasFreeBet, showPushOn22, visibleCount,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -43,10 +44,10 @@ export function CardHand({
     : 'bg-stone-700 text-stone-200'
 
   const resultBg = result?.result === 'win'
-    ? 'bg-amber-500 text-amber-950'
+    ? 'bg-black text-emerald-400'
     : result?.result === 'loss'
-    ? 'bg-red-700 text-red-100'
-    : 'bg-stone-500 text-stone-100'
+    ? 'bg-black text-red-400'
+    : 'bg-black text-stone-300'
 
   const formatResult = (r: HandResult) => {
     if (r.result === 'push') return 'PUSH'
@@ -63,52 +64,66 @@ export function CardHand({
     : ''
 
   return (
-    <div className={`flex flex-col items-center gap-2 px-2 ${ringClass}`}>
+    <div className={`flex flex-col items-center gap-2 py-2 ${hasFreeBet ? 'pl-6 pr-[18px]' : 'px-2'} ${ringClass}`}>
       {/* Label */}
       {label && (
         <div className="text-stone-400 text-[10px] uppercase tracking-widest">{label}</div>
       )}
 
-      {/* Free-bet lammer */}
-      {hasFreeBet && (
-        <div className="w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
-          shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center">
-          <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
+      {/* Cards (lammer overlaid on first card) */}
+      {isSplit ? (
+        <div className="relative" style={{ width: 52 + (visibleCards.length - 1) * 20, height: 74 + (visibleCards.length - 1) * 6 }}>
+          {visibleCards.map((c, i) => (
+            <div key={i} className="absolute" style={{ top: i * 6, left: i * 20 }}>
+              <Card card={c} faceDown={hideSecond && i === 1} dimmed={isDimmed} />
+            </div>
+          ))}
+          {hasFreeBet && (
+            <div className="absolute z-10 w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
+              shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
+              style={{ top: 32, left: -16 }}>
+              <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="relative flex gap-1.5 flex-wrap justify-center">
+          {hasFreeBet && (
+            <div className="absolute z-10 w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
+              shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
+              style={{ top: 32, left: -16 }}>
+              <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
+            </div>
+          )}
+          {visibleCards.map((c, i) => (
+            <Card
+              key={i}
+              card={c}
+              faceDown={hideSecond && i === 1}
+              dimmed={isDimmed}
+            />
+          ))}
         </div>
       )}
 
-      {/* Cards */}
-      <div className="flex gap-1.5 flex-wrap justify-center">
-        {visibleCards.map((c, i) => (
-          <Card
-            key={i}
-            card={c}
-            faceDown={hideSecond && i === 1}
-            dimmed={isDimmed}
-          />
-        ))}
+      {/* Total + result badges side by side */}
+      <div className="flex items-center gap-1.5">
+        {showAll && !hideTotal && visibleCards.length > 0 && (
+          <div className={`px-2 py-0.5 rounded text-xs font-bold ${totalBg}`}>
+            {totalLabel}
+          </div>
+        )}
+        {push22 && showAll && !hideTotal && (
+          <div className="px-3 py-1 rounded-full text-xs font-bold bg-stone-500 text-stone-100">
+            PUSH
+          </div>
+        )}
+        {result && (
+          <div className={`px-3 py-1 rounded-full text-xs font-bold ${resultBg}`}>
+            {formatResult(result)}
+          </div>
+        )}
       </div>
-
-      {/* Total badge — only when we can see all cards */}
-      {showAll && !hideTotal && visibleCards.length > 0 && (
-        <div className={`px-2 py-0.5 rounded text-xs font-bold ${totalBg}`}>
-          {totalLabel}
-        </div>
-      )}
-
-      {/* Dealer 22 push badge */}
-      {push22 && showAll && !hideTotal && (
-        <div className="px-3 py-1 rounded-full text-xs font-bold bg-stone-500 text-stone-100">
-          PUSH
-        </div>
-      )}
-
-      {/* Result badge */}
-      {result && (
-        <div className={`px-3 py-1 rounded-full text-xs font-bold ${resultBg}`}>
-          {formatResult(result)}
-        </div>
-      )}
     </div>
   )
 }
