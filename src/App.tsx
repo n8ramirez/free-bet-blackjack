@@ -135,7 +135,7 @@ export default function App() {
         />
       )}
 
-      {/* ── Top bar ─────────────────────────────────────────────── */}
+      {/* ── Top bar + Marquee ───────────────────────────────────── */}
       <div className="flex-none grid grid-cols-3 items-center px-5 py-3 bg-felt-light border-b border-felt-border">
         {/* Left — Bankroll */}
         <div>
@@ -188,6 +188,15 @@ export default function App() {
           )}
         </div>
       </div>
+
+      {/* ── Marquee banner (first load + game over only) ────────── */}
+      {isBetting && (game.lastBetCents === 0 || game.isGameOver) && (
+      <div className="flex-none bg-sky-300 overflow-hidden h-6 flex items-center">
+        <span className="marquee-track text-[10px] font-bold text-sky-950 uppercase tracking-wide px-4">
+          🏆&nbsp; Road to 1 Million Challenge: Cash Prize for 1st Player to Break $1M Peak Bankroll &nbsp;🏆
+        </span>
+      </div>
+      )}
 
       {/* ── Dealer area ─────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col items-center justify-center py-4 min-h-0">
