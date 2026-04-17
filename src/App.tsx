@@ -207,7 +207,7 @@ export default function App() {
       )}
 
       {/* ── Dealer area ─────────────────────────────────────────── */}
-      <div className={`flex-1 flex flex-col items-center min-h-0 ${isQuadrant ? 'justify-start pt-[20px]' : 'justify-center py-4'}`}>
+      <div className={`flex-1 flex flex-col items-center min-h-0 ${isQuadrant ? 'justify-start pt-[6px]' : 'justify-center py-4'}`}>
         {dealerHand.cards.length > 0 ? (
           <CardHand
             hand={dealerHand}
@@ -255,7 +255,7 @@ export default function App() {
               { cards: ['8♣', 'J♠'], betCents: 50000, freeSplit: false, isSplit: true },
               { cards: ['8♦', '7♥', '2♠'], betCents: 50000, freeSplit: true,  isSplit: true },
             ].map((hand, i) => (
-              <div key={i} className="flex items-start justify-center pt-3">
+              <div key={i} className={`flex items-start justify-center pt-3 ${i >= 2 ? '-mt-[20px]' : ''}`}>
                 <CardHand
                   hand={hand}
                   label={`Hand ${i + 1}`}
@@ -274,7 +274,7 @@ export default function App() {
                 const active = isPlayerTurn && i === game.activeHandIndex
                 const dimmed = isPlayerTurn && !active
                 return (
-                  <div key={i} className="flex items-start justify-center pt-3">
+                  <div key={i} className={`flex items-start justify-center pt-3 ${i >= 2 ? '-mt-[20px]' : ''}`}>
                     <CardHand
                       hand={hand}
                       label={`Hand ${i + 1}`}
