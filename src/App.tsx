@@ -193,7 +193,7 @@ export default function App() {
       {isBetting && (game.lastBetCents === 0 || game.isGameOver) && (
       <div className="flex-none bg-sky-300 overflow-hidden h-6 flex items-center">
         <span className="marquee-track text-[10px] font-bold text-sky-950 uppercase tracking-wide px-4">
-          🏆&nbsp; Road to 1 Million Challenge: Cash Prize for 1st Player to Break $1M Peak Bankroll &nbsp;🏆
+          🏆&nbsp; Road to 1 Million Challenge: $50 Cash Prize for 1st Player to Break $1M Peak Bankroll &nbsp;🏆
         </span>
       </div>
       )}
