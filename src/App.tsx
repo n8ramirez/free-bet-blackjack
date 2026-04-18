@@ -253,15 +253,18 @@ export default function App() {
                 ${game.potOfGoldResult.payoutCents > 0 ? 'bg-amber-900/60' : 'bg-black/50'}`}>
                 <PotOfGoldIcon className="w-4 h-4 flex-shrink-0" />
                 <span className="text-[11px] font-bold uppercase tracking-wide text-amber-300">Pot of Gold</span>
-                <span className={`text-[11px] font-bold ${game.potOfGoldResult.payoutCents > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {game.potOfGoldResult.dealerBJ
-                    ? 'Dealer BJ — Loss'
-                    : game.potOfGoldResult.pucks === 0
-                    ? 'No Lammers — Loss'
-                    : game.potOfGoldResult.payoutCents > 0
-                    ? `+$${(game.potOfGoldResult.payoutCents / 100).toLocaleString()} (${game.potOfGoldResult.pucks} lammer${game.potOfGoldResult.pucks !== 1 ? 's' : ''})`
-                    : `-$${(Math.abs(game.potOfGoldResult.payoutCents) / 100).toLocaleString()}`}
-                </span>
+                {game.potOfGoldResult.payoutCents > 0 ? (
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: game.potOfGoldResult.pucks }).map((_, i) => (
+                      <div key={i} className="w-4 h-4 rounded-full bg-amber-400 border border-yellow-200
+                        shadow-[0_1px_3px_rgba(0,0,0,0.5)] flex items-center justify-center">
+                        <span className="text-[5px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
               </div>
             )}
           </>
@@ -444,15 +447,13 @@ export default function App() {
               <div className="flex items-center gap-1.5">
                 <PotOfGoldIcon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Pot of Gold</span>
-                <span className={`text-xs font-bold ${game.potOfGoldResult.payoutCents > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {game.potOfGoldResult.dealerBJ
-                    ? 'Dealer BJ'
-                    : game.potOfGoldResult.pucks === 0
-                    ? 'No Lammers'
-                    : game.potOfGoldResult.payoutCents > 0
-                    ? `+$${(game.potOfGoldResult.payoutCents / 100).toLocaleString()} (${game.potOfGoldResult.pucks} lammer${game.potOfGoldResult.pucks !== 1 ? 's' : ''})`
-                    : `-$${(Math.abs(game.potOfGoldResult.payoutCents) / 100).toLocaleString()}`}
-                </span>
+                {game.potOfGoldResult.payoutCents > 0 ? (
+                  <span className="text-xs font-bold text-emerald-400">
+                    +${(game.potOfGoldResult.payoutCents / 100).toLocaleString()}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-red-400">Lose</span>
+                )}
               </div>
             )}
             {/* Dealer total */}
