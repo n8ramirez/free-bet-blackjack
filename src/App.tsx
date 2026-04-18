@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
+import { SideBetPanel, PotOfGoldIcon } from './components/SideBetPanel'
+import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
 import { LeaderboardModal } from './components/LeaderboardModal'
@@ -22,6 +24,7 @@ export default function App() {
   const [highScoreHandled, setHighScoreHandled] = useState(false)
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
   const [debugSplit, setDebugSplit] = useState(false)
+  const [showSideBetInfo, setShowSideBetInfo] = useState(false)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -134,6 +137,7 @@ export default function App() {
           onClose={() => { setShowLeaderboard(false); setHighlightIndex(undefined) }}
         />
       )}
+      {showSideBetInfo && <SideBetInfoModal onClose={() => setShowSideBetInfo(false)} />}
       {showHighScoreEntry && qualifyingRank !== null && (
         <HighScoreModal
           peakBankrollCents={game.peakBankrollCents}
@@ -184,7 +188,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Right — Bet (always rendered to hold the column width) */}
+        {/* Right — Bet + POG indicator */}
         <div className="text-right">
           {(isDealing || isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
             <>
@@ -192,6 +196,17 @@ export default function App() {
               <div className="text-amber-400 font-bold text-xl font-game">
                 ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
               </div>
+              {game.lastPotOfGoldBetCents > 0 && (
+                <div className="flex items-center justify-end gap-1 mt-1">
+                  <PotOfGoldIcon className="w-4 h-4" />
+                  <span className="text-amber-400 text-[10px] font-bold font-game">
+                    ${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
+                  </span>
+                  {game.currentPuckCount > 0 && (
+                    <span className="text-amber-300 text-[10px]">· {game.currentPuckCount} lammer{game.currentPuckCount !== 1 ? 's' : ''}</span>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -227,11 +242,29 @@ export default function App() {
       {/* ── Divider / Round result banner ───────────────────────── */}
       <div className={`relative flex-none flex flex-col items-center w-full ${isOver ? 'z-20' : 'z-10'} ${isQuadrant ? '-mt-[240px] pb-[32px]' : ''}`}>
         {isOver ? (
-          <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
-            <div className={`text-2xl font-bold font-game tracking-wide ${bannerTitleColor}`}>
-              {bannerTitle}
+          <>
+            <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
+              <div className={`text-2xl font-bold font-game tracking-wide ${bannerTitleColor}`}>
+                {bannerTitle}
+              </div>
             </div>
-          </div>
+            {game.potOfGoldResult && (
+              <div className={`w-full py-1.5 flex items-center justify-center gap-2
+                ${game.potOfGoldResult.payoutCents > 0 ? 'bg-amber-900/60' : 'bg-black/50'}`}>
+                <PotOfGoldIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-amber-300">Pot of Gold</span>
+                <span className={`text-[11px] font-bold ${game.potOfGoldResult.payoutCents > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {game.potOfGoldResult.dealerBJ
+                    ? 'Dealer BJ — Loss'
+                    : game.potOfGoldResult.pucks === 0
+                    ? 'No Lammers — Loss'
+                    : game.potOfGoldResult.payoutCents > 0
+                    ? `+$${(game.potOfGoldResult.payoutCents / 100).toLocaleString()} (${game.potOfGoldResult.pucks} lammer${game.potOfGoldResult.pucks !== 1 ? 's' : ''})`
+                    : `-$${(Math.abs(game.potOfGoldResult.payoutCents) / 100).toLocaleString()}`}
+                </span>
+              </div>
+            )}
+          </>
         ) : (
           <>
             <div className="text-stone-400 text-[9px] uppercase tracking-widest pb-1">
@@ -330,19 +363,33 @@ export default function App() {
       </div>
 
       {/* ── Bottom panel ────────────────────────────────────────── */}
-      <div className="flex-none bg-stone-900 rounded-t-2xl shadow-[0_-6px_24px_rgba(0,0,0,0.6)]">
+      <div className={`relative flex-none bg-stone-900 rounded-t-2xl shadow-[0_-6px_24px_rgba(0,0,0,0.6)] ${game.sideBetPanelOpen ? 'z-30' : ''}`}>
+
+        {/* Side bet drawer — slides up from behind BetPanel */}
+        <SideBetPanel
+          isOpen={game.sideBetPanelOpen}
+          potOfGoldBetCents={game.potOfGoldBetCents}
+        />
 
         {/* Betting phase */}
         {isBetting && !game.isGameOver && (
-          <BetPanel
-            bankrollCents={game.bankrollCents}
-            pendingBetCents={game.pendingBetCents}
-            lastBetCents={game.lastBetCents}
-            onAddChip={game.addChip}
-            onClearBet={game.clearBet}
-            onReBet={game.reBet}
-            onDeal={game.deal}
-          />
+          <div className="relative z-10 bg-stone-900 rounded-t-2xl">
+            <BetPanel
+              bankrollCents={game.bankrollCents}
+              pendingBetCents={game.pendingBetCents}
+              potOfGoldBetCents={game.potOfGoldBetCents}
+              lastBetCents={game.lastBetCents}
+              lastPotOfGoldBetCents={game.lastPotOfGoldBetCents}
+              sideBetPanelOpen={game.sideBetPanelOpen}
+              onAddChip={game.addChip}
+              onClearBet={game.clearBet}
+              onReBet={game.reBet}
+              onReBetWithSideBets={game.reBetWithSideBets}
+              onDeal={game.deal}
+              onToggleSideBetPanel={game.toggleSideBetPanel}
+              onShowInfo={() => setShowSideBetInfo(true)}
+            />
+          </div>
         )}
 
         {/* Game over */}
@@ -368,18 +415,20 @@ export default function App() {
 
         {/* Player-turn phase */}
         {isPlayerTurn && !game.pendingDealerTurn && (
-          <ActionBar
-            canHit={true}
-            canStand={true}
-            canDouble={game.canDoubleNow}
-            canSplit={game.canSplitNow}
-            isFreeDouble={game.isFreeDouble}
-            isFreeSplit={game.isFreeSplit}
-            onHit={game.hit}
-            onStand={game.stand}
-            onDouble={game.double}
-            onSplit={game.split}
-          />
+          <div className="relative z-10">
+            <ActionBar
+              canHit={true}
+              canStand={true}
+              canDouble={game.canDoubleNow}
+              canSplit={game.canSplitNow}
+              isFreeDouble={game.isFreeDouble}
+              isFreeSplit={game.isFreeSplit}
+              onHit={game.hit}
+              onStand={game.stand}
+              onDouble={game.double}
+              onSplit={game.split}
+            />
+          </div>
         )}
 
         {/* Round-over phase */}
@@ -390,6 +439,22 @@ export default function App() {
               ${netCents > 0 ? 'text-amber-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
+            {/* POG result line */}
+            {game.potOfGoldResult && (
+              <div className="flex items-center gap-1.5">
+                <PotOfGoldIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Pot of Gold</span>
+                <span className={`text-xs font-bold ${game.potOfGoldResult.payoutCents > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {game.potOfGoldResult.dealerBJ
+                    ? 'Dealer BJ'
+                    : game.potOfGoldResult.pucks === 0
+                    ? 'No Lammers'
+                    : game.potOfGoldResult.payoutCents > 0
+                    ? `+$${(game.potOfGoldResult.payoutCents / 100).toLocaleString()} (${game.potOfGoldResult.pucks} lammer${game.potOfGoldResult.pucks !== 1 ? 's' : ''})`
+                    : `-$${(Math.abs(game.potOfGoldResult.payoutCents) / 100).toLocaleString()}`}
+                </span>
+              </div>
+            )}
             {/* Dealer total */}
             {dealerTotalVisible && (
               <div className="text-stone-400 text-sm">
