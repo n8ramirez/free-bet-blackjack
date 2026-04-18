@@ -202,9 +202,6 @@ export default function App() {
                   <span className="text-amber-400 text-[10px] font-bold font-game">
                     ${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
                   </span>
-                  {game.currentPuckCount > 0 && (
-                    <span className="text-amber-300 text-[10px]">· {game.currentPuckCount} lammer{game.currentPuckCount !== 1 ? 's' : ''}</span>
-                  )}
                 </div>
               )}
             </>
