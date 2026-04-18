@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 32px 20px rgba(251,191,36,0.5); }
-  50%       { box-shadow: 0 0 28px 17px rgba(251,191,36,0.38); }
+  0%, 100% { box-shadow: 0 0 32px 20px rgba(56,189,248,0.6); }
+  50%       { box-shadow: 0 0 28px 17px rgba(56,189,248,0.45); }
 }
 
 .glow-pulse {
