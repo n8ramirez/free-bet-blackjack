@@ -60,19 +60,21 @@ export function CardHand({
   }
 
   const ringClass = isActive
-    ? 'ring-2 ring-sky-300 ring-offset-2 ring-offset-felt rounded-xl'
+    ? 'ring-2 ring-transparent ring-offset-2 ring-offset-felt rounded-xl'
     : ''
+
 
   return (
     <div className={`flex flex-col items-center gap-2 py-2 ${hasFreeBet ? 'pl-6 pr-[18px]' : 'px-2'} ${ringClass}`}>
       {/* Label */}
       {label && (
-        <div className="text-stone-400 text-[10px] uppercase tracking-widest">{label}</div>
+        <div className="relative z-10 text-stone-400 text-[10px] uppercase tracking-widest">{label}</div>
       )}
 
       {/* Cards (lammer overlaid on first card) */}
       {isSplit ? (
         <div className="relative" style={{ width: 52 + (visibleCards.length - 1) * 20, height: 74 + (visibleCards.length - 1) * 6 }}>
+          {isActive && isSplit && <div className="glow-pulse absolute rounded-full w-12 h-12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
           {visibleCards.map((c, i) => (
             <div key={i} className="absolute" style={{ top: i * 6, left: i * 20 }}>
               <Card card={c} faceDown={hideSecond && i === 1} dimmed={isDimmed} />
@@ -88,6 +90,7 @@ export function CardHand({
         </div>
       ) : (
         <div className="relative flex gap-1.5 flex-wrap justify-center">
+          {isActive && isSplit && <div className="glow-pulse absolute rounded-full w-12 h-12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
           {hasFreeBet && (
             <div className="absolute z-10 w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
               shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
@@ -107,7 +110,7 @@ export function CardHand({
       )}
 
       {/* Total + result badges side by side */}
-      <div className="flex items-center gap-1.5">
+      <div className="relative z-10 flex items-center gap-1.5">
         {showAll && !hideTotal && visibleCards.length > 0 && (
           <div className={`px-2 py-0.5 rounded text-xs font-bold ${totalBg}`}>
             {totalLabel}
