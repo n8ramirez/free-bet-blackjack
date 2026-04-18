@@ -250,10 +250,10 @@ export default function App() {
         {debugSplit ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
             {[
-              { cards: ['8♠', 'K♦'], betCents: 50000, freeSplit: true,  isSplit: true },
-              { cards: ['8♥', '5♦', '3♣'], betCents: 50000, freeSplit: true,  isSplit: true },
-              { cards: ['8♣', 'J♠'], betCents: 50000, freeSplit: false, isSplit: true },
-              { cards: ['8♦', '7♥', '2♠'], betCents: 50000, freeSplit: true,  isSplit: true },
+              { cards: ['8♠', 'K♦'],        betCents: 50000, freeSplit: true,  doubled: false, freeDouble: false, isSplit: true },
+              { cards: ['8♥', '5♦', '3♣'],  betCents: 50000, freeSplit: true,  doubled: true,  freeDouble: true,  isSplit: true },
+              { cards: ['8♣', 'J♠'],         betCents: 50000, freeSplit: false, doubled: false, freeDouble: false, isSplit: true },
+              { cards: ['8♦', '7♥', '2♠'],   betCents: 50000, freeSplit: true,  doubled: false, freeDouble: false, isSplit: true },
             ].map((hand, i) => (
               <div key={i} className={`flex items-start justify-center pt-3 ${i >= 2 ? '-mt-[20px]' : ''}`}>
                 <CardHand
@@ -262,7 +262,8 @@ export default function App() {
                   isSplit
                   isActive={i === 0}
                   isDimmed={i !== 0}
-                  hasFreeBet={!!hand.freeSplit}
+                  hasFreeSplit={!!hand.freeSplit}
+                  hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                 />
               </div>
             ))}
@@ -282,7 +283,8 @@ export default function App() {
                       isDimmed={dimmed}
                       isSplit
                       result={isOver ? game.results[i] : undefined}
-                      hasFreeBet={!!(hand.freeSplit || hand.freeDouble)}
+                      hasFreeSplit={!!hand.freeSplit}
+                      hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                       visibleCount={playerVisibleCount}
                     />
                   </div>
@@ -303,7 +305,8 @@ export default function App() {
                       isDimmed={dimmed}
                       isSplit
                       result={isOver ? game.results[i] : undefined}
-                      hasFreeBet={!!(hand.freeSplit || hand.freeDouble)}
+                      hasFreeSplit={!!hand.freeSplit}
+                      hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                       visibleCount={playerVisibleCount}
                     />
                   </div>
@@ -317,7 +320,8 @@ export default function App() {
                 label="You"
                 isActive={isPlayerTurn}
                 result={isOver ? game.results[0] : undefined}
-                hasFreeBet={!!(game.engine.playerHands[0].freeSplit || game.engine.playerHands[0].freeDouble)}
+                hasFreeSplit={!!game.engine.playerHands[0].freeSplit}
+                hasFreeDouble={!!(game.engine.playerHands[0].doubled && game.engine.playerHands[0].freeDouble)}
                 visibleCount={playerVisibleCount}
               />
             </div>

@@ -4,19 +4,31 @@ import { Hand, HandResult, handTotals, isBlackjack } from '../engine'
 type CardHandProps = {
   hand:           Hand
   label?:         string
-  hideSecond?:    boolean   // hide dealer hole card during player turn
-  hideTotal?:     boolean   // hide the total badge (e.g. dealer before reveal)
-  isActive?:      boolean   // highlight this hand
-  isDimmed?:      boolean   // non-active hand in a split
-  isSplit?:       boolean   // hand is part of a split — stack cards with overlap
+  hideSecond?:    boolean
+  hideTotal?:     boolean
+  isActive?:      boolean
+  isDimmed?:      boolean
+  isSplit?:       boolean
   result?:        HandResult
-  hasFreeBet?:    boolean    // show free-bet lammer (free split or free double)
-  showPushOn22?:  boolean    // treat dealer 22 as push instead of bust
-  visibleCount?:  number     // how many cards to show (for deal animation)
+  hasFreeSplit?:  boolean
+  hasFreeDouble?: boolean
+  showPushOn22?:  boolean
+  visibleCount?:  number
 }
 
+const Puck = ({ top, left = -16, zIndex = 10 }: { top: number; left?: number; zIndex?: number }) => (
+  <div
+    className="absolute w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
+      shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
+    style={{ top, left, zIndex }}
+  >
+    <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
+  </div>
+)
+
 export function CardHand({
-  hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result, hasFreeBet, showPushOn22, visibleCount,
+  hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result,
+  hasFreeSplit, hasFreeDouble, showPushOn22, visibleCount,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -24,6 +36,7 @@ export function CardHand({
   const bust     = total > 21
   const push22   = showPushOn22 && total === 22
   const showAll  = !hideSecond
+  const hasAnyFreeBet = hasFreeSplit || hasFreeDouble
 
   const totalLabel = bj
     ? 'BLACKJACK'
@@ -63,9 +76,17 @@ export function CardHand({
     ? 'ring-2 ring-transparent ring-offset-2 ring-offset-felt rounded-xl'
     : ''
 
+  const pucks = (
+    <>
+      {hasFreeSplit && hasFreeDouble && <Puck top={27} left={-16} zIndex={10} />}
+      {hasFreeSplit && hasFreeDouble && <Puck top={37} left={-8} zIndex={11} />}
+      {hasFreeSplit && !hasFreeDouble && <Puck top={32} />}
+      {hasFreeDouble && !hasFreeSplit && <Puck top={32} />}
+    </>
+  )
 
   return (
-    <div className={`flex flex-col items-center gap-2 py-2 ${hasFreeBet ? 'pl-6 pr-[18px]' : 'px-2'} ${ringClass}`}>
+    <div className={`flex flex-col items-center gap-2 py-2 ${hasAnyFreeBet ? 'pl-6 pr-[18px]' : 'px-2'} ${ringClass}`}>
       {/* Label */}
       {label && (
         <div className="relative z-10 text-stone-400 text-[10px] uppercase tracking-widest">{label}</div>
@@ -80,24 +101,12 @@ export function CardHand({
               <Card card={c} faceDown={hideSecond && i === 1} dimmed={isDimmed} />
             </div>
           ))}
-          {hasFreeBet && (
-            <div className="absolute z-10 w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
-              shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
-              style={{ top: 32, left: -16 }}>
-              <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
-            </div>
-          )}
+          {pucks}
         </div>
       ) : (
         <div className="relative flex gap-1.5 flex-wrap justify-center">
           {isActive && isSplit && <div className="glow-pulse absolute rounded-full w-12 h-12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
-          {hasFreeBet && (
-            <div className="absolute z-10 w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
-              shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
-              style={{ top: 32, left: -16 }}>
-              <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
-            </div>
-          )}
+          {pucks}
           {visibleCards.map((c, i) => (
             <Card
               key={i}
