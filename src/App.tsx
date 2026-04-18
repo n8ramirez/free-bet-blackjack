@@ -449,7 +449,9 @@ export default function App() {
                     +${(game.potOfGoldResult.payoutCents / 100).toLocaleString()}
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-red-400">Lose</span>
+                  <span className="text-xs font-bold text-red-400">
+                    -${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
+                  </span>
                 )}
               </div>
             )}
