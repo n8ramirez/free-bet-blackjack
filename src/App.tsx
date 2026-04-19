@@ -152,7 +152,7 @@ export default function App() {
         {/* Left — Bankroll */}
         <div>
           <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
-          <div className="text-white font-bold text-xl font-game">
+          <div className="text-white font-bold text-base font-game">
             ${(game.bankrollCents / 100).toLocaleString()}
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function App() {
           {(isDealing || isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
             <>
               <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
-              <div className="text-amber-400 font-bold text-xl font-game">
+              <div className="text-amber-400 font-bold text-base font-game">
                 ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
               </div>
               {game.lastPotOfGoldBetCents > 0 && (
