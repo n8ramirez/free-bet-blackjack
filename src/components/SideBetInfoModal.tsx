@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { POG_PAYOUTS } from '../hooks/useGameState'
-import { PotOfGoldIcon } from './SideBetPanel'
+import { POG_PAYOUTS, PUSH22_PAYOUT } from '../hooks/useGameState'
+import { PotOfGoldIcon, Push22Icon } from './SideBetPanel'
 
-type Tab = 'pot-of-gold' | 'coming-soon-1' | 'coming-soon-2'
+type Tab = 'pot-of-gold' | 'push-22' | 'coming-soon'
 
 type Props = { onClose: () => void }
 
@@ -45,18 +45,18 @@ export function SideBetInfoModal({ onClose }: Props) {
             Pot of Gold
           </button>
           <button
-            onClick={() => setTab('coming-soon-1')}
+            onClick={() => setTab('push-22')}
             className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
-              ${tab === 'coming-soon-1'
-                ? 'text-stone-300 border-b-2 border-stone-400 -mb-px'
-                : 'text-stone-500 hover:text-stone-400'}`}
+              ${tab === 'push-22'
+                ? 'text-sky-400 border-b-2 border-sky-400 -mb-px'
+                : 'text-stone-500 hover:text-stone-300'}`}
           >
-            Coming Soon
+            Push 22
           </button>
           <button
-            onClick={() => setTab('coming-soon-2')}
+            onClick={() => setTab('coming-soon')}
             className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
-              ${tab === 'coming-soon-2'
+              ${tab === 'coming-soon'
                 ? 'text-stone-300 border-b-2 border-stone-400 -mb-px'
                 : 'text-stone-500 hover:text-stone-400'}`}
           >
@@ -67,7 +67,8 @@ export function SideBetInfoModal({ onClose }: Props) {
         {/* Content */}
         <div className="px-5 py-4">
           {tab === 'pot-of-gold' && <PotOfGoldInfo />}
-          {(tab === 'coming-soon-1' || tab === 'coming-soon-2') && <ComingSoon />}
+          {tab === 'push-22'     && <Push22Info />}
+          {tab === 'coming-soon' && <ComingSoon />}
         </div>
       </div>
     </div>
@@ -122,6 +123,48 @@ function PotOfGoldInfo() {
       <Section title="Losing conditions">
         <Rule>No gold lammers collected — wager is lost.</Rule>
         <Rule>Dealer blackjack — All Pot of Gold wagers lose to a dealer blackjack.</Rule>
+      </Section>
+    </div>
+  )
+}
+
+function Push22Info() {
+  return (
+    <div className="flex flex-col gap-4 text-sm">
+      <div className="flex items-center gap-2">
+        <Push22Icon className="w-8 h-8 flex-shrink-0" />
+        <p className="text-stone-300">
+          Bet on the dealer busting with exactly <span className="text-sky-400 font-semibold">22</span>.
+          If the dealer's final total is 22, you win — regardless of your main hand result.
+        </p>
+      </div>
+
+      <Section title="Payout table">
+        <div className="mt-1 rounded-xl overflow-hidden border border-stone-700">
+          <div className="grid grid-cols-2 bg-stone-800 px-3 py-1.5">
+            <span className="text-stone-500 text-[9px] uppercase tracking-widest">Dealer Total</span>
+            <span className="text-stone-500 text-[9px] uppercase tracking-widest text-right">Pays</span>
+          </div>
+          <div className="grid grid-cols-2 px-3 py-2 bg-stone-900">
+            <span className="text-sky-400 font-bold">22</span>
+            <span className="text-stone-200 font-semibold text-right">{PUSH22_PAYOUT} : 1</span>
+          </div>
+          <div className="grid grid-cols-2 px-3 py-2 bg-stone-800/50">
+            <span className="text-stone-400 font-bold">All others</span>
+            <span className="text-stone-400 font-semibold text-right">Lose</span>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Winning conditions">
+        <Rule>Dealer's final total is exactly <span className="text-sky-400 font-semibold">22</span> — side bet pays {PUSH22_PAYOUT} to 1.</Rule>
+        <Rule>Pays out even if your main hand busted.</Rule>
+      </Section>
+
+      <Section title="Losing conditions">
+        <Rule>Dealer finishes with any total other than 22.</Rule>
+        <Rule>Dealer blackjack (21) — side bet loses.</Rule>
+        <Rule>Dealer busts with 23 or more — side bet loses.</Rule>
       </Section>
     </div>
   )

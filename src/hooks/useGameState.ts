@@ -34,12 +34,18 @@ export const POG_PAYOUTS: Record<number, number> = {
   1: 3, 2: 10, 3: 30, 4: 60, 5: 100, 6: 299, 7: 1000,
 }
 
-export type SideBetType = 'pot-of-gold'
+export const PUSH22_PAYOUT = 11
+
+export type SideBetType = 'pot-of-gold' | 'push-22'
 
 export type PotOfGoldResult = {
   pucks:       number
   payoutCents: number
   dealerBJ:    boolean
+}
+
+export type Push22Result = {
+  payoutCents: number
 }
 
 function countPucks(hands: Hand[]): number {
@@ -102,6 +108,9 @@ export type UIState = {
   potOfGoldBetCents:     number
   lastPotOfGoldBetCents: number
   potOfGoldResult:       PotOfGoldResult | null
+  push22BetCents:        number
+  lastPush22BetCents:    number
+  push22Result:          Push22Result | null
 }
 
 function initial(): UIState {
@@ -124,6 +133,9 @@ function initial(): UIState {
     potOfGoldBetCents:     0,
     lastPotOfGoldBetCents: 0,
     potOfGoldResult:       null,
+    push22BetCents:        0,
+    lastPush22BetCents:    0,
+    push22Result:          null,
   }
 }
 
@@ -164,6 +176,16 @@ function finishFromDealerTurn(base: UIState): UIState {
     potOfGoldResult = { pucks, payoutCents, dealerBJ }
   }
 
+  // Push 22 resolution — dealer ends on exactly 22 → 11:1 payout
+  let push22Result: Push22Result | null = null
+  if (base.push22BetCents > 0) {
+    const dealerTotal = handTotals(engine.dealer.cards).total
+    const win = dealerTotal === 22
+    const payoutCents = win ? base.push22BetCents * PUSH22_PAYOUT : -base.push22BetCents
+    bankroll += base.push22BetCents + payoutCents
+    push22Result = { payoutCents }
+  }
+
   return {
     ...base,
     phase:             'round-over',
@@ -172,6 +194,7 @@ function finishFromDealerTurn(base: UIState): UIState {
     results,
     dealerRevealed:    true,
     potOfGoldResult,
+    push22Result,
   }
 }
 
@@ -258,12 +281,15 @@ export function useGameState() {
     setState(s => {
       if (s.phase !== 'betting') return s
       if (s.sideBetPanelOpen) {
-        const next = s.potOfGoldBetCents + cents
-        if (s.pendingBetCents + next > s.bankrollCents) return s
-        return { ...s, potOfGoldBetCents: next }
+        const totalOther = s.pendingBetCents
+          + (s.selectedSideBet === 'push-22' ? s.potOfGoldBetCents : s.push22BetCents)
+        const currentSide = s.selectedSideBet === 'push-22' ? s.push22BetCents : s.potOfGoldBetCents
+        if (totalOther + currentSide + cents > s.bankrollCents) return s
+        if (s.selectedSideBet === 'push-22') return { ...s, push22BetCents: s.push22BetCents + cents }
+        return { ...s, potOfGoldBetCents: s.potOfGoldBetCents + cents }
       }
       const next = s.pendingBetCents + cents
-      if (s.potOfGoldBetCents + next > s.bankrollCents) return s
+      if (s.potOfGoldBetCents + s.push22BetCents + next > s.bankrollCents) return s
       return { ...s, pendingBetCents: next }
     })
   }, [])
@@ -271,7 +297,10 @@ export function useGameState() {
   const clearBet = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting') return s
-      if (s.sideBetPanelOpen) return { ...s, potOfGoldBetCents: 0 }
+      if (s.sideBetPanelOpen) {
+        if (s.selectedSideBet === 'push-22') return { ...s, push22BetCents: 0 }
+        return { ...s, potOfGoldBetCents: 0 }
+      }
       return { ...s, pendingBetCents: 0 }
     })
   }, [])
@@ -287,10 +316,16 @@ export function useGameState() {
   const reBetWithSideBets = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting' || s.lastBetCents === 0) return s
-      const bet    = Math.min(s.lastBetCents, s.bankrollCents)
-      const pogBet = Math.min(s.lastPotOfGoldBetCents, Math.max(0, s.bankrollCents - bet))
-      return { ...s, pendingBetCents: bet, potOfGoldBetCents: pogBet }
+      const bet      = Math.min(s.lastBetCents, s.bankrollCents)
+      const remaining = Math.max(0, s.bankrollCents - bet)
+      const pogBet   = Math.min(s.lastPotOfGoldBetCents, remaining)
+      const p22Bet   = Math.min(s.lastPush22BetCents, Math.max(0, remaining - pogBet))
+      return { ...s, pendingBetCents: bet, potOfGoldBetCents: pogBet, push22BetCents: p22Bet }
     })
+  }, [])
+
+  const selectSideBet = useCallback((type: SideBetType) => {
+    setState(s => ({ ...s, selectedSideBet: type }))
   }, [])
 
   const toggleSideBetPanel = useCallback(() => {
@@ -301,7 +336,7 @@ export function useGameState() {
     setState(s => {
       if (s.phase !== 'betting') return s
       if (s.pendingBetCents < MIN_BET) return s
-      if (s.pendingBetCents + s.potOfGoldBetCents > s.bankrollCents) return s
+      if (s.pendingBetCents + s.potOfGoldBetCents + s.push22BetCents > s.bankrollCents) return s
       const shoe = s.engine.shoe.length < 52 ? createGameState().shoe : [...s.engine.shoe]
       const engine: GameState = { shoe, playerHands: [], dealer: { cards: [], betCents: 0 } }
       dealInitial(engine, s.pendingBetCents)
@@ -309,16 +344,18 @@ export function useGameState() {
         ...s,
         phase:                 'dealing',
         engine,
-        bankrollCents:         s.bankrollCents - s.pendingBetCents - s.potOfGoldBetCents,
+        bankrollCents:         s.bankrollCents - s.pendingBetCents - s.potOfGoldBetCents - s.push22BetCents,
         pendingBetCents:       0,
         lastBetCents:          s.pendingBetCents,
         lastPotOfGoldBetCents: s.potOfGoldBetCents,
+        lastPush22BetCents:    s.push22BetCents,
         activeHandIndex:       0,
         results:               [],
         dealerRevealed:        false,
         revealCount:           0,
         sideBetPanelOpen:      false,
         potOfGoldResult:       null,
+        push22Result:          null,
       }
     })
   }, [])
@@ -389,7 +426,9 @@ export function useGameState() {
         peakBankrollCents:     s.peakBankrollCents,
         lastBetCents:          s.lastBetCents,
         lastPotOfGoldBetCents: s.lastPotOfGoldBetCents,
+        lastPush22BetCents:    s.lastPush22BetCents,
         sideBetPanelOpen:      s.sideBetPanelOpen,
+        selectedSideBet:       s.selectedSideBet,
       }
     })
   }, [])
@@ -428,7 +467,7 @@ export function useGameState() {
     isGameOver:      state.phase === 'betting' && state.bankrollCents < Math.min(...CHIPS),
     pendingDealerTurn,
     currentPuckCount,
-    addChip, clearBet, reBet, reBetWithSideBets, toggleSideBetPanel,
+    addChip, clearBet, reBet, reBetWithSideBets, selectSideBet, toggleSideBetPanel,
     deal, hit, stand, double, split, newHand, resetGame,
   }
 }

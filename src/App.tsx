@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
-import { SideBetPanel, PotOfGoldIcon } from './components/SideBetPanel'
+import { SideBetPanel, PotOfGoldIcon, Push22Icon } from './components/SideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
@@ -204,6 +204,14 @@ export default function App() {
                   </span>
                 </div>
               )}
+              {game.lastPush22BetCents > 0 && (
+                <div className="flex items-center justify-end gap-1 mt-1">
+                  <Push22Icon className="w-4 h-4" />
+                  <span className="text-sky-400 text-[10px] font-bold font-game">
+                    ${(game.lastPush22BetCents / 100).toLocaleString()}
+                  </span>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -251,14 +259,19 @@ export default function App() {
                 <PotOfGoldIcon className="w-4 h-4 flex-shrink-0" />
                 <span className="text-[11px] font-bold uppercase tracking-wide text-amber-300">Pot of Gold</span>
                 {game.potOfGoldResult.payoutCents > 0 ? (
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: game.potOfGoldResult.pucks }).map((_, i) => (
-                      <div key={i} className="w-4 h-4 rounded-full bg-amber-400 border border-yellow-200
-                        shadow-[0_1px_3px_rgba(0,0,0,0.5)] flex items-center justify-center">
-                        <span className="text-[5px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
-                      </div>
-                    ))}
-                  </div>
+                  <span className="text-[11px] font-bold text-emerald-400">Win</span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
+            )}
+            {game.push22Result && (
+              <div className={`w-full py-1.5 flex items-center justify-center gap-2
+                ${game.push22Result.payoutCents > 0 ? 'bg-sky-900/60' : 'bg-black/50'}`}>
+                <Push22Icon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-sky-300">Push 22</span>
+                {game.push22Result.payoutCents > 0 ? (
+                  <span className="text-[11px] font-bold text-emerald-400">Win</span>
                 ) : (
                   <span className="text-[11px] font-bold text-red-400">Lose</span>
                 )}
@@ -368,7 +381,10 @@ export default function App() {
         {/* Side bet drawer — slides up from behind BetPanel */}
         <SideBetPanel
           isOpen={game.sideBetPanelOpen}
+          selectedSideBet={game.selectedSideBet}
           potOfGoldBetCents={game.potOfGoldBetCents}
+          push22BetCents={game.push22BetCents}
+          onSelectSideBet={game.selectSideBet}
         />
 
         {/* Betting phase */}
@@ -378,8 +394,10 @@ export default function App() {
               bankrollCents={game.bankrollCents}
               pendingBetCents={game.pendingBetCents}
               potOfGoldBetCents={game.potOfGoldBetCents}
+              push22BetCents={game.push22BetCents}
               lastBetCents={game.lastBetCents}
               lastPotOfGoldBetCents={game.lastPotOfGoldBetCents}
+              lastPush22BetCents={game.lastPush22BetCents}
               sideBetPanelOpen={game.sideBetPanelOpen}
               onAddChip={game.addChip}
               onClearBet={game.clearBet}
@@ -451,6 +469,22 @@ export default function App() {
                 ) : (
                   <span className="text-xs font-bold text-red-400">
                     -${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Push 22 result line */}
+            {game.push22Result && (
+              <div className="flex items-center gap-1.5">
+                <Push22Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Push 22</span>
+                {game.push22Result.payoutCents > 0 ? (
+                  <span className="text-xs font-bold text-emerald-400">
+                    +${(game.push22Result.payoutCents / 100).toLocaleString()}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-red-400">
+                    -${(game.lastPush22BetCents / 100).toLocaleString()}
                   </span>
                 )}
               </div>

@@ -1,19 +1,21 @@
 import { CHIPS, CHIP_LABELS, CHIP_COLORS, MIN_BET } from '../hooks/useGameState'
 
 type BetPanelProps = {
-  bankrollCents:         number
-  pendingBetCents:       number
-  potOfGoldBetCents:     number
-  lastBetCents:          number
-  lastPotOfGoldBetCents: number
-  sideBetPanelOpen:      boolean
-  onAddChip:             (cents: number) => void
-  onClearBet:            () => void
-  onReBet:               () => void
-  onReBetWithSideBets:   () => void
-  onDeal:                () => void
-  onToggleSideBetPanel:  () => void
-  onShowInfo:            () => void
+  bankrollCents:          number
+  pendingBetCents:        number
+  potOfGoldBetCents:      number
+  push22BetCents:         number
+  lastBetCents:           number
+  lastPotOfGoldBetCents:  number
+  lastPush22BetCents:     number
+  sideBetPanelOpen:       boolean
+  onAddChip:              (cents: number) => void
+  onClearBet:             () => void
+  onReBet:                () => void
+  onReBetWithSideBets:    () => void
+  onDeal:                 () => void
+  onToggleSideBetPanel:   () => void
+  onShowInfo:             () => void
 }
 
 function fmtDollars(cents: number): string {
@@ -22,13 +24,19 @@ function fmtDollars(cents: number): string {
 }
 
 export function BetPanel({
-  bankrollCents, pendingBetCents, potOfGoldBetCents, lastBetCents, lastPotOfGoldBetCents,
+  bankrollCents, pendingBetCents, potOfGoldBetCents, push22BetCents,
+  lastBetCents, lastPotOfGoldBetCents, lastPush22BetCents,
   sideBetPanelOpen, onAddChip, onClearBet, onReBet, onReBetWithSideBets, onDeal, onToggleSideBetPanel, onShowInfo,
 }: BetPanelProps) {
-  const canDeal       = pendingBetCents >= MIN_BET && (pendingBetCents + potOfGoldBetCents) <= bankrollCents
+  const totalSideBets = potOfGoldBetCents + push22BetCents
+  const totalSpent    = pendingBetCents + totalSideBets
+  const canDeal       = pendingBetCents >= MIN_BET && totalSpent <= bankrollCents
   const belowMin      = pendingBetCents > 0 && pendingBetCents < MIN_BET
-  const totalSpent    = pendingBetCents + potOfGoldBetCents
-  const hasPendingBet = pendingBetCents > 0 || potOfGoldBetCents > 0
+
+  // Show clear button only if the active tab has a bet
+  const hasActiveBet  = sideBetPanelOpen ? totalSideBets > 0 : pendingBetCents > 0
+  // Show rebet only when no bets anywhere
+  const hasPendingBet = pendingBetCents > 0 || totalSideBets > 0
   const showRebet     = !hasPendingBet && lastBetCents > 0 && lastBetCents <= bankrollCents
 
   return (
@@ -81,8 +89,8 @@ export function BetPanel({
         </div>
         <div className="text-center flex-1">
           <div className={`text-3xl font-bold font-game transition-colors
-            ${potOfGoldBetCents > 0 ? 'text-amber-400' : 'text-stone-600'}`}>
-            {potOfGoldBetCents > 0 ? fmtDollars(potOfGoldBetCents) : '—'}
+            ${totalSideBets > 0 ? 'text-amber-400' : 'text-stone-600'}`}>
+            {totalSideBets > 0 ? fmtDollars(totalSideBets) : '—'}
           </div>
         </div>
       </div>
@@ -115,7 +123,7 @@ export function BetPanel({
 
       {/* Action row */}
       <div className="flex gap-2 w-full">
-        {hasPendingBet ? (
+        {hasActiveBet ? (
           <button
             onClick={onClearBet}
             className="flex-1 py-3 rounded-xl bg-stone-700 hover:bg-stone-600
@@ -125,7 +133,8 @@ export function BetPanel({
           </button>
         ) : showRebet ? (
           (() => {
-            const withSideBets = lastPotOfGoldBetCents > 0 && lastBetCents + lastPotOfGoldBetCents <= bankrollCents
+            const lastTotal = lastBetCents + lastPotOfGoldBetCents + lastPush22BetCents
+            const withSideBets = (lastPotOfGoldBetCents > 0 || lastPush22BetCents > 0) && lastTotal <= bankrollCents
             return (
               <button
                 onClick={withSideBets ? onReBetWithSideBets : onReBet}
@@ -134,7 +143,7 @@ export function BetPanel({
                   ${withSideBets ? 'text-amber-400' : 'text-stone-300'}`}
               >
                 {withSideBets
-                  ? `Rebet + Side Bets ${fmtDollars(lastBetCents + lastPotOfGoldBetCents)}`
+                  ? `Rebet + Side Bets ${fmtDollars(lastTotal)}`
                   : `Rebet ${fmtDollars(lastBetCents)}`}
               </button>
             )
