@@ -1,21 +1,23 @@
 import { CHIPS, CHIP_LABELS, CHIP_COLORS, MIN_BET } from '../hooks/useGameState'
 
 type BetPanelProps = {
-  bankrollCents:          number
-  pendingBetCents:        number
-  potOfGoldBetCents:      number
-  push22BetCents:         number
-  lastBetCents:           number
-  lastPotOfGoldBetCents:  number
-  lastPush22BetCents:     number
-  sideBetPanelOpen:       boolean
-  onAddChip:              (cents: number) => void
-  onClearBet:             () => void
-  onReBet:                () => void
-  onReBetWithSideBets:    () => void
-  onDeal:                 () => void
-  onToggleSideBetPanel:   () => void
-  onShowInfo:             () => void
+  bankrollCents:           number
+  pendingBetCents:         number
+  potOfGoldBetCents:       number
+  push22BetCents:          number
+  hellraiserBetCents:      number
+  lastBetCents:            number
+  lastPotOfGoldBetCents:   number
+  lastPush22BetCents:      number
+  lastHellraiserBetCents:  number
+  sideBetPanelOpen:        boolean
+  onAddChip:               (cents: number) => void
+  onClearBet:              () => void
+  onReBet:                 () => void
+  onReBetWithSideBets:     () => void
+  onDeal:                  () => void
+  onToggleSideBetPanel:    () => void
+  onShowInfo:              () => void
 }
 
 function fmtDollars(cents: number): string {
@@ -24,18 +26,15 @@ function fmtDollars(cents: number): string {
 }
 
 export function BetPanel({
-  bankrollCents, pendingBetCents, potOfGoldBetCents, push22BetCents,
-  lastBetCents, lastPotOfGoldBetCents, lastPush22BetCents,
+  bankrollCents, pendingBetCents, potOfGoldBetCents, push22BetCents, hellraiserBetCents,
+  lastBetCents, lastPotOfGoldBetCents, lastPush22BetCents, lastHellraiserBetCents,
   sideBetPanelOpen, onAddChip, onClearBet, onReBet, onReBetWithSideBets, onDeal, onToggleSideBetPanel, onShowInfo,
 }: BetPanelProps) {
-  const totalSideBets = potOfGoldBetCents + push22BetCents
+  const totalSideBets = potOfGoldBetCents + push22BetCents + hellraiserBetCents
   const totalSpent    = pendingBetCents + totalSideBets
   const canDeal       = pendingBetCents >= MIN_BET && totalSpent <= bankrollCents
   const belowMin      = pendingBetCents > 0 && pendingBetCents < MIN_BET
-
-  // Show clear button only if the active tab has a bet
   const hasActiveBet  = sideBetPanelOpen ? totalSideBets > 0 : pendingBetCents > 0
-  // Show rebet only when no bets anywhere
   const hasPendingBet = pendingBetCents > 0 || totalSideBets > 0
   const showRebet     = !hasPendingBet && lastBetCents > 0 && lastBetCents <= bankrollCents
 
@@ -133,8 +132,9 @@ export function BetPanel({
           </button>
         ) : showRebet ? (
           (() => {
-            const lastTotal = lastBetCents + lastPotOfGoldBetCents + lastPush22BetCents
-            const withSideBets = (lastPotOfGoldBetCents > 0 || lastPush22BetCents > 0) && lastTotal <= bankrollCents
+            const lastTotal    = lastBetCents + lastPotOfGoldBetCents + lastPush22BetCents + lastHellraiserBetCents
+            const hasSideBets  = lastPotOfGoldBetCents > 0 || lastPush22BetCents > 0 || lastHellraiserBetCents > 0
+            const withSideBets = hasSideBets && lastTotal <= bankrollCents
             return (
               <button
                 onClick={withSideBets ? onReBetWithSideBets : onReBet}

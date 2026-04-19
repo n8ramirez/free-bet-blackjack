@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { POG_PAYOUTS, PUSH22_PAYOUT } from '../hooks/useGameState'
-import { PotOfGoldIcon, Push22Icon } from './SideBetPanel'
+import { POG_PAYOUTS, PUSH22_PAYOUT, HELLRAISER_PAYOUTS } from '../hooks/useGameState'
+import { PotOfGoldIcon, Push22Icon, HellraiserIcon } from './SideBetPanel'
 
-type Tab = 'pot-of-gold' | 'push-22' | 'coming-soon'
+type Tab = 'pot-of-gold' | 'push-22' | 'hellraiser'
 
 type Props = { onClose: () => void }
 
@@ -54,13 +54,13 @@ export function SideBetInfoModal({ onClose }: Props) {
             Push 22
           </button>
           <button
-            onClick={() => setTab('coming-soon')}
+            onClick={() => setTab('hellraiser')}
             className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
-              ${tab === 'coming-soon'
-                ? 'text-stone-300 border-b-2 border-stone-400 -mb-px'
-                : 'text-stone-500 hover:text-stone-400'}`}
+              ${tab === 'hellraiser'
+                ? 'text-orange-400 border-b-2 border-orange-400 -mb-px'
+                : 'text-stone-500 hover:text-stone-300'}`}
           >
-            Coming Soon
+            Hellraiser
           </button>
         </div>
 
@@ -68,7 +68,7 @@ export function SideBetInfoModal({ onClose }: Props) {
         <div className="px-5 py-4">
           {tab === 'pot-of-gold' && <PotOfGoldInfo />}
           {tab === 'push-22'     && <Push22Info />}
-          {tab === 'coming-soon' && <ComingSoon />}
+          {tab === 'hellraiser'  && <HellraiserInfo />}
         </div>
       </div>
     </div>
@@ -109,10 +109,7 @@ function PotOfGoldInfo() {
             <span className="text-stone-500 text-[9px] uppercase tracking-widest text-right">Pays</span>
           </div>
           {Object.entries(POG_PAYOUTS).map(([pucks, mult], i) => (
-            <div
-              key={pucks}
-              className={`grid grid-cols-2 px-3 py-2 ${i % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}
-            >
+            <div key={pucks} className={`grid grid-cols-2 px-3 py-2 ${i % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
               <span className="text-amber-400 font-bold">{pucks}</span>
               <span className="text-stone-200 font-semibold text-right">{mult} : 1</span>
             </div>
@@ -170,12 +167,42 @@ function Push22Info() {
   )
 }
 
-function ComingSoon() {
+function HellraiserInfo() {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
-      <div className="text-4xl">🚧</div>
-      <div className="text-stone-300 font-bold text-base">Coming Soon</div>
-      <div className="text-stone-500 text-sm">This side bet is still in development. Check back later!</div>
+    <div className="flex flex-col gap-4 text-sm">
+      <div className="flex items-center gap-2">
+        <HellraiserIcon className="w-8 h-8 flex-shrink-0" />
+        <p className="text-stone-300">
+          Based on your first two cards and the dealer's <span className="text-orange-400 font-semibold">face-up card</span>.
+          The best 3-card combination wins — result is revealed immediately after the deal.
+        </p>
+      </div>
+
+      <Section title="Payout table">
+        <div className="mt-1 rounded-xl overflow-hidden border border-stone-700">
+          <div className="grid grid-cols-2 bg-stone-800 px-3 py-1.5">
+            <span className="text-stone-500 text-[9px] uppercase tracking-widest">Hand</span>
+            <span className="text-stone-500 text-[9px] uppercase tracking-widest text-right">Pays</span>
+          </div>
+          {HELLRAISER_PAYOUTS.map(([name, mult], i) => (
+            <div key={name} className={`grid grid-cols-2 px-3 py-2 ${i % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
+              <span className="text-orange-400 font-bold text-xs">{name}</span>
+              <span className="text-stone-200 font-semibold text-right">{mult} : 1</span>
+            </div>
+          ))}
+          <div className={`grid grid-cols-2 px-3 py-2 ${HELLRAISER_PAYOUTS.length % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
+            <span className="text-stone-400 font-bold text-xs">All others</span>
+            <span className="text-stone-400 font-semibold text-right">Lose</span>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="How it works">
+        <Rule>Only the <span className="text-orange-400 font-semibold">best qualifying hand</span> pays — e.g. Three of a Kind Suited pays instead of Three of a Kind.</Rule>
+        <Rule>Ace counts both <span className="text-orange-400 font-semibold">high and low</span> for straights (A-2-3 and Q-K-A).</Rule>
+        <Rule>Result is shown immediately after the deal, before you act.</Rule>
+        <Rule>Pays out even if the dealer has blackjack.</Rule>
+      </Section>
     </div>
   )
 }

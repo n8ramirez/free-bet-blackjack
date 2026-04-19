@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useGameState } from './hooks/useGameState'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
-import { SideBetPanel, PotOfGoldIcon, Push22Icon } from './components/SideBetPanel'
+import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
@@ -212,6 +212,14 @@ export default function App() {
                   </span>
                 </div>
               )}
+              {game.lastHellraiserBetCents > 0 && (
+                <div className="flex items-center justify-end gap-1 mt-1">
+                  <HellraiserIcon className="w-4 h-4" />
+                  <span className="text-orange-400 text-[10px] font-bold font-game">
+                    ${(game.lastHellraiserBetCents / 100).toLocaleString()}
+                  </span>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -277,7 +285,35 @@ export default function App() {
                 )}
               </div>
             )}
+            {/* Hellraiser strip in round-over — only shown on BJ hands (otherwise shown during player-turn) */}
+            {game.hellraiserResult && (dealerBJ || playerBJ) && (
+              <div className={`w-full py-1.5 flex items-center justify-center gap-2
+                ${game.hellraiserResult.handName ? 'bg-black/50' : 'bg-black/50'}`}>
+                <HellraiserIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-orange-300">Hellraiser</span>
+                {game.hellraiserResult.handName ? (
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    {game.hellraiserResult.handName} &nbsp;+{fmtDollars(game.hellraiserResult.payoutCents)}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
+            )}
           </>
+        ) : isPlayerTurn && game.hellraiserBannerVisible && game.hellraiserResult ? (
+          <div className={`w-full py-2 flex items-center justify-center gap-2
+            ${game.hellraiserResult.handName ? 'bg-black/60' : 'bg-black/60'}`}>
+            <HellraiserIcon className="w-4 h-4 flex-shrink-0" />
+            <span className="text-[11px] font-bold uppercase tracking-wide text-orange-300">Hellraiser</span>
+            {game.hellraiserResult.handName ? (
+              <span className="text-[11px] font-bold text-emerald-400">
+                {game.hellraiserResult.handName} &nbsp;+{fmtDollars(game.hellraiserResult.payoutCents)}
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold text-red-400">Lose</span>
+            )}
+          </div>
         ) : (
           <>
             <div className="text-stone-400 text-[9px] uppercase tracking-widest pb-1">
@@ -384,6 +420,7 @@ export default function App() {
           selectedSideBet={game.selectedSideBet}
           potOfGoldBetCents={game.potOfGoldBetCents}
           push22BetCents={game.push22BetCents}
+          hellraiserBetCents={game.hellraiserBetCents}
           onSelectSideBet={game.selectSideBet}
         />
 
@@ -395,9 +432,11 @@ export default function App() {
               pendingBetCents={game.pendingBetCents}
               potOfGoldBetCents={game.potOfGoldBetCents}
               push22BetCents={game.push22BetCents}
+              hellraiserBetCents={game.hellraiserBetCents}
               lastBetCents={game.lastBetCents}
               lastPotOfGoldBetCents={game.lastPotOfGoldBetCents}
               lastPush22BetCents={game.lastPush22BetCents}
+              lastHellraiserBetCents={game.lastHellraiserBetCents}
               sideBetPanelOpen={game.sideBetPanelOpen}
               onAddChip={game.addChip}
               onClearBet={game.clearBet}
@@ -485,6 +524,22 @@ export default function App() {
                 ) : (
                   <span className="text-xs font-bold text-red-400">
                     -${(game.lastPush22BetCents / 100).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Hellraiser result line */}
+            {game.hellraiserResult && (
+              <div className="flex items-center gap-1.5">
+                <HellraiserIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Hellraiser</span>
+                {game.hellraiserResult.payoutCents > 0 ? (
+                  <span className="text-xs font-bold text-emerald-400">
+                    +${(game.hellraiserResult.payoutCents / 100).toLocaleString()}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-red-400">
+                    -${(game.lastHellraiserBetCents / 100).toLocaleString()}
                   </span>
                 )}
               </div>

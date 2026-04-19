@@ -57,7 +57,7 @@ export function RulesModal({ onClose }: Props) {
 
           <Section title="Payouts">
             <Rule>Blackjack pays <span className="text-amber-400 font-semibold">3 to 2</span>.</Rule>
-            <Rule>Player blackjack always wins, even if the dealer also has blackjack.</Rule>
+            <Rule>Player and dealer blackjack is a push — no chips won or lost.</Rule>
             <Rule>Blackjack on a split hand pays <span className="text-amber-400 font-semibold">1 to 1</span>.</Rule>
             <Rule>All other wins pay 1 to 1.</Rule>
           </Section>

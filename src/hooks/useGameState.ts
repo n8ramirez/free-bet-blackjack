@@ -36,7 +36,62 @@ export const POG_PAYOUTS: Record<number, number> = {
 
 export const PUSH22_PAYOUT = 11
 
-export type SideBetType = 'pot-of-gold' | 'push-22'
+// ---------------------------------------------------------------------------
+// Hellraiser side bet
+// ---------------------------------------------------------------------------
+export const HELLRAISER_PAYOUTS: [string, number][] = [
+  ['Three of a Kind Suited', 270],
+  ['Straight Flush',         180],
+  ['Three of a Kind',         90],
+  ['Flush',                    9],
+  ['Straight',                 9],
+]
+
+function cardSuit(card: string): string {
+  return card[card.length - 1]
+}
+
+function rankToStraightValue(rank: string): number {
+  if (rank === 'A') return 1
+  if (rank === 'J') return 11
+  if (rank === 'Q') return 12
+  if (rank === 'K') return 13
+  return parseInt(rank, 10)
+}
+
+function isThreeConsecutive(v1: number, v2: number, v3: number): boolean {
+  const low = [v1, v2, v3].sort((a, b) => a - b)
+  if (low[1] === low[0] + 1 && low[2] === low[1] + 1) return true
+  // Try ace as high (14) — no wrap-around (K-A-2 is excluded naturally)
+  const high = [v1, v2, v3].map(v => v === 1 ? 14 : v).sort((a, b) => a - b)
+  return high[1] === high[0] + 1 && high[2] === high[1] + 1
+}
+
+function resolveHellraiser(c1: string, c2: string, c3: string, betCents: number): HellraiserResult {
+  const r1 = cardRank(c1), r2 = cardRank(c2), r3 = cardRank(c3)
+  const s1 = cardSuit(c1), s2 = cardSuit(c2), s3 = cardSuit(c3)
+
+  const sameSuit = s1 === s2 && s2 === s3
+  const sameRank = r1 === r2 && r2 === r3
+  const v1 = rankToStraightValue(r1)
+  const v2 = rankToStraightValue(r2)
+  const v3 = rankToStraightValue(r3)
+  const straight = isThreeConsecutive(v1, v2, v3)
+
+  let handName: string | null = null
+  let multiplier = 0
+
+  if (sameRank && sameSuit)     { handName = 'Three of a Kind Suited'; multiplier = 270 }
+  else if (straight && sameSuit){ handName = 'Straight Flush';         multiplier = 180 }
+  else if (sameRank)            { handName = 'Three of a Kind';        multiplier = 90  }
+  else if (sameSuit)            { handName = 'Flush';                  multiplier = 9   }
+  else if (straight)            { handName = 'Straight';               multiplier = 9   }
+
+  const payoutCents = handName ? betCents * multiplier : -betCents
+  return { handName, payoutCents }
+}
+
+export type SideBetType = 'pot-of-gold' | 'push-22' | 'hellraiser'
 
 export type PotOfGoldResult = {
   pucks:       number
@@ -45,6 +100,11 @@ export type PotOfGoldResult = {
 }
 
 export type Push22Result = {
+  payoutCents: number
+}
+
+export type HellraiserResult = {
+  handName:    string | null
   payoutCents: number
 }
 
@@ -90,52 +150,60 @@ export type Phase = 'betting' | 'dealing' | 'player-turn' | 'dealer-turn' | 'rou
 // State shape
 // ---------------------------------------------------------------------------
 export type UIState = {
-  phase:                 Phase
-  engine:                GameState
-  bankrollCents:         number
-  peakBankrollCents:     number
-  pendingBetCents:       number
-  lastBetCents:          number
-  activeHandIndex:       number
-  results:               HandResult[]
-  dealerRevealed:        boolean
-  revealCount:           number
-  dealerRevealCount:     number
-  dealerStartDelay:      number
-  pendingDealerTurn:     boolean
-  sideBetPanelOpen:      boolean
-  selectedSideBet:       SideBetType
-  potOfGoldBetCents:     number
-  lastPotOfGoldBetCents: number
-  potOfGoldResult:       PotOfGoldResult | null
-  push22BetCents:        number
-  lastPush22BetCents:    number
-  push22Result:          Push22Result | null
+  phase:                   Phase
+  engine:                  GameState
+  bankrollCents:           number
+  peakBankrollCents:       number
+  pendingBetCents:         number
+  lastBetCents:            number
+  activeHandIndex:         number
+  results:                 HandResult[]
+  dealerRevealed:          boolean
+  revealCount:             number
+  dealerRevealCount:       number
+  dealerStartDelay:        number
+  pendingDealerTurn:       boolean
+  sideBetPanelOpen:        boolean
+  selectedSideBet:         SideBetType
+  potOfGoldBetCents:       number
+  lastPotOfGoldBetCents:   number
+  potOfGoldResult:         PotOfGoldResult | null
+  push22BetCents:          number
+  lastPush22BetCents:      number
+  push22Result:            Push22Result | null
+  hellraiserBetCents:      number
+  lastHellraiserBetCents:  number
+  hellraiserResult:        HellraiserResult | null
+  hellraiserBannerVisible: boolean
 }
 
 function initial(): UIState {
   return {
-    phase:                 'betting',
-    engine:                createGameState(),
-    bankrollCents:         STARTING_BANKROLL,
-    peakBankrollCents:     STARTING_BANKROLL,
-    pendingBetCents:       0,
-    lastBetCents:          0,
-    activeHandIndex:       0,
-    results:               [],
-    dealerRevealed:        false,
-    revealCount:           0,
-    dealerRevealCount:     0,
-    dealerStartDelay:      0,
-    pendingDealerTurn:     false,
-    sideBetPanelOpen:      false,
-    selectedSideBet:       'pot-of-gold',
-    potOfGoldBetCents:     0,
-    lastPotOfGoldBetCents: 0,
-    potOfGoldResult:       null,
-    push22BetCents:        0,
-    lastPush22BetCents:    0,
-    push22Result:          null,
+    phase:                   'betting',
+    engine:                  createGameState(),
+    bankrollCents:           STARTING_BANKROLL,
+    peakBankrollCents:       STARTING_BANKROLL,
+    pendingBetCents:         0,
+    lastBetCents:            0,
+    activeHandIndex:         0,
+    results:                 [],
+    dealerRevealed:          false,
+    revealCount:             0,
+    dealerRevealCount:       0,
+    dealerStartDelay:        0,
+    pendingDealerTurn:       false,
+    sideBetPanelOpen:        false,
+    selectedSideBet:         'pot-of-gold',
+    potOfGoldBetCents:       0,
+    lastPotOfGoldBetCents:   0,
+    potOfGoldResult:         null,
+    push22BetCents:          0,
+    lastPush22BetCents:      0,
+    push22Result:            null,
+    hellraiserBetCents:      0,
+    lastHellraiserBetCents:  0,
+    hellraiserResult:        null,
+    hellraiserBannerVisible: false,
   }
 }
 
@@ -186,6 +254,7 @@ function finishFromDealerTurn(base: UIState): UIState {
     push22Result = { payoutCents }
   }
 
+
   return {
     ...base,
     phase:             'round-over',
@@ -229,8 +298,38 @@ export function useGameState() {
         const playerBJ = isBlackjack(engine.playerHands[0].cards)
         const upcard   = cardRank(engine.dealer.cards[0])
         const dealerBJ = (upcard === 'A' || TEN_VALUE.has(upcard)) && isBlackjack(engine.dealer.cards)
-        if (playerBJ || dealerBJ) return startDealerTurn(s, engine, playerBJ && !dealerBJ)
-        return { ...s, phase: 'player-turn' }
+
+        // Resolve Hellraiser now — first 2 player cards + dealer upcard are all known
+        const hellraiserResult = s.hellraiserBetCents > 0
+          ? resolveHellraiser(
+              engine.playerHands[0].cards[0],
+              engine.playerHands[0].cards[1],
+              engine.dealer.cards[0],
+              s.hellraiserBetCents,
+            )
+          : null
+
+        // Apply Hellraiser payout immediately — stake + net win/loss
+        const hellraiserPayout = hellraiserResult
+          ? s.hellraiserBetCents + hellraiserResult.payoutCents
+          : 0
+        const newBankroll      = s.bankrollCents + hellraiserPayout
+        const sWithHR = {
+          ...s,
+          hellraiserResult,
+          bankrollCents:     newBankroll,
+          peakBankrollCents: Math.max(s.peakBankrollCents, newBankroll),
+        }
+
+        if (playerBJ || dealerBJ) {
+          // BJ path — no player actions, so don't show in-play banner; show at round-over
+          return startDealerTurn(sWithHR, engine, playerBJ && !dealerBJ)
+        }
+        return {
+          ...sWithHR,
+          phase:                   'player-turn',
+          hellraiserBannerVisible: hellraiserResult !== null,
+        }
       })
       return
     }
@@ -280,17 +379,14 @@ export function useGameState() {
   const addChip = useCallback((cents: number) => {
     setState(s => {
       if (s.phase !== 'betting') return s
+      const totalSpent = s.pendingBetCents + s.potOfGoldBetCents + s.push22BetCents + s.hellraiserBetCents
+      if (totalSpent + cents > s.bankrollCents) return s
       if (s.sideBetPanelOpen) {
-        const totalOther = s.pendingBetCents
-          + (s.selectedSideBet === 'push-22' ? s.potOfGoldBetCents : s.push22BetCents)
-        const currentSide = s.selectedSideBet === 'push-22' ? s.push22BetCents : s.potOfGoldBetCents
-        if (totalOther + currentSide + cents > s.bankrollCents) return s
-        if (s.selectedSideBet === 'push-22') return { ...s, push22BetCents: s.push22BetCents + cents }
+        if (s.selectedSideBet === 'push-22')    return { ...s, push22BetCents:    s.push22BetCents    + cents }
+        if (s.selectedSideBet === 'hellraiser') return { ...s, hellraiserBetCents: s.hellraiserBetCents + cents }
         return { ...s, potOfGoldBetCents: s.potOfGoldBetCents + cents }
       }
-      const next = s.pendingBetCents + cents
-      if (s.potOfGoldBetCents + s.push22BetCents + next > s.bankrollCents) return s
-      return { ...s, pendingBetCents: next }
+      return { ...s, pendingBetCents: s.pendingBetCents + cents }
     })
   }, [])
 
@@ -298,7 +394,8 @@ export function useGameState() {
     setState(s => {
       if (s.phase !== 'betting') return s
       if (s.sideBetPanelOpen) {
-        if (s.selectedSideBet === 'push-22') return { ...s, push22BetCents: 0 }
+        if (s.selectedSideBet === 'push-22')    return { ...s, push22BetCents: 0 }
+        if (s.selectedSideBet === 'hellraiser') return { ...s, hellraiserBetCents: 0 }
         return { ...s, potOfGoldBetCents: 0 }
       }
       return { ...s, pendingBetCents: 0 }
@@ -316,11 +413,14 @@ export function useGameState() {
   const reBetWithSideBets = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting' || s.lastBetCents === 0) return s
-      const bet      = Math.min(s.lastBetCents, s.bankrollCents)
-      const remaining = Math.max(0, s.bankrollCents - bet)
-      const pogBet   = Math.min(s.lastPotOfGoldBetCents, remaining)
-      const p22Bet   = Math.min(s.lastPush22BetCents, Math.max(0, remaining - pogBet))
-      return { ...s, pendingBetCents: bet, potOfGoldBetCents: pogBet, push22BetCents: p22Bet }
+      const bet       = Math.min(s.lastBetCents, s.bankrollCents)
+      let remaining   = Math.max(0, s.bankrollCents - bet)
+      const pogBet    = Math.min(s.lastPotOfGoldBetCents, remaining)
+      remaining       = Math.max(0, remaining - pogBet)
+      const p22Bet    = Math.min(s.lastPush22BetCents, remaining)
+      remaining       = Math.max(0, remaining - p22Bet)
+      const hellBet   = Math.min(s.lastHellraiserBetCents, remaining)
+      return { ...s, pendingBetCents: bet, potOfGoldBetCents: pogBet, push22BetCents: p22Bet, hellraiserBetCents: hellBet }
     })
   }, [])
 
@@ -336,26 +436,30 @@ export function useGameState() {
     setState(s => {
       if (s.phase !== 'betting') return s
       if (s.pendingBetCents < MIN_BET) return s
-      if (s.pendingBetCents + s.potOfGoldBetCents + s.push22BetCents > s.bankrollCents) return s
+      const totalCost = s.pendingBetCents + s.potOfGoldBetCents + s.push22BetCents + s.hellraiserBetCents
+      if (totalCost > s.bankrollCents) return s
       const shoe = s.engine.shoe.length < 52 ? createGameState().shoe : [...s.engine.shoe]
       const engine: GameState = { shoe, playerHands: [], dealer: { cards: [], betCents: 0 } }
       dealInitial(engine, s.pendingBetCents)
       return {
         ...s,
-        phase:                 'dealing',
+        phase:                   'dealing',
         engine,
-        bankrollCents:         s.bankrollCents - s.pendingBetCents - s.potOfGoldBetCents - s.push22BetCents,
-        pendingBetCents:       0,
-        lastBetCents:          s.pendingBetCents,
-        lastPotOfGoldBetCents: s.potOfGoldBetCents,
-        lastPush22BetCents:    s.push22BetCents,
-        activeHandIndex:       0,
-        results:               [],
-        dealerRevealed:        false,
-        revealCount:           0,
-        sideBetPanelOpen:      false,
-        potOfGoldResult:       null,
-        push22Result:          null,
+        bankrollCents:           s.bankrollCents - totalCost,
+        pendingBetCents:         0,
+        lastBetCents:            s.pendingBetCents,
+        lastPotOfGoldBetCents:   s.potOfGoldBetCents,
+        lastPush22BetCents:      s.push22BetCents,
+        lastHellraiserBetCents:  s.hellraiserBetCents,
+        activeHandIndex:         0,
+        results:                 [],
+        dealerRevealed:          false,
+        revealCount:             0,
+        sideBetPanelOpen:        false,
+        potOfGoldResult:         null,
+        push22Result:            null,
+        hellraiserResult:        null,
+        hellraiserBannerVisible: false,
       }
     })
   }, [])
@@ -367,7 +471,7 @@ export function useGameState() {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
       playerHit(engine, s.activeHandIndex)
-      return afterHit(s, engine)
+      return afterHit({ ...s, hellraiserBannerVisible: false }, engine)
     })
   }, [])
 
@@ -375,7 +479,7 @@ export function useGameState() {
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
-      return advanceFrom(s, engine, s.activeHandIndex)
+      return advanceFrom({ ...s, hellraiserBannerVisible: false }, engine, s.activeHandIndex)
     })
   }, [])
 
@@ -389,7 +493,7 @@ export function useGameState() {
       if (cost > s.bankrollCents) return s
       const engine = cloneEngine(s.engine)
       playerDouble(engine, s.activeHandIndex)
-      const base = { ...s, engine, bankrollCents: s.bankrollCents - cost }
+      const base = { ...s, engine, bankrollCents: s.bankrollCents - cost, hellraiserBannerVisible: false }
       let nextIdx = s.activeHandIndex + 1
       while (nextIdx < engine.playerHands.length && handIsDone(engine.playerHands[nextIdx])) nextIdx++
       if (nextIdx >= engine.playerHands.length) return { ...base, pendingDealerTurn: true }
@@ -408,7 +512,7 @@ export function useGameState() {
       if (cost > s.bankrollCents) return s
       const engine = cloneEngine(s.engine)
       playerSplit(engine, s.activeHandIndex)
-      const base = { ...s, engine, bankrollCents: s.bankrollCents - cost }
+      const base = { ...s, engine, bankrollCents: s.bankrollCents - cost, hellraiserBannerVisible: false }
       if (engine.playerHands[s.activeHandIndex].isSplitAce) return advanceFrom(base, engine, s.activeHandIndex)
       return base
     })
@@ -421,14 +525,15 @@ export function useGameState() {
       if (s.phase !== 'round-over') return s
       return {
         ...initial(),
-        engine:                { ...s.engine, playerHands: [], dealer: { cards: [], betCents: 0 } },
-        bankrollCents:         s.bankrollCents,
-        peakBankrollCents:     s.peakBankrollCents,
-        lastBetCents:          s.lastBetCents,
-        lastPotOfGoldBetCents: s.lastPotOfGoldBetCents,
-        lastPush22BetCents:    s.lastPush22BetCents,
-        sideBetPanelOpen:      s.sideBetPanelOpen,
-        selectedSideBet:       s.selectedSideBet,
+        engine:                  { ...s.engine, playerHands: [], dealer: { cards: [], betCents: 0 } },
+        bankrollCents:           s.bankrollCents,
+        peakBankrollCents:       s.peakBankrollCents,
+        lastBetCents:            s.lastBetCents,
+        lastPotOfGoldBetCents:   s.lastPotOfGoldBetCents,
+        lastPush22BetCents:      s.lastPush22BetCents,
+        lastHellraiserBetCents:  s.lastHellraiserBetCents,
+        sideBetPanelOpen:        s.sideBetPanelOpen,
+        selectedSideBet:         s.selectedSideBet,
       }
     })
   }, [])
