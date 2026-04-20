@@ -2,24 +2,28 @@ import { Card } from './Card'
 import { Hand, HandResult, handTotals, isBlackjack } from '../engine'
 
 type CardHandProps = {
-  hand:           Hand
-  label?:         string
-  hideSecond?:    boolean
-  hideTotal?:     boolean
-  isActive?:      boolean
-  isDimmed?:      boolean
-  isSplit?:       boolean
-  result?:        HandResult
-  hasFreeSplit?:  boolean
-  hasFreeDouble?: boolean
-  showPushOn22?:  boolean
-  visibleCount?:  number
+  hand:                  Hand
+  label?:                string
+  hideSecond?:           boolean
+  hideTotal?:            boolean
+  isActive?:             boolean
+  isDimmed?:             boolean
+  isSplit?:              boolean
+  result?:               HandResult
+  hasFreeSplit?:         boolean
+  hasFreeDouble?:        boolean
+  showPushOn22?:         boolean
+  visibleCount?:         number
+  hellraiserGlow?:          boolean
+  hellraiserGlowFirstOnly?: boolean
+  push22Glow?:              boolean
+  pogGlow?:                 boolean
 }
 
-const Puck = ({ top, left = -16, zIndex = 10 }: { top: number; left?: number; zIndex?: number }) => (
+const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; left?: number; zIndex?: number; glowing?: boolean }) => (
   <div
-    className="absolute w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
-      shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center"
+    className={`absolute w-8 h-8 rounded-full bg-amber-400 border-2 border-yellow-200
+      shadow-[0_2px_6px_rgba(0,0,0,0.5)] flex items-center justify-center${glowing ? ' pog-glow' : ''}`}
     style={{ top, left, zIndex }}
   >
     <span className="text-[8px] font-black text-amber-950 leading-none tracking-wide">FREE</span>
@@ -29,6 +33,7 @@ const Puck = ({ top, left = -16, zIndex = 10 }: { top: number; left?: number; zI
 export function CardHand({
   hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result,
   hasFreeSplit, hasFreeDouble, showPushOn22, visibleCount,
+  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -78,10 +83,10 @@ export function CardHand({
 
   const pucks = (
     <>
-      {hasFreeSplit && hasFreeDouble && <Puck top={27} left={-16} zIndex={10} />}
-      {hasFreeSplit && hasFreeDouble && <Puck top={37} left={-8} zIndex={11} />}
-      {hasFreeSplit && !hasFreeDouble && <Puck top={32} />}
-      {hasFreeDouble && !hasFreeSplit && <Puck top={32} />}
+      {hasFreeSplit && hasFreeDouble && <Puck top={27} left={-16} zIndex={10} glowing={pogGlow} />}
+      {hasFreeSplit && hasFreeDouble && <Puck top={37} left={-8} zIndex={11} glowing={pogGlow} />}
+      {hasFreeSplit && !hasFreeDouble && <Puck top={32} glowing={pogGlow} />}
+      {hasFreeDouble && !hasFreeSplit && <Puck top={32} glowing={pogGlow} />}
     </>
   )
 
@@ -98,7 +103,13 @@ export function CardHand({
           {isActive && isSplit && <div className="glow-pulse absolute rounded-full w-12 h-12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
           {visibleCards.map((c, i) => (
             <div key={i} className="absolute" style={{ top: i * 6, left: i * 20 }}>
-              <Card card={c} faceDown={hideSecond && i === 1} dimmed={isDimmed} />
+              <Card
+                card={c}
+                faceDown={hideSecond && i === 1}
+                dimmed={isDimmed}
+                glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
+                push22Glow={push22Glow}
+              />
             </div>
           ))}
           {pucks}
@@ -113,6 +124,8 @@ export function CardHand({
               card={c}
               faceDown={hideSecond && i === 1}
               dimmed={isDimmed}
+              glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
+                push22Glow={push22Glow}
             />
           ))}
         </div>

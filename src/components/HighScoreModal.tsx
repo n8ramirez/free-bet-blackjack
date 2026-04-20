@@ -29,13 +29,13 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip }: Pr
         {/* Header */}
         <div className="px-5 pt-6 pb-5 border-b border-stone-700 text-center">
           <div className="text-white text-[9px] uppercase tracking-widest mb-2">New High Score</div>
-          <div className="text-amber-400 font-bold text-4xl font-game">#{rank}</div>
+          <div className="text-amber-400 font-bold text-4xl">#{rank}</div>
         </div>
 
         <div className="px-5 py-5 flex flex-col gap-4">
           <div className="text-center">
             <div className="text-stone-400 text-[10px] uppercase tracking-widest mb-1">Peak Bankroll</div>
-            <div className="text-emerald-400 font-bold text-2xl font-game">{fmt}</div>
+            <div className="text-emerald-400 font-bold text-2xl">{fmt}</div>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">

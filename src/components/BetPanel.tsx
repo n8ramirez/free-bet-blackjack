@@ -80,14 +80,14 @@ export function BetPanel({
       {/* Bet display row */}
       <div className="w-full flex justify-between items-start">
         <div className="text-center flex-1">
-          <div className={`text-3xl font-bold font-game transition-colors
+          <div className={`text-3xl font-bold transition-colors
             ${pendingBetCents > 0 ? 'text-amber-400' : 'text-stone-600'}`}>
             {pendingBetCents > 0 ? fmtDollars(pendingBetCents) : '—'}
           </div>
           {belowMin && <div className="text-red-400 text-xs mt-1">Min $5</div>}
         </div>
         <div className="text-center flex-1">
-          <div className={`text-3xl font-bold font-game transition-colors
+          <div className={`text-3xl font-bold transition-colors
             ${totalSideBets > 0 ? 'text-amber-400' : 'text-stone-600'}`}>
             {totalSideBets > 0 ? fmtDollars(totalSideBets) : '—'}
           </div>

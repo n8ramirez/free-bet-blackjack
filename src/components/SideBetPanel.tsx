@@ -123,7 +123,7 @@ export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push2
                   {tab.label}
                 </span>
               </div>
-              <div className={`text-base font-bold font-game transition-colors ${tab.betCents > 0 ? tab.activeColor : 'text-stone-500'}`}>
+              <div className={`text-base font-bold transition-colors ${tab.betCents > 0 ? tab.activeColor : 'text-stone-500'}`}>
                 {tab.betCents > 0 ? fmtDollars(tab.betCents) : '—'}
               </div>
               <div className={`h-0.5 w-8 rounded-full ${isActive ? tab.barColor : 'bg-transparent'}`} />

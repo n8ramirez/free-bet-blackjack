@@ -72,7 +72,7 @@ export function LeaderboardModal({ entries, highlightIndex, onClose }: Props) {
                         {entry.name}
                       </div>
                     </div>
-                    <div className={`font-bold text-sm font-game flex-shrink-0
+                    <div className={`font-bold text-sm flex-shrink-0
                       ${isHighlight ? 'text-amber-400' : 'text-emerald-400'}`}>
                       {formatDollars(entry.peak_bankroll_cents)}
                     </div>

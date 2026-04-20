@@ -79,11 +79,16 @@ export default function App() {
     game.resetGame()
   }
 
+  const hellraiserWon = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
+  const pogGlowActive = game.lastPotOfGoldBetCents > 0
+
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
   const isPlayerTurn = game.phase === 'player-turn'
   const isDealerTurn = game.phase === 'dealer-turn'
   const isOver       = game.phase === 'round-over'
+
+  const push22Won = isOver && (game.push22Result?.payoutCents ?? 0) > 0
 
   // During dealing phase, reveal cards one at a time: player[0] → dealer[0] → player[1] → dealer[1]
   const playerVisibleCount = isDealing
@@ -115,7 +120,7 @@ export default function App() {
     else if (playerBJ)               { bannerTitle = 'Player Blackjack'; bannerTitleColor = 'text-amber-400' }
     else if (dealer22)               { bannerTitle = '22 Push';          bannerTitleColor = 'text-stone-300' }
     else if (allBust)                { bannerTitle = 'Player Bust';      bannerTitleColor = 'text-red-400'   }
-    else if (netCents > 0)           { bannerTitle = 'Player Wins';      bannerTitleColor = 'text-amber-400' }
+    else if (netCents > 0)           { bannerTitle = 'Player Wins';      bannerTitleColor = 'text-emerald-400' }
     else if (netCents < 0)           { bannerTitle = 'Dealer Wins';      bannerTitleColor = 'text-red-400'   }
     else                             { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
   }
@@ -160,7 +165,7 @@ export default function App() {
         {/* Left — Bankroll */}
         <div>
           <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
-          <div className="text-white font-bold text-base font-game">
+          <div className="text-white font-bold text-base">
             ${Math.round(animatedBankroll / 100).toLocaleString()}
           </div>
         </div>
@@ -201,13 +206,13 @@ export default function App() {
           {(isDealing || isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
             <>
               <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
-              <div className="text-amber-400 font-bold text-base font-game">
+              <div className="text-amber-400 font-bold text-base">
                 ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
               </div>
               {game.lastPotOfGoldBetCents > 0 && (
                 <div className="flex items-center justify-end gap-1 mt-1">
                   <PotOfGoldIcon className="w-4 h-4" />
-                  <span className="text-amber-400 text-[10px] font-bold font-game">
+                  <span className="text-amber-400 text-[10px] font-bold">
                     ${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
                   </span>
                 </div>
@@ -215,7 +220,7 @@ export default function App() {
               {game.lastPush22BetCents > 0 && (
                 <div className="flex items-center justify-end gap-1 mt-1">
                   <Push22Icon className="w-4 h-4" />
-                  <span className="text-sky-400 text-[10px] font-bold font-game">
+                  <span className="text-sky-400 text-[10px] font-bold">
                     ${(game.lastPush22BetCents / 100).toLocaleString()}
                   </span>
                 </div>
@@ -223,7 +228,7 @@ export default function App() {
               {game.lastHellraiserBetCents > 0 && (
                 <div className="flex items-center justify-end gap-1 mt-1">
                   <HellraiserIcon className="w-4 h-4" />
-                  <span className="text-orange-400 text-[10px] font-bold font-game">
+                  <span className="text-orange-400 text-[10px] font-bold">
                     ${(game.lastHellraiserBetCents / 100).toLocaleString()}
                   </span>
                 </div>
@@ -252,6 +257,9 @@ export default function App() {
             hideTotal={!game.dealerRevealed}
             showPushOn22={game.dealerRevealed && dealerTotal === 22}
             visibleCount={dealerVisibleCount}
+            hellraiserGlow={hellraiserWon}
+            hellraiserGlowFirstOnly={hellraiserWon}
+            push22Glow={push22Won}
           />
         ) : (
           <div className="text-white text-sm uppercase tracking-widest">
@@ -265,7 +273,7 @@ export default function App() {
         {isOver ? (
           <>
             <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
-              <div className={`text-2xl font-bold font-game tracking-wide ${bannerTitleColor}`}>
+              <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
                 {bannerTitle}
               </div>
             </div>
@@ -376,6 +384,8 @@ export default function App() {
                       hasFreeSplit={!!hand.freeSplit}
                       hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                       visibleCount={playerVisibleCount}
+                      hellraiserGlow={hellraiserWon}
+                      pogGlow={pogGlowActive}
                     />
                   </div>
                 )
@@ -398,6 +408,8 @@ export default function App() {
                       hasFreeSplit={!!hand.freeSplit}
                       hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                       visibleCount={playerVisibleCount}
+                      hellraiserGlow={hellraiserWon}
+                      pogGlow={pogGlowActive}
                     />
                   </div>
                 )
@@ -413,6 +425,8 @@ export default function App() {
                 hasFreeSplit={!!game.engine.playerHands[0].freeSplit}
                 hasFreeDouble={!!(game.engine.playerHands[0].doubled && game.engine.playerHands[0].freeDouble)}
                 visibleCount={playerVisibleCount}
+                hellraiserGlow={hellraiserWon}
+                pogGlow={pogGlowActive}
               />
             </div>
           )
@@ -463,7 +477,7 @@ export default function App() {
             <div className="text-stone-300 text-lg font-bold">Out of chips!</div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-stone-400 uppercase tracking-widest text-[10px]">Peak Bankroll</span>
-              <span className="text-amber-400 font-bold font-game">
+              <span className="text-amber-400 font-bold">
                 ${(game.peakBankrollCents / 100).toLocaleString()}
               </span>
             </div>
@@ -500,8 +514,8 @@ export default function App() {
         {isOver && (
           <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-6">
             {/* Net result summary */}
-            <div className={`text-2xl font-bold font-game
-              ${netCents > 0 ? 'text-amber-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
+            <div className={`text-2xl font-bold
+              ${netCents > 0 ? 'text-emerald-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
             {/* POG result line */}
