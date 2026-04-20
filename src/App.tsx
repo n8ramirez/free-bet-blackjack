@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGameState } from './hooks/useGameState'
+import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
@@ -70,6 +71,8 @@ export default function App() {
     setHighlightIndex(undefined)
     setShowLeaderboard(true)
   }
+
+  const animatedBankroll = useCountUp(game.bankrollCents, 700, 600)
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -153,7 +156,7 @@ export default function App() {
         <div>
           <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
           <div className="text-white font-bold text-base font-game">
-            ${(game.bankrollCents / 100).toLocaleString()}
+            ${Math.round(animatedBankroll / 100).toLocaleString()}
           </div>
         </div>
 
