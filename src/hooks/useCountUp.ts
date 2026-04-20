@@ -1,13 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-export function useCountUp(target: number, duration = 700, delay = 0): number {
+export function useCountUp(target: number, duration = 700, delay = 0): [number, (value: number) => void] {
   const [displayed, setDisplayed] = useState(target)
-  const prevRef    = useRef(target)
-  const rafRef     = useRef<number | null>(null)
-  const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const displayedRef = useRef(target)
+  const rafRef       = useRef<number | null>(null)
+  const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const snapTo = useCallback((value: number) => {
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    if (timerRef.current !== null) clearTimeout(timerRef.current)
+    rafRef.current = null
+    timerRef.current = null
+    displayedRef.current = value
+    setDisplayed(value)
+  }, [])
 
   useEffect(() => {
-    const from = prevRef.current
+    const from = displayedRef.current
     const to   = target
     if (from === to) return
 
@@ -19,12 +28,13 @@ export function useCountUp(target: number, duration = 700, delay = 0): number {
       function tick(now: number) {
         const progress = Math.min((now - start) / duration, 1)
         const eased    = 1 - Math.pow(1 - progress, 3)
-        setDisplayed(Math.round(from + (to - from) * eased))
+        const value    = Math.round(from + (to - from) * eased)
+        displayedRef.current = value
+        setDisplayed(value)
         if (progress < 1) {
           rafRef.current = requestAnimationFrame(tick)
         } else {
-          prevRef.current = to
-          rafRef.current  = null
+          rafRef.current = null
         }
       }
       rafRef.current = requestAnimationFrame(tick)
@@ -43,5 +53,5 @@ export function useCountUp(target: number, duration = 700, delay = 0): number {
     }
   }, [target, duration, delay])
 
-  return displayed
+  return [displayed, snapTo]
 }

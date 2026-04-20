@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useGameState } from './hooks/useGameState'
+import { useGameState, STARTING_BANKROLL } from './hooks/useGameState'
 import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
@@ -72,7 +72,12 @@ export default function App() {
     setShowLeaderboard(true)
   }
 
-  const animatedBankroll = useCountUp(game.bankrollCents, 700, 600)
+  const [animatedBankroll, snapBankroll] = useCountUp(game.bankrollCents, 700, 600)
+
+  function handleResetGame() {
+    snapBankroll(STARTING_BANKROLL)
+    game.resetGame()
+  }
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -463,7 +468,7 @@ export default function App() {
               </span>
             </div>
             <button
-              onClick={game.resetGame}
+              onClick={handleResetGame}
               className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
                 text-white font-bold text-lg active:scale-95 transition-all
                 shadow-[0_4px_0px_#14532d]"
