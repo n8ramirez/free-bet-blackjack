@@ -211,8 +211,9 @@ function initial(): UIState {
 // Dealer turn helpers
 // ---------------------------------------------------------------------------
 function startDealerTurn(base: UIState, engine: GameState, skipDraw = false): UIState {
-  const allBust = engine.playerHands.every(h => handTotals(h.cards).total > 21)
-  if (!allBust && !skipDraw) dealerPlay(engine)
+  const allBust   = engine.playerHands.every(h => handTotals(h.cards).total > 21)
+  const hasPush22 = base.push22BetCents > 0
+  if ((!allBust && !skipDraw) || hasPush22) dealerPlay(engine)
   return {
     ...base,
     phase:             'dealer-turn',
