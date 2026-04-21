@@ -487,9 +487,7 @@ export default function App() {
                 text-white font-bold text-lg active:scale-95 transition-all
                 shadow-[0_4px_0px_#14532d]"
             >
-              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
-              <div className="absolute inset-x-0 top-0 h-6 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-0 h-6 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
               <span className="relative">New Game</span>
             </button>
           </div>
@@ -581,9 +579,7 @@ export default function App() {
                 text-white font-bold text-lg active:scale-95 transition-all
                 shadow-[0_4px_0px_#14532d] active:shadow-none active:translate-y-1"
             >
-              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
-              <div className="absolute inset-x-0 top-0 h-6 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-0 h-6 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
               <span className="relative">New Hand</span>
             </button>
           </div>

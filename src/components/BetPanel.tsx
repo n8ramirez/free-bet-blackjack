@@ -126,11 +126,9 @@ export function BetPanel({
           <button
             onClick={onClearBet}
             className="relative overflow-hidden flex-1 py-3 rounded-xl bg-rose-700 hover:bg-rose-600
-              text-white text-lg font-bold active:scale-95 transition-all"
+              text-white text-lg font-bold active:scale-95 transition-all shadow-[0_4px_0px_#9f1239] active:shadow-none active:translate-y-1"
           >
-            <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
-            <div className="absolute inset-x-0 top-0 h-5 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-5 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
             <span className="relative">{sideBetPanelOpen ? 'Clear Side Bet' : 'Clear'}</span>
           </button>
         ) : showRebet ? (
@@ -142,11 +140,9 @@ export function BetPanel({
               <button
                 onClick={withSideBets ? onReBetWithSideBets : onReBet}
                 className={`relative overflow-hidden flex-1 py-3 rounded-xl bg-violet-700 hover:bg-violet-600
-                  text-lg font-bold active:scale-95 transition-all text-white`}
+                  text-lg font-bold active:scale-95 transition-all text-white shadow-[0_4px_0px_#4c1d95] active:shadow-none active:translate-y-1`}
               >
-                <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
-                <div className="absolute inset-x-0 top-0 h-5 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-                <div className="absolute inset-x-0 bottom-0 h-5 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
                 <span className="relative">{withSideBets ? `Rebet + Side Bets ${fmtDollars(lastTotal)}` : `Rebet ${fmtDollars(lastBetCents)}`}</span>
               </button>
             )
@@ -164,9 +160,7 @@ export function BetPanel({
           `}
         >
           {canDeal && <>
-            <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
-            <div className="absolute inset-x-0 top-0 h-5 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-5 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
           </>}
           <span className="relative">Deal</span>
         </button>
