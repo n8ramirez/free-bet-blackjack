@@ -242,7 +242,7 @@ export default function App() {
       {isBetting && (game.lastBetCents === 0 || game.isGameOver) && (
       <div className="flex-none bg-sky-300 overflow-hidden h-6 flex items-center">
         <span className="marquee-track text-[10px] font-bold text-sky-950 uppercase tracking-wide px-4">
-          🏆&nbsp; Road to 1 Million Challenge: $50 Cash Prize for 1st Player to Break $1M Peak Bankroll &nbsp;🏆
+          🏆&nbsp; Thank you for playing Free Bet Blackjack. Check back often for new features and updates! &nbsp;🏆
         </span>
       </div>
       )}
@@ -483,11 +483,14 @@ export default function App() {
             </div>
             <button
               onClick={handleResetGame}
-              className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
+              className="relative overflow-hidden w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
                 text-white font-bold text-lg active:scale-95 transition-all
                 shadow-[0_4px_0px_#14532d]"
             >
-              New Game — $500
+              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-6 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-6 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+              <span className="relative">New Game</span>
             </button>
           </div>
         )}
@@ -574,11 +577,14 @@ export default function App() {
             )}
             <button
               onClick={game.newHand}
-              className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
+              className="relative overflow-hidden w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
                 text-white font-bold text-lg active:scale-95 transition-all
                 shadow-[0_4px_0px_#14532d] active:shadow-none active:translate-y-1"
             >
-              New Hand
+              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-6 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-6 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+              <span className="relative">New Hand</span>
             </button>
           </div>
         )}

@@ -27,17 +27,21 @@ function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color
       onClick={onClick}
       disabled={disabled}
       className={`
+        relative overflow-hidden
         flex flex-col items-center justify-center gap-0.5
         py-4 font-bold text-white transition-all
         shadow-[0_4px_0px_rgba(0,0,0,0.4)]
         active:shadow-[0_1px_0px_rgba(0,0,0,0.4)]
         active:translate-y-[3px]
-        ${free ? 'relative w-full rounded-[8px]' : 'rounded-xl'}
+        ${free ? 'w-full rounded-[8px]' : 'rounded-xl'}
         ${color}
         ${disabled ? 'opacity-30 cursor-not-allowed' : 'active:scale-[0.97]'}
       `}
     >
-      <span className="text-base leading-none">{label}</span>
+      <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-6 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-6 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+      <span className="relative text-base leading-none">{label}</span>
     </button>
   )
 

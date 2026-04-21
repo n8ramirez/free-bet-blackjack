@@ -125,10 +125,13 @@ export function BetPanel({
         {hasActiveBet ? (
           <button
             onClick={onClearBet}
-            className="flex-1 py-3 rounded-xl bg-stone-700 hover:bg-stone-600
-              text-stone-300 text-sm font-semibold active:scale-95 transition-all"
+            className="relative overflow-hidden flex-1 py-3 rounded-xl bg-rose-700 hover:bg-rose-600
+              text-white text-lg font-bold active:scale-95 transition-all"
           >
-            {sideBetPanelOpen ? 'Clear Side Bet' : 'Clear'}
+            <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-5 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-5 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+            <span className="relative">{sideBetPanelOpen ? 'Clear Side Bet' : 'Clear'}</span>
           </button>
         ) : showRebet ? (
           (() => {
@@ -138,13 +141,13 @@ export function BetPanel({
             return (
               <button
                 onClick={withSideBets ? onReBetWithSideBets : onReBet}
-                className={`flex-1 py-3 rounded-xl bg-stone-700 hover:bg-stone-600
-                  text-xs font-semibold active:scale-95 transition-all
-                  ${withSideBets ? 'text-amber-400' : 'text-stone-300'}`}
+                className={`relative overflow-hidden flex-1 py-3 rounded-xl bg-violet-700 hover:bg-violet-600
+                  text-lg font-bold active:scale-95 transition-all text-white`}
               >
-                {withSideBets
-                  ? `Rebet + Side Bets ${fmtDollars(lastTotal)}`
-                  : `Rebet ${fmtDollars(lastBetCents)}`}
+                <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-5 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-5 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+                <span className="relative">{withSideBets ? `Rebet + Side Bets ${fmtDollars(lastTotal)}` : `Rebet ${fmtDollars(lastBetCents)}`}</span>
               </button>
             )
           })()
@@ -154,13 +157,18 @@ export function BetPanel({
           onClick={onDeal}
           disabled={!canDeal}
           className={`
-            flex-1 py-3 rounded-xl font-bold text-lg transition-all
+            relative overflow-hidden flex-1 py-3 rounded-xl font-bold text-lg transition-all
             ${canDeal
               ? 'bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 shadow-[0_4px_0px_#14532d] active:shadow-none active:translate-y-1'
               : 'bg-stone-800 text-stone-600 cursor-not-allowed'}
           `}
         >
-          Deal
+          {canDeal && <>
+            <div className="absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.28)_0%,transparent_70%)] pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-5 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-5 rounded-b-xl bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+          </>}
+          <span className="relative">Deal</span>
         </button>
       </div>
     </div>
