@@ -129,7 +129,7 @@ export function BetPanel({
                   text-lg font-bold active:scale-95 transition-all text-white shadow-[0_4px_0px_#4c1d95] active:shadow-none active:translate-y-1`}
               >
                 <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-                <span className="relative">{withSideBets ? `Rebet + Side Bets ${fmtDollars(lastTotal)}` : `Rebet ${fmtDollars(lastBetCents)}`}</span>
+                <span className="relative">Rebet</span>
               </SafeButton>
             )
           })()
