@@ -118,7 +118,8 @@ export default function App() {
   let bannerTitle = ''
   let bannerTitleColor = 'text-stone-300'
   if (isOver) {
-    if (dealerBJ && !playerBJ)      { bannerTitle = 'Dealer Blackjack'; bannerTitleColor = 'text-red-400'   }
+    if (dealerBJ && playerBJ)        { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
+    else if (dealerBJ)               { bannerTitle = 'Dealer Blackjack'; bannerTitleColor = 'text-red-400'   }
     else if (playerBJ)               { bannerTitle = 'Player Blackjack'; bannerTitleColor = 'text-amber-400' }
     else if (dealer22)               { bannerTitle = '22 Push';          bannerTitleColor = 'text-stone-300' }
     else if (allBust)                { bannerTitle = 'Player Bust';      bannerTitleColor = 'text-red-400'   }
