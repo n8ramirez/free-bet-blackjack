@@ -1,3 +1,4 @@
+import { SafeButton } from './SafeButton'
 
 type ActionBarProps = {
   canHit:      boolean
@@ -23,7 +24,7 @@ type BtnProps = {
 
 function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color }: BtnProps) {
   const btn = (
-    <button
+    <SafeButton
       onClick={onClick}
       disabled={disabled}
       className={`
@@ -39,7 +40,7 @@ function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color
     >
       <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
       <span className="relative text-base leading-none">{label}</span>
-    </button>
+    </SafeButton>
   )
 
   if (free) {

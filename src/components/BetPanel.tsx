@@ -1,4 +1,5 @@
 import { CHIPS, CHIP_LABELS, CHIP_COLORS, MIN_BET } from '../hooks/useGameState'
+import { SafeButton } from './SafeButton'
 
 type BetPanelProps = {
   bankrollCents:           number
@@ -43,7 +44,7 @@ export function BetPanel({
 
       {/* Tabs */}
       <div className="flex w-full border-b border-stone-700">
-        <button
+        <SafeButton
           onClick={sideBetPanelOpen ? onToggleSideBetPanel : undefined}
           className={`flex-1 pb-2 text-[11px] font-bold uppercase tracking-widest transition-colors
             ${!sideBetPanelOpen
@@ -51,8 +52,8 @@ export function BetPanel({
               : 'text-stone-500 hover:text-stone-300'}`}
         >
           Main Bet
-        </button>
-        <button
+        </SafeButton>
+        <SafeButton
           onClick={onToggleSideBetPanel}
           className={`flex-1 pb-2 text-[11px] font-bold uppercase tracking-widest transition-colors
             ${sideBetPanelOpen
@@ -74,7 +75,7 @@ export function BetPanel({
               </span>
             )}
           </span>
-        </button>
+        </SafeButton>
       </div>
 
       {/* Bet display row */}
@@ -100,7 +101,7 @@ export function BetPanel({
           const { bg, border } = CHIP_COLORS[i]
           const canAfford = bankrollCents >= totalSpent + cents
           return (
-            <button
+            <SafeButton
               key={cents}
               onClick={() => onAddChip(cents)}
               disabled={!canAfford}
@@ -115,7 +116,7 @@ export function BetPanel({
               `}
             >
               {CHIP_LABELS[i]}
-            </button>
+            </SafeButton>
           )
         })}
       </div>
@@ -123,33 +124,33 @@ export function BetPanel({
       {/* Action row */}
       <div className="flex gap-2 w-full">
         {hasActiveBet ? (
-          <button
+          <SafeButton
             onClick={onClearBet}
-            className="relative overflow-hidden flex-1 py-3 rounded-xl bg-rose-700 hover:bg-rose-600
-              text-white text-lg font-bold active:scale-95 transition-all shadow-[0_4px_0px_#9f1239] active:shadow-none active:translate-y-1"
+            className="relative overflow-hidden flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-500
+              text-white text-lg font-bold active:scale-95 transition-all shadow-[0_4px_0px_#92400e] active:shadow-none active:translate-y-1"
           >
             <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
             <span className="relative">{sideBetPanelOpen ? 'Clear Side Bet' : 'Clear'}</span>
-          </button>
+          </SafeButton>
         ) : showRebet ? (
           (() => {
             const lastTotal    = lastBetCents + lastPotOfGoldBetCents + lastPush22BetCents + lastHellraiserBetCents
             const hasSideBets  = lastPotOfGoldBetCents > 0 || lastPush22BetCents > 0 || lastHellraiserBetCents > 0
             const withSideBets = hasSideBets && lastTotal <= bankrollCents
             return (
-              <button
+              <SafeButton
                 onClick={withSideBets ? onReBetWithSideBets : onReBet}
                 className={`relative overflow-hidden flex-1 py-3 rounded-xl bg-violet-700 hover:bg-violet-600
                   text-lg font-bold active:scale-95 transition-all text-white shadow-[0_4px_0px_#4c1d95] active:shadow-none active:translate-y-1`}
               >
                 <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
                 <span className="relative">{withSideBets ? `Rebet + Side Bets ${fmtDollars(lastTotal)}` : `Rebet ${fmtDollars(lastBetCents)}`}</span>
-              </button>
+              </SafeButton>
             )
           })()
         ) : null}
 
-        <button
+        <SafeButton
           onClick={onDeal}
           disabled={!canDeal}
           className={`
@@ -163,7 +164,7 @@ export function BetPanel({
             <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
           </>}
           <span className="relative">Deal</span>
-        </button>
+        </SafeButton>
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import type { SideBetType } from '../hooks/useGameState'
+import { SafeButton } from './SafeButton'
 
 type SideBetPanelProps = {
   isOpen:             boolean
@@ -110,7 +111,7 @@ export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push2
         {tabs.map((tab, i) => {
           const isActive = selectedSideBet === tab.key
           return (
-            <button
+            <SafeButton
               key={tab.key}
               onClick={() => onSelectSideBet(tab.key)}
               className={`flex-1 flex flex-col items-center gap-0.5 py-2 px-2 transition-colors
@@ -127,7 +128,7 @@ export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push2
                 {tab.betCents > 0 ? fmtDollars(tab.betCents) : '—'}
               </div>
               <div className={`h-0.5 w-8 rounded-full ${isActive ? tab.barColor : 'bg-transparent'}`} />
-            </button>
+            </SafeButton>
           )
         })}
       </div>
