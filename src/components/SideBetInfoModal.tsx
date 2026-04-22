@@ -160,11 +160,12 @@ function Push22Info() {
 
       <Section title="Winning conditions">
         <Rule>Dealer's final total is exactly <span className="text-sky-400 font-semibold">22</span> — side bet pays {PUSH22_PAYOUT} to 1.</Rule>
-        <Rule>Pays out even if your main hand busted.</Rule>
+        <Rule>Pays out even if your main hand busted and dealer finishes with 22.</Rule>
+        <Rule>Pays out even if your main hand is blackjack and dealer finishes with 22.</Rule>
       </Section>
 
       <Section title="Losing conditions">
-        <Rule>Dealer finishes with any total other than 22.</Rule>
+        <Rule>Dealer finishes with any total other than exactly <span className="text-sky-400 font-semibold">22</span>.</Rule>
         <Rule>Dealer blackjack (21) — side bet loses.</Rule>
         <Rule>Dealer busts with 23 or more — side bet loses.</Rule>
       </Section>
@@ -204,7 +205,7 @@ function HellraiserInfo() {
 
       <Section title="How it works">
         <Rule>Only the <span className="text-orange-400 font-semibold">best qualifying hand</span> pays — e.g. Three of a Kind Suited pays instead of Three of a Kind.</Rule>
-        <Rule>Ace counts both <span className="text-orange-400 font-semibold">high and low</span> for straights (A-2-3 and Q-K-A).</Rule>
+        <Rule>Ace counts both <span className="text-orange-400 font-semibold">high and low</span> for straights (A-K-Q and A-2-3).</Rule>
         <Rule>Result is shown immediately after the deal, before you act.</Rule>
         <Rule>Pays out even if the dealer has blackjack.</Rule>
       </Section>
