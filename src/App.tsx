@@ -8,6 +8,7 @@ import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
 import { LeaderboardModal } from './components/LeaderboardModal'
+import { MenuModal } from './components/MenuModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
 import {
@@ -26,6 +27,7 @@ export default function App() {
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
   const [debugSplit, setDebugSplit] = useState(false)
   const [showSideBetInfo, setShowSideBetInfo] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -66,10 +68,10 @@ export default function App() {
   }
 
   async function handleOpenLeaderboard() {
-    const entries = await getLeaderboard()
-    setLeaderboardEntries(entries)
     setHighlightIndex(undefined)
     setShowLeaderboard(true)
+    const entries = await getLeaderboard()
+    setLeaderboardEntries(entries)
   }
 
   const [animatedBankroll, snapBankroll] = useCountUp(game.bankrollCents, 700, 600)
@@ -151,6 +153,13 @@ export default function App() {
         />
       )}
       {showSideBetInfo && <SideBetInfoModal onClose={() => setShowSideBetInfo(false)} />}
+      {showMenu && (
+        <MenuModal
+          onClose={() => setShowMenu(false)}
+          onHowToPlay={() => setShowRules(true)}
+          onLeaderboard={handleOpenLeaderboard}
+        />
+      )}
       {showHighScoreEntry && qualifyingRank !== null && (
         <HighScoreModal
           peakBankrollCents={game.peakBankrollCents}
@@ -161,10 +170,10 @@ export default function App() {
       )}
 
       {/* ── Top bar + Marquee ───────────────────────────────────── */}
-      <div className="flex-none grid grid-cols-3 items-center px-5 py-3 bg-felt-light border-b border-felt-border">
+      <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative">
         {/* Left — Bankroll */}
         <div>
-          <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
+          <div className="text-stone-500 text-[9px] uppercase tracking-widest">Bankroll</div>
           <div className="text-white font-bold text-base">
             ${Math.round(animatedBankroll / 100).toLocaleString()}
           </div>
@@ -173,68 +182,19 @@ export default function App() {
         {/* Center — always perfectly centered */}
         <div className="flex flex-col items-center">
           <div className="text-white text-[9px] uppercase tracking-widest">Free Bet</div>
-          <div className="relative flex items-center justify-center">
-            <button
-              onClick={handleOpenLeaderboard}
-              className="absolute right-full mr-2 w-6 h-6 rounded-full border-2 border-amber-400 text-amber-400
-                hover:border-amber-300 hover:text-amber-300 transition-colors
-                flex items-center justify-center"
-            >
-              <svg viewBox="0 0 14 11" width="11" height="9" fill="currentColor">
-                {/* 2nd place block (left) */}
-                <rect x="0" y="4" width="4" height="7" rx="0.5" />
-                {/* 1st place block (center) */}
-                <rect x="5" y="1" width="4" height="10" rx="0.5" />
-                {/* 3rd place block (right) */}
-                <rect x="10" y="6" width="4" height="5" rx="0.5" />
-              </svg>
-            </button>
-            <div className="text-amber-400 font-bold text-sm">Blackjack</div>
-            <button
-              onClick={() => setShowRules(true)}
-              className="absolute left-full ml-2 w-6 h-6 rounded-full border-2 border-sky-300 text-sky-300
-                hover:border-sky-200 hover:text-sky-200 transition-colors
-                flex items-center justify-center text-[12px] font-bold leading-none"
-            >
-              i
-            </button>
-          </div>
+          <div className="text-amber-400 font-bold text-sm">Blackjack</div>
         </div>
 
-        {/* Right — Bet + POG indicator */}
-        <div className="text-right">
-          {(isDealing || isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
-            <>
-              <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
-              <div className="text-amber-400 font-bold text-base">
-                ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
-              </div>
-              {game.lastPotOfGoldBetCents > 0 && (
-                <div className="flex items-center justify-end gap-1 mt-1">
-                  <PotOfGoldIcon className="w-4 h-4" />
-                  <span className="text-amber-400 text-[10px] font-bold">
-                    ${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
-                  </span>
-                </div>
-              )}
-              {game.lastPush22BetCents > 0 && (
-                <div className="flex items-center justify-end gap-1 mt-1">
-                  <Push22Icon className="w-4 h-4" />
-                  <span className="text-sky-400 text-[10px] font-bold">
-                    ${(game.lastPush22BetCents / 100).toLocaleString()}
-                  </span>
-                </div>
-              )}
-              {game.lastHellraiserBetCents > 0 && (
-                <div className="flex items-center justify-end gap-1 mt-1">
-                  <HellraiserIcon className="w-4 h-4" />
-                  <span className="text-orange-400 text-[10px] font-bold">
-                    ${(game.lastHellraiserBetCents / 100).toLocaleString()}
-                  </span>
-                </div>
-              )}
-            </>
-          )}
+        {/* Right — Hamburger menu */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowMenu(true)}
+            className="flex flex-col justify-center gap-[5px] w-8 h-8 items-center"
+          >
+            <span className="block w-5 h-0.5 bg-stone-500 rounded-full" />
+            <span className="block w-5 h-0.5 bg-stone-500 rounded-full" />
+            <span className="block w-5 h-0.5 bg-stone-500 rounded-full" />
+          </button>
         </div>
       </div>
 
@@ -249,6 +209,41 @@ export default function App() {
 
       {/* ── Dealer area ─────────────────────────────────────────── */}
       <div className={`relative flex-1 flex flex-col items-center min-h-0 ${isOver ? 'z-10' : 'z-20'} ${isQuadrant ? 'justify-start pt-[6px]' : 'justify-center py-4'}`}>
+
+        {/* Bet overlay — left side, just below header */}
+        {(isDealing || isPlayerTurn || isDealerTurn || isOver) && game.engine.playerHands.length > 0 && (
+          <div className="absolute top-2 left-3 z-10 flex flex-col gap-0.5">
+            <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
+            <div className="text-amber-400 font-bold text-base">
+              ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
+            </div>
+            {game.lastPotOfGoldBetCents > 0 && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <PotOfGoldIcon className="w-4 h-4" />
+                <span className="text-amber-400 text-[10px] font-bold">
+                  ${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {game.lastPush22BetCents > 0 && (
+              <div className="flex items-center gap-1">
+                <Push22Icon className="w-4 h-4" />
+                <span className="text-sky-400 text-[10px] font-bold">
+                  ${(game.lastPush22BetCents / 100).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {game.lastHellraiserBetCents > 0 && (
+              <div className="flex items-center gap-1">
+                <HellraiserIcon className="w-4 h-4" />
+                <span className="text-orange-400 text-[10px] font-bold">
+                  ${(game.lastHellraiserBetCents / 100).toLocaleString()}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {dealerHand.cards.length > 0 ? (
           <CardHand
             hand={dealerHand}
