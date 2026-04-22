@@ -8,6 +8,7 @@ type SideBetPanelProps = {
   push22BetCents:     number
   hellraiserBetCents: number
   onSelectSideBet:    (type: SideBetType) => void
+  onShowInfo:         () => void
 }
 
 export const PotOfGoldIcon = ({ className = '' }: { className?: string }) => (
@@ -70,7 +71,7 @@ type TabConfig = {
   barColor:    string
 }
 
-export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push22BetCents, hellraiserBetCents, onSelectSideBet }: SideBetPanelProps) {
+export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push22BetCents, hellraiserBetCents, onSelectSideBet, onShowInfo }: SideBetPanelProps) {
   const tabs: TabConfig[] = [
     {
       key:         'pot-of-gold',
@@ -102,11 +103,23 @@ export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push2
     <div
       className={`
         absolute bottom-full left-0 right-0 z-0
-        bg-stone-900 border-t border-stone-700 rounded-t-2xl overflow-hidden
         transition-[transform,opacity] duration-200 ease-in-out
-        ${isOpen ? 'translate-y-0 opacity-100 pointer-events-auto shadow-[0_-6px_24px_rgba(0,0,0,0.6),0_20px_0_0_#1c1917]' : 'translate-y-full opacity-0 pointer-events-none'}
+        ${isOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-full opacity-0 pointer-events-none'}
       `}
     >
+      {/* Floating info button — hovers above the Hellraiser (rightmost) tab */}
+      <SafeButton
+        onClick={onShowInfo}
+        className="absolute -top-12 right-7 z-10 w-8 h-8 rounded-full
+          bg-stone-900 border-2 border-amber-400 text-amber-400
+          hover:border-amber-300 hover:text-amber-300 transition-colors
+          flex items-center justify-center text-lg font-extrabold leading-none
+          shadow-[0_2px_8px_rgba(0,0,0,0.6)] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+      >
+        ?
+      </SafeButton>
+
+      <div className={`bg-stone-900 border-t border-stone-700 rounded-t-2xl overflow-hidden ${isOpen ? 'shadow-[0_-6px_24px_rgba(0,0,0,0.6),0_20px_0_0_#1c1917]' : ''}`}>
       <div className="flex border-b border-stone-700">
         {tabs.map((tab, i) => {
           const isActive = selectedSideBet === tab.key
@@ -131,6 +144,7 @@ export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push2
             </SafeButton>
           )
         })}
+      </div>
       </div>
     </div>
   )

@@ -18,7 +18,6 @@ type BetPanelProps = {
   onReBetWithSideBets:     () => void
   onDeal:                  () => void
   onToggleSideBetPanel:    () => void
-  onShowInfo:              () => void
 }
 
 function fmtDollars(cents: number): string {
@@ -29,7 +28,7 @@ function fmtDollars(cents: number): string {
 export function BetPanel({
   bankrollCents, pendingBetCents, potOfGoldBetCents, push22BetCents, hellraiserBetCents,
   lastBetCents, lastPotOfGoldBetCents, lastPush22BetCents, lastHellraiserBetCents,
-  sideBetPanelOpen, onAddChip, onClearBet, onReBet, onReBetWithSideBets, onDeal, onToggleSideBetPanel, onShowInfo,
+  sideBetPanelOpen, onAddChip, onClearBet, onReBet, onReBetWithSideBets, onDeal, onToggleSideBetPanel,
 }: BetPanelProps) {
   const totalSideBets = potOfGoldBetCents + push22BetCents + hellraiserBetCents
   const totalSpent    = pendingBetCents + totalSideBets
@@ -60,21 +59,7 @@ export function BetPanel({
               ? 'text-amber-400 border-b-2 border-amber-400 -mb-px'
               : 'text-stone-500 hover:text-stone-300'}`}
         >
-          <span className="flex items-center justify-center gap-1.5 w-full">
-            <span className={`w-4 h-4 flex-shrink-0 ${sideBetPanelOpen ? 'invisible' : 'hidden'}`} />
-            Side Bets
-            {sideBetPanelOpen && (
-              <span
-                role="button"
-                onClick={e => { e.stopPropagation(); onShowInfo() }}
-                className="w-4 h-4 flex-shrink-0 rounded-full border border-amber-400 text-amber-400
-                  hover:border-amber-300 hover:text-amber-300 transition-colors
-                  flex items-center justify-center text-[10px] font-bold leading-none"
-              >
-                ?
-              </span>
-            )}
-          </span>
+          Side Bets
         </SafeButton>
       </div>
 

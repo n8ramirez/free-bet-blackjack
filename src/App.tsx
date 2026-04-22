@@ -142,7 +142,7 @@ export default function App() {
 
   return (
     <div className="h-[100dvh] bg-felt flex flex-col overflow-hidden">
-      {showRules && <RulesModal onClose={() => setShowRules(false)} />}
+      {showRules && <RulesModal onClose={() => setShowRules(false)} onShowSideBets={() => { setShowRules(false); setShowSideBetInfo(true) }} />}
       {showLeaderboard && (
         <LeaderboardModal
           entries={leaderboardEntries}
@@ -444,6 +444,7 @@ export default function App() {
           push22BetCents={game.push22BetCents}
           hellraiserBetCents={game.hellraiserBetCents}
           onSelectSideBet={game.selectSideBet}
+          onShowInfo={() => setShowSideBetInfo(true)}
         />
 
         {/* Betting phase */}
@@ -466,7 +467,6 @@ export default function App() {
               onReBetWithSideBets={game.reBetWithSideBets}
               onDeal={game.deal}
               onToggleSideBetPanel={game.toggleSideBetPanel}
-              onShowInfo={() => setShowSideBetInfo(true)}
             />
           </div>
         )}

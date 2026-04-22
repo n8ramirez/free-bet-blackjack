@@ -64,11 +64,16 @@ export function SideBetInfoModal({ onClose }: Props) {
           </button>
         </div>
 
-        {/* Content */}
-        <div className="px-5 py-4">
-          {tab === 'pot-of-gold' && <PotOfGoldInfo />}
-          {tab === 'push-22'     && <Push22Info />}
-          {tab === 'hellraiser'  && <HellraiserInfo />}
+        {/* Content — height locked to PotOfGold via invisible spacer */}
+        <div className="relative">
+          <div className="invisible pointer-events-none px-5 py-4" aria-hidden>
+            <PotOfGoldInfo />
+          </div>
+          <div className="absolute inset-0 px-5 py-4">
+            {tab === 'pot-of-gold' && <PotOfGoldInfo />}
+            {tab === 'push-22'     && <Push22Info />}
+            {tab === 'hellraiser'  && <HellraiserInfo />}
+          </div>
         </div>
       </div>
     </div>

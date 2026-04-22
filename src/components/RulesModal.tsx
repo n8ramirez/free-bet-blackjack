@@ -1,7 +1,7 @@
 
-type Props = { onClose: () => void }
+type Props = { onClose: () => void; onShowSideBets: () => void }
 
-export function RulesModal({ onClose }: Props) {
+export function RulesModal({ onClose, onShowSideBets }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
@@ -13,7 +13,7 @@ export function RulesModal({ onClose }: Props) {
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-700">
+        <div className="flex items-center justify-between px-5 py-4">
           <div>
             <div className="text-white text-[9px] uppercase tracking-widest">How to play</div>
             <div className="text-amber-400 font-bold text-base">Free Bet Blackjack</div>
@@ -23,6 +23,23 @@ export function RulesModal({ onClose }: Props) {
             className="text-stone-400 hover:text-white text-xl leading-none px-2"
           >
             ✕
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-stone-700">
+          <button
+            className="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+              text-white border-b-2 border-white -mb-px"
+          >
+            Rules
+          </button>
+          <button
+            onClick={onShowSideBets}
+            className="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+              text-stone-500 hover:text-stone-300"
+          >
+            Side Bets
           </button>
         </div>
 
