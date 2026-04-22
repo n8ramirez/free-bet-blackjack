@@ -170,7 +170,7 @@ export default function App() {
       )}
 
       {/* ── Top bar + Marquee ───────────────────────────────────── */}
-      <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative">
+      <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative [padding-top:max(0.75rem,env(safe-area-inset-top))]">
         {/* Left — Bankroll */}
         <div>
           <div className="text-stone-500 text-[9px] uppercase tracking-widest">Bankroll</div>
