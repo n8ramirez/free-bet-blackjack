@@ -200,7 +200,7 @@ export default function App() {
 
       {/* ── Marquee banner (first load + game over only) ────────── */}
       {isBetting && (game.lastBetCents === 0 || game.isGameOver) && (
-      <div className="flex-none bg-sky-300 overflow-hidden h-6 flex items-center">
+      <div className="flex-none bg-sky-300 overflow-hidden h-6 flex items-center mt-2">
         <span className="marquee-track text-[10px] font-bold text-sky-950 uppercase tracking-wide px-4">
           🏆&nbsp; Thank you for playing Free Bet Blackjack. Check back often for new features and updates! &nbsp;🏆
         </span>
