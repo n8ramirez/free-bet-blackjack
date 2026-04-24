@@ -1,0 +1,32 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="gBody" cx="38%" cy="32%" r="70%">
+      <stop offset="0%" stop-color="#E8304A"></stop>
+      <stop offset="60%" stop-color="#C0182E"></stop>
+      <stop offset="100%" stop-color="#8A0F20"></stop>
+    </radialGradient>
+    <radialGradient id="gRim" cx="50%" cy="50%" r="50%">
+      <stop offset="70%" stop-color="#C0182E"></stop>
+      <stop offset="100%" stop-color="#8A0F20"></stop>
+    </radialGradient>
+    <radialGradient id="gSheen" cx="40%" cy="25%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.22)"></stop>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
+    </radialGradient>
+    <clipPath id="outerClip"><circle cx="64" cy="64" r="56"></circle></clipPath>
+    <filter id="shadow" x="-15%" y="-10%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.55)"></feDropShadow>
+    </filter>
+  </defs>
+  <ellipse cx="64" cy="67" rx="56" ry="22.4" fill="rgba(0,0,0,0.30)" filter="url(#shadow)"></ellipse>
+  <circle cx="64" cy="64" r="56" fill="url(#gRim)" filter="url(#shadow)"></circle>
+  <g clip-path="url(#outerClip)"><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(0, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(45, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(90, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(135, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(180, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(225, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(270, 64, 64)"></rect><rect x="59.5" y="7" width="9" height="10" fill="#FFFFFF" rx="2" transform="rotate(315, 64, 64)"></rect></g>
+  <circle cx="64" cy="64" r="48" fill="url(#gBody)"></circle>
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.6" stroke-dasharray="4 3"></circle>
+  <circle cx="95.11" cy="95.11" r="2.5" fill="#FFFFFF" opacity="0.7"></circle><circle cx="32.89" cy="95.11" r="2.5" fill="#FFFFFF" opacity="0.7"></circle><circle cx="32.89" cy="32.89" r="2.5" fill="#FFFFFF" opacity="0.7"></circle><circle cx="95.11" cy="32.89" r="2.5" fill="#FFFFFF" opacity="0.7"></circle>
+  <circle cx="64" cy="64" r="36" fill="#FFFFFF"></circle>
+  <circle cx="64" cy="64" r="36" fill="none" stroke="#C0182E" stroke-width="1.5" stroke-opacity="0.35"></circle>
+  <text x="64" y="65" text-anchor="middle" dominant-baseline="middle" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif" font-weight="700" font-size="30" fill="#111111" letter-spacing="-1">5</text>
+  <circle cx="64" cy="64" r="56" fill="url(#gSheen)" clip-path="url(#outerClip)"></circle>
+</svg>

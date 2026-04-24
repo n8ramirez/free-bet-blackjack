@@ -15,17 +15,6 @@ export const STARTING_BANKROLL = 50_000
 export const MIN_BET            = 500
 export const CHIPS              = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 500_000]
 export const CHIP_LABELS        = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K', '$5K']
-export const CHIP_COLORS = [
-  { bg: 'bg-red-600',    border: 'border-red-400',    shadow: 'shadow-red-900/60'    },
-  { bg: 'bg-blue-600',   border: 'border-blue-400',   shadow: 'shadow-blue-900/60'   },
-  { bg: 'bg-green-600',  border: 'border-green-400',  shadow: 'shadow-green-900/60'  },
-  { bg: 'bg-stone-600',  border: 'border-stone-400',  shadow: 'shadow-stone-900/60'  },
-  { bg: 'bg-violet-700', border: 'border-violet-400', shadow: 'shadow-violet-900/60' },
-  { bg: 'bg-amber-500',  border: 'border-amber-300',  shadow: 'shadow-amber-900/60'  },
-  { bg: 'bg-orange-600', border: 'border-orange-400', shadow: 'shadow-orange-900/60' },
-  { bg: 'bg-slate-800',  border: 'border-slate-400',  shadow: 'shadow-slate-900/60'  },
-  { bg: 'bg-cyan-700',   border: 'border-cyan-400',   shadow: 'shadow-cyan-900/60'   },
-]
 
 // ---------------------------------------------------------------------------
 // Pot of Gold side bet
