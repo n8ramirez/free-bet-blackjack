@@ -112,7 +112,7 @@ export function BetPanel({
                     ${canAfford ? '' : 'opacity-30 cursor-not-allowed'}
                   `}
                 >
-                  <img src={CHIP_IMAGES[i]} alt={CHIP_LABELS[i]} className="w-full h-full" draggable={false} />
+                  <img src={CHIP_IMAGES[i]} alt={CHIP_LABELS[i]} className="w-full h-full" draggable={false} onContextMenu={(e) => e.preventDefault()} style={{ WebkitTouchCallout: 'none', userSelect: 'none' }} />
                 </SafeButton>
               )
             })}
