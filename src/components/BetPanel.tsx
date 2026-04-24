@@ -1,5 +1,16 @@
-import { CHIPS, CHIP_LABELS, CHIP_COLORS, MIN_BET } from '../hooks/useGameState'
+import { CHIPS, CHIP_LABELS, MIN_BET } from '../hooks/useGameState'
 import { SafeButton } from './SafeButton'
+import chip5   from '../assets/chips/chip-5.svg'
+import chip10  from '../assets/chips/chip-10.svg'
+import chip25  from '../assets/chips/chip-25.svg'
+import chip50  from '../assets/chips/chip-50.svg'
+import chip100 from '../assets/chips/chip-100.svg'
+import chip250 from '../assets/chips/chip-250.svg'
+import chip500 from '../assets/chips/chip-500.svg'
+import chip1k  from '../assets/chips/chip-1k.svg'
+import chip5k  from '../assets/chips/chip-5k.svg'
+
+const CHIP_IMAGES = [chip5, chip10, chip25, chip50, chip100, chip250, chip500, chip1k, chip5k]
 
 type BetPanelProps = {
   bankrollCents:           number
@@ -83,7 +94,6 @@ export function BetPanel({
       {/* Chips */}
       <div className="flex gap-3 flex-wrap justify-center">
         {CHIPS.map((cents, i) => {
-          const { bg, border } = CHIP_COLORS[i]
           const canAfford = bankrollCents >= totalSpent + cents
           return (
             <SafeButton
@@ -91,16 +101,15 @@ export function BetPanel({
               onClick={() => onAddChip(cents)}
               disabled={!canAfford}
               className={`
-                w-14 h-14 rounded-full border-[4px] border-dashed font-bold text-xs text-white
-                ${bg} ${border}
-                shadow-[0_5px_0px_rgba(0,0,0,0.5)]
-                active:shadow-[0_1px_0px_rgba(0,0,0,0.5)]
+                w-16 h-16 p-0 bg-transparent border-none
+                [filter:drop-shadow(0_5px_0px_rgba(0,0,0,0.5))]
+                active:[filter:drop-shadow(0_1px_0px_rgba(0,0,0,0.5))]
                 active:translate-y-[4px]
                 transition-transform
                 ${canAfford ? '' : 'opacity-30 cursor-not-allowed'}
               `}
             >
-              {CHIP_LABELS[i]}
+              <img src={CHIP_IMAGES[i]} alt={CHIP_LABELS[i]} className="w-full h-full" draggable={false} />
             </SafeButton>
           )
         })}
