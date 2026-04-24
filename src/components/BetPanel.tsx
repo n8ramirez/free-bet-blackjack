@@ -92,27 +92,32 @@ export function BetPanel({
       </div>
 
       {/* Chips */}
-      <div className="flex gap-3 flex-wrap justify-center">
-        {CHIPS.map((cents, i) => {
-          const canAfford = bankrollCents >= totalSpent + cents
-          return (
-            <SafeButton
-              key={cents}
-              onClick={() => onAddChip(cents)}
-              disabled={!canAfford}
-              className={`
-                w-16 h-16 p-0 bg-transparent border-none
-                [filter:drop-shadow(0_5px_0px_rgba(0,0,0,0.5))]
-                active:[filter:drop-shadow(0_1px_0px_rgba(0,0,0,0.5))]
-                active:translate-y-[4px]
-                transition-transform
-                ${canAfford ? '' : 'opacity-30 cursor-not-allowed'}
-              `}
-            >
-              <img src={CHIP_IMAGES[i]} alt={CHIP_LABELS[i]} className="w-full h-full" draggable={false} />
-            </SafeButton>
-          )
-        })}
+      <div className="flex flex-col items-center gap-2">
+        {[CHIPS.slice(0, 5), CHIPS.slice(5)].map((row, rowIdx) => (
+          <div key={rowIdx} className="flex gap-3">
+            {row.map((cents, j) => {
+              const i = rowIdx === 0 ? j : j + 5
+              const canAfford = bankrollCents >= totalSpent + cents
+              return (
+                <SafeButton
+                  key={cents}
+                  onClick={() => onAddChip(cents)}
+                  disabled={!canAfford}
+                  className={`
+                    w-16 h-16 p-0 bg-transparent border-none
+                    [filter:drop-shadow(0_5px_0px_rgba(0,0,0,0.5))]
+                    active:[filter:drop-shadow(0_1px_0px_rgba(0,0,0,0.5))]
+                    active:translate-y-[4px]
+                    transition-transform
+                    ${canAfford ? '' : 'opacity-30 cursor-not-allowed'}
+                  `}
+                >
+                  <img src={CHIP_IMAGES[i]} alt={CHIP_LABELS[i]} className="w-full h-full" draggable={false} />
+                </SafeButton>
+              )
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Action row */}
