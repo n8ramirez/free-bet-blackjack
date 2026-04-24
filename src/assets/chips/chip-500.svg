@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
   <defs>
     <radialGradient id="gBody" cx="38%" cy="32%" r="70%">
@@ -25,8 +25,7 @@
   <circle cx="64" cy="64" r="48" fill="url(#gBody)"></circle>
   <circle cx="64" cy="64" r="44" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.6" stroke-dasharray="4 3"></circle>
   <circle cx="95.11" cy="95.11" r="2.5" fill="#FFFFFF" opacity="0.7"></circle><circle cx="32.89" cy="95.11" r="2.5" fill="#FFFFFF" opacity="0.7"></circle><circle cx="32.89" cy="32.89" r="2.5" fill="#FFFFFF" opacity="0.7"></circle><circle cx="95.11" cy="32.89" r="2.5" fill="#FFFFFF" opacity="0.7"></circle>
-  <circle cx="64" cy="64" r="36" fill="#FFFFFF"></circle>
-  <circle cx="64" cy="64" r="36" fill="none" stroke="#C84010" stroke-width="1.5" stroke-opacity="0.35"></circle>
-  <text x="64" y="65" text-anchor="middle" dominant-baseline="middle" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif" font-weight="700" font-size="30" fill="#111111" letter-spacing="-2">500</text>
+  <circle cx="64" cy="64" r="36" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.4"></circle>
+  <text x="64" y="64" dy="0.35em" text-anchor="middle" font-family="&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif" font-weight="700" font-size="29" fill="#FFFFFF">500</text>
   <circle cx="64" cy="64" r="56" fill="url(#gSheen)" clip-path="url(#outerClip)"></circle>
 </svg>
