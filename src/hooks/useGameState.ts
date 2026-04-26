@@ -313,7 +313,7 @@ export function useGameState() {
 
         if (playerBJ || dealerBJ) {
           // BJ path — no player actions, so don't show in-play banner; show at round-over
-          return startDealerTurn(sWithHR, engine, playerBJ && !dealerBJ)
+          return startDealerTurn({ ...sWithHR, hellraiserBannerVisible: hellraiserResult !== null }, engine, playerBJ && !dealerBJ)
         }
         return {
           ...sWithHR,
