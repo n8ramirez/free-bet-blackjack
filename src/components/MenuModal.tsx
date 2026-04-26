@@ -1,17 +1,20 @@
 type Props = {
-  onClose:         () => void
-  onHowToPlay:     () => void
-  onLeaderboard:   () => void
+  onClose:        () => void
+  onHowToPlay:    () => void
+  onLeaderboard:  () => void
+  onSettings:     () => void
+  onRestartGame:  () => void
 }
 
 type MenuItemProps = {
-  label:    string
-  icon?:    React.ReactNode
-  onClick?: () => void
-  disabled?: boolean
+  label:      string
+  icon?:      React.ReactNode
+  onClick?:   () => void
+  disabled?:  boolean
+  comingSoon?: boolean
 }
 
-function MenuItem({ label, icon, onClick, disabled }: MenuItemProps) {
+function MenuItem({ label, icon, onClick, disabled, comingSoon }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
@@ -21,7 +24,7 @@ function MenuItem({ label, icon, onClick, disabled }: MenuItemProps) {
           ? 'text-stone-600 cursor-default'
           : 'text-white hover:bg-stone-800 active:bg-stone-700'}`}
     >
-      {disabled ? (
+      {comingSoon ? (
         <span className="text-[10px] font-bold uppercase tracking-widest text-stone-600">Coming Soon</span>
       ) : (
         <span className="flex items-center gap-3">
@@ -33,7 +36,7 @@ function MenuItem({ label, icon, onClick, disabled }: MenuItemProps) {
   )
 }
 
-export function MenuModal({ onClose, onHowToPlay, onLeaderboard }: Props) {
+export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onRestartGame }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-[10dvh]"
@@ -81,9 +84,35 @@ export function MenuModal({ onClose, onHowToPlay, onLeaderboard }: Props) {
             }
             onClick={() => { onClose(); onLeaderboard() }}
           />
-          <MenuItem label="Statistics" disabled />
-          <MenuItem label="Settings"   disabled />
-          <MenuItem label="Share"      disabled />
+          <MenuItem
+            label="Settings"
+            icon={
+              <span className="w-5 h-5 rounded-full border-2 border-amber-400 text-amber-400 flex-shrink-0"
+                style={{display:'grid', placeItems:'center'}}>
+                <svg viewBox="0.2 0.4 14 14" width="13" height="13" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.45,1.21 L8.55,1.21 L8.04,3.14 L9.83,4.17 L11.24,2.76 L12.8,5.45 L10.86,5.96 L10.86,8.04 L12.8,8.55 L11.24,11.24 L9.83,9.83 L8.04,10.86 L8.55,12.8 L5.45,12.8 L5.96,10.86 L4.17,9.83 L2.76,11.24 L1.2,8.55 L3.14,8.04 L3.14,5.96 L1.2,5.45 L2.76,2.76 L4.17,4.17 L5.96,3.14 Z M9.5,7 A2.5,2.5 0 1 0 4.5,7 A2.5,2.5 0 1 0 9.5,7 Z"/>
+                </svg>
+              </span>
+            }
+            onClick={() => { onClose(); onSettings() }}
+          />
+          <MenuItem
+            label="Restart Game"
+            icon={
+              <span className="w-5 h-5 rounded-full border-2 border-amber-400 text-amber-400 flex-shrink-0"
+                style={{display:'grid', placeItems:'center'}}>
+                <svg viewBox="0 0 14 14" width="11" height="11" fill="currentColor">
+                  <rect x="2.5" y="-0.75" width="3.2" height="1.5" rx="0.75" transform="translate(6.6,7) rotate(0)"/>
+                  <rect x="2.5" y="-0.75" width="3.2" height="1.5" rx="0.75" transform="translate(6.6,7) rotate(72)"/>
+                  <rect x="2.5" y="-0.75" width="3.2" height="1.5" rx="0.75" transform="translate(6.6,7) rotate(144)"/>
+                  <rect x="2.5" y="-0.75" width="3.2" height="1.5" rx="0.75" transform="translate(6.6,7) rotate(216)"/>
+                  <rect x="2.5" y="-0.75" width="3.2" height="1.5" rx="0.75" transform="translate(6.6,7) rotate(288)"/>
+                </svg>
+              </span>
+            }
+            onClick={() => { onClose(); onRestartGame() }}
+          />
+          <MenuItem label="Share" disabled comingSoon />
         </div>
       </div>
     </div>

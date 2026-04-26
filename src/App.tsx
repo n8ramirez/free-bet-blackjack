@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGameState, STARTING_BANKROLL } from './hooks/useGameState'
+import { useSettings } from './hooks/useSettings'
 import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
@@ -9,6 +10,8 @@ import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
 import { LeaderboardModal } from './components/LeaderboardModal'
 import { MenuModal } from './components/MenuModal'
+import { SettingsModal } from './components/SettingsModal'
+import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
 import {
@@ -17,7 +20,8 @@ import {
 } from './hooks/useLeaderboard'
 
 export default function App() {
-  const game = useGameState()
+  const game     = useGameState()
+  const settings = useSettings()
   const [showRules, setShowRules] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showHighScoreEntry, setShowHighScoreEntry] = useState(false)
@@ -27,7 +31,9 @@ export default function App() {
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
   const [debugSplit, setDebugSplit] = useState(false)
   const [showSideBetInfo, setShowSideBetInfo] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
+  const [showMenu, setShowMenu]                   = useState(false)
+  const [showSettings, setShowSettings]           = useState(false)
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -79,6 +85,12 @@ export default function App() {
   function handleResetGame() {
     snapBankroll(STARTING_BANKROLL)
     game.resetGame()
+  }
+
+  function handleRestartGame() {
+    snapBankroll(0)
+    game.restartGame()
+    setShowRestartConfirm(false)
   }
 
   const hellraiserWon = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
@@ -154,11 +166,28 @@ export default function App() {
         />
       )}
       {showSideBetInfo && <SideBetInfoModal onClose={() => setShowSideBetInfo(false)} />}
+      {showSettings && (
+        <SettingsModal
+          onClose={() => setShowSettings(false)}
+          soundEffects={settings.soundEffects}
+          music={settings.music}
+          onSoundEffects={settings.setSoundEffects}
+          onMusic={settings.setMusic}
+        />
+      )}
       {showMenu && (
         <MenuModal
           onClose={() => setShowMenu(false)}
           onHowToPlay={() => setShowRules(true)}
           onLeaderboard={handleOpenLeaderboard}
+          onSettings={() => setShowSettings(true)}
+          onRestartGame={() => setShowRestartConfirm(true)}
+        />
+      )}
+      {showRestartConfirm && (
+        <RestartConfirmModal
+          onConfirm={handleRestartGame}
+          onCancel={() => setShowRestartConfirm(false)}
         />
       )}
       {showHighScoreEntry && qualifyingRank !== null && (

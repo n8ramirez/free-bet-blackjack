@@ -166,12 +166,36 @@ export type UIState = {
   hellraiserBannerVisible: boolean
 }
 
+const BANKROLL_KEY = 'fbbj_bankroll'
+
+function loadBankroll(): { bankrollCents: number; peakBankrollCents: number } {
+  try {
+    const raw = localStorage.getItem(BANKROLL_KEY)
+    if (raw) {
+      const { bankrollCents, peakBankrollCents } = JSON.parse(raw)
+      if (typeof bankrollCents === 'number' && typeof peakBankrollCents === 'number') {
+        return { bankrollCents, peakBankrollCents }
+      }
+    }
+  } catch {}
+  return { bankrollCents: STARTING_BANKROLL, peakBankrollCents: STARTING_BANKROLL }
+}
+
+function saveBankroll(bankrollCents: number, peakBankrollCents: number) {
+  try { localStorage.setItem(BANKROLL_KEY, JSON.stringify({ bankrollCents, peakBankrollCents })) } catch {}
+}
+
+function clearBankroll() {
+  try { localStorage.removeItem(BANKROLL_KEY) } catch {}
+}
+
 function initial(): UIState {
+  const { bankrollCents, peakBankrollCents } = loadBankroll()
   return {
     phase:                   'betting',
     engine:                  createGameState(),
-    bankrollCents:           STARTING_BANKROLL,
-    peakBankrollCents:       STARTING_BANKROLL,
+    bankrollCents,
+    peakBankrollCents,
     pendingBetCents:         0,
     lastBetCents:            0,
     activeHandIndex:         0,
@@ -275,6 +299,10 @@ function afterHit(base: UIState, engine: GameState): UIState {
 // ---------------------------------------------------------------------------
 export function useGameState() {
   const [state, setState] = useState<UIState>(initial)
+
+  useEffect(() => {
+    saveBankroll(state.bankrollCents, state.peakBankrollCents)
+  }, [state.bankrollCents, state.peakBankrollCents])
 
   const { phase, revealCount, engine, activeHandIndex, dealerRevealCount, dealerStartDelay, pendingDealerTurn } = state
 
@@ -528,7 +556,37 @@ export function useGameState() {
     })
   }, [])
 
-  const resetGame = useCallback(() => setState(initial), [])
+  const resetGame = useCallback(() => { clearBankroll(); setState(initial) }, [])
+
+  const restartGame = useCallback(() => {
+    setState(s => ({
+      phase:                   'betting',
+      engine:                  createGameState(),
+      bankrollCents:           0,
+      peakBankrollCents:       s.peakBankrollCents,
+      pendingBetCents:         0,
+      lastBetCents:            0,
+      activeHandIndex:         0,
+      results:                 [],
+      dealerRevealed:          false,
+      revealCount:             0,
+      dealerRevealCount:       0,
+      dealerStartDelay:        0,
+      pendingDealerTurn:       false,
+      sideBetPanelOpen:        false,
+      selectedSideBet:         'pot-of-gold' as SideBetType,
+      potOfGoldBetCents:       0,
+      lastPotOfGoldBetCents:   0,
+      potOfGoldResult:         null,
+      push22BetCents:          0,
+      lastPush22BetCents:      0,
+      push22Result:            null,
+      hellraiserBetCents:      0,
+      lastHellraiserBetCents:  0,
+      hellraiserResult:        null,
+      hellraiserBannerVisible: false,
+    }))
+  }, [])
 
   // ---------------------------------------------------------------------------
   // Derived values
@@ -563,6 +621,6 @@ export function useGameState() {
     pendingDealerTurn,
     currentPuckCount,
     addChip, clearBet, reBet, reBetWithSideBets, selectSideBet, toggleSideBetPanel,
-    deal, hit, stand, double, split, newHand, resetGame,
+    deal, hit, stand, double, split, newHand, resetGame, restartGame,
   }
 }
