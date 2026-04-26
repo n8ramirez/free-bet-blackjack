@@ -112,7 +112,7 @@ export default function App() {
   const dealerBJ = isOver && isBlackjack(game.engine.dealer.cards)
   const dealer22 = isOver && handTotals(game.engine.dealer.cards).total === 22
   const playerBJ   = isOver && game.results.some(
-    r => r.reason === 'blackjack' || r.reason === 'blackjack vs dealer 22'
+    r => r.reason === 'blackjack' || r.reason === 'blackjack vs dealer 22' || r.reason === 'blackjack push'
   )
   const allBust    = isOver && game.results.length > 0 && game.results.every(r => r.reason === 'bust')
   let bannerTitle = ''
