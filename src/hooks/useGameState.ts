@@ -353,7 +353,7 @@ export function useGameState() {
         }
         if (hellraiserResult) {
           if (hellraiserResult.handName) playSound('side-bet-win')
-          else playSound('lose')
+          else playSound('hellraiser-lose')
         }
         return {
           ...sWithHR,
@@ -508,7 +508,7 @@ export function useGameState() {
   // -- Player turn --
 
   const hit = useCallback(() => {
-    playSound('click')
+    playSound('card-flip')
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
@@ -527,7 +527,7 @@ export function useGameState() {
   }, [])
 
   const double = useCallback(() => {
-    playSound('click')
+    playSound('card-flip')
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const hand = s.engine.playerHands[s.activeHandIndex]
