@@ -14,7 +14,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
-import { initSounds, setSoundEnabled } from './sounds'
+import { initSounds, setSoundEnabled, playSound } from './sounds'
 import {
   getLeaderboard, getQualifyingRank, addToLeaderboard,
   type LeaderboardEntry,
@@ -222,7 +222,7 @@ export default function App() {
         {/* Right — Hamburger menu */}
         <div className="flex justify-end">
           <button
-            onClick={() => setShowMenu(true)}
+            onClick={() => { playSound('click'); setShowMenu(true) }}
             className="flex flex-col justify-center gap-[5px] w-8 h-8 items-center"
           >
             <span className="block w-5 h-0.5 bg-stone-500 rounded-full" />
@@ -511,7 +511,7 @@ export default function App() {
               </span>
             </div>
             <button
-              onClick={handleResetGame}
+              onClick={() => { playSound('click'); handleResetGame() }}
               className="relative overflow-hidden w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
                 text-white font-bold text-lg active:scale-95 transition-all
                 shadow-[0_4px_0px_#14532d]"
