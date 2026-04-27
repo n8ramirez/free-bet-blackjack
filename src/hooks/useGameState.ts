@@ -270,6 +270,13 @@ function finishFromDealerTurn(base: UIState): UIState {
   }
 
 
+  const netCents   = results.reduce((sum, r) => sum + r.payoutCents, 0)
+  const push22Wins = push22Result !== null && push22Result.payoutCents > 0
+  if (netCents > 0)      playSound('win')
+  else if (netCents < 0) playSound('lose')
+  else if (push22Wins)   playSound('side-bet-win')
+  else                   playSound('push')
+
   return {
     ...base,
     phase:             'round-over',
@@ -343,6 +350,10 @@ export function useGameState() {
         if (playerBJ || dealerBJ) {
           // BJ path — no player actions, so don't show in-play banner; show at round-over
           return startDealerTurn({ ...sWithHR, hellraiserBannerVisible: hellraiserResult !== null }, engine, playerBJ && !dealerBJ)
+        }
+        if (hellraiserResult) {
+          if (hellraiserResult.handName) playSound('side-bet-win')
+          else playSound('lose')
         }
         return {
           ...sWithHR,
@@ -457,10 +468,12 @@ export function useGameState() {
   }, [])
 
   const toggleSideBetPanel = useCallback(() => {
+    playSound('click')
     setState(s => ({ ...s, sideBetPanelOpen: !s.sideBetPanelOpen }))
   }, [])
 
   const deal = useCallback(() => {
+    playSound('click')
     setState(s => {
       if (s.phase !== 'betting') return s
       if (s.pendingBetCents < MIN_BET) return s
@@ -495,6 +508,7 @@ export function useGameState() {
   // -- Player turn --
 
   const hit = useCallback(() => {
+    playSound('click')
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
@@ -504,6 +518,7 @@ export function useGameState() {
   }, [])
 
   const stand = useCallback(() => {
+    playSound('click')
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
@@ -512,6 +527,7 @@ export function useGameState() {
   }, [])
 
   const double = useCallback(() => {
+    playSound('click')
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const hand = s.engine.playerHands[s.activeHandIndex]
@@ -530,6 +546,7 @@ export function useGameState() {
   }, [])
 
   const split = useCallback(() => {
+    playSound('split')
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const hand = s.engine.playerHands[s.activeHandIndex]
@@ -549,6 +566,7 @@ export function useGameState() {
   // -- Round over --
 
   const newHand = useCallback(() => {
+    playSound('click')
     setState(s => {
       if (s.phase !== 'round-over') return s
       return {
