@@ -10,9 +10,9 @@ type Settings = {
 function load(): Settings {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { soundEffects: false, music: false, ...JSON.parse(raw) }
+    if (raw) return { soundEffects: true, music: false, ...JSON.parse(raw) }
   } catch {}
-  return { soundEffects: false, music: false }
+  return { soundEffects: true, music: false }
 }
 
 function save(settings: Settings) {
