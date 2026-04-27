@@ -1,4 +1,4 @@
-import { Howl } from 'howler'
+import { Howl, Howler } from 'howler'
 import spriteUrl from './assets/sounds/sprite.mp3'
 import spriteData from './assets/sounds/sprite.json'
 
@@ -22,4 +22,10 @@ export function setSoundEnabled(v: boolean): void {
 export function playSound(name: SoundName): void {
   if (!soundEnabled || !howl) return
   howl.play(name)
+}
+
+export function resumeAudio(): void {
+  if (Howler.ctx && Howler.ctx.state === 'suspended') {
+    Howler.ctx.resume()
+  }
 }

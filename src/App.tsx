@@ -14,7 +14,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
-import { initSounds, setSoundEnabled, playSound } from './sounds'
+import { initSounds, setSoundEnabled, playSound, resumeAudio } from './sounds'
 import {
   getLeaderboard, getQualifyingRank, addToLeaderboard,
   type LeaderboardEntry,
@@ -83,6 +83,11 @@ export default function App() {
 
   useEffect(() => { initSounds() }, [])
   useEffect(() => { setSoundEnabled(settings.soundEffects) }, [settings.soundEffects])
+  useEffect(() => {
+    const handleVisibilityChange = () => { if (document.visibilityState === 'visible') resumeAudio() }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   const [animatedBankroll, snapBankroll] = useCountUp(game.bankrollCents, 700, 600)
 
