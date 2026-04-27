@@ -14,6 +14,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
+import { initSounds, setSoundEnabled } from './sounds'
 import {
   getLeaderboard, getQualifyingRank, addToLeaderboard,
   type LeaderboardEntry,
@@ -79,6 +80,9 @@ export default function App() {
     const entries = await getLeaderboard()
     setLeaderboardEntries(entries)
   }
+
+  useEffect(() => { initSounds() }, [])
+  useEffect(() => { setSoundEnabled(settings.soundEffects) }, [settings.soundEffects])
 
   const [animatedBankroll, snapBankroll] = useCountUp(game.bankrollCents, 700, 600)
 

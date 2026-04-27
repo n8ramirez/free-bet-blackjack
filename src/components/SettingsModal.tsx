@@ -6,10 +6,10 @@ type Props = {
   onMusic:        (v: boolean) => void
 }
 
-function Toggle({ label, enabled, onToggle }: { label: string; enabled: boolean; onToggle: () => void }) {
+function Toggle({ label, enabled, onToggle, dimmed }: { label: string; enabled: boolean; onToggle: () => void; dimmed?: boolean }) {
   return (
     <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800">
-      <span className="text-[10px] font-bold uppercase tracking-widest text-stone-600">{label}</span>
+      <span className={`text-[10px] font-bold uppercase tracking-widest ${dimmed ? 'text-stone-600' : 'text-white'}`}>{label}</span>
       <button
         onClick={onToggle}
         className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0
@@ -39,8 +39,8 @@ export function SettingsModal({ onClose, soundEffects, music, onSoundEffects, on
         </div>
 
         <div className="flex flex-col">
-          <Toggle label="Sound Effects - Coming Soon" enabled={soundEffects} onToggle={() => onSoundEffects(!soundEffects)} />
-          <Toggle label="Music - Coming Soon"         enabled={music}        onToggle={() => onMusic(!music)} />
+          <Toggle label="Sound Effects"       enabled={soundEffects} onToggle={() => onSoundEffects(!soundEffects)} />
+          <Toggle label="Music - Coming Soon" enabled={music}        onToggle={() => onMusic(!music)} dimmed />
         </div>
       </div>
     </div>

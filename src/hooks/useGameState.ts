@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { playSound } from '../sounds'
 import {
   GameState, Hand, HandResult,
   createGameState, dealInitial,
@@ -400,10 +401,12 @@ export function useGameState() {
       const totalSpent = s.pendingBetCents + s.potOfGoldBetCents + s.push22BetCents + s.hellraiserBetCents
       if (totalSpent + cents > s.bankrollCents) return s
       if (s.sideBetPanelOpen) {
+        playSound('chip-side')
         if (s.selectedSideBet === 'push-22')    return { ...s, push22BetCents:    s.push22BetCents    + cents }
         if (s.selectedSideBet === 'hellraiser') return { ...s, hellraiserBetCents: s.hellraiserBetCents + cents }
         return { ...s, potOfGoldBetCents: s.potOfGoldBetCents + cents }
       }
+      playSound('chip-main')
       return { ...s, pendingBetCents: s.pendingBetCents + cents }
     })
   }, [])
@@ -412,10 +415,15 @@ export function useGameState() {
     setState(s => {
       if (s.phase !== 'betting') return s
       if (s.sideBetPanelOpen) {
+        const hasBet = s.selectedSideBet === 'push-22'    ? s.push22BetCents > 0
+                     : s.selectedSideBet === 'hellraiser' ? s.hellraiserBetCents > 0
+                     : s.potOfGoldBetCents > 0
+        if (hasBet) playSound('clear-side')
         if (s.selectedSideBet === 'push-22')    return { ...s, push22BetCents: 0 }
         if (s.selectedSideBet === 'hellraiser') return { ...s, hellraiserBetCents: 0 }
         return { ...s, potOfGoldBetCents: 0 }
       }
+      if (s.pendingBetCents > 0) playSound('clear-main')
       return { ...s, pendingBetCents: 0 }
     })
   }, [])
@@ -423,6 +431,7 @@ export function useGameState() {
   const reBet = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting' || s.lastBetCents === 0) return s
+      playSound('rebet')
       const bet = Math.min(s.lastBetCents, s.bankrollCents)
       return { ...s, pendingBetCents: bet }
     })
@@ -431,6 +440,7 @@ export function useGameState() {
   const reBetWithSideBets = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting' || s.lastBetCents === 0) return s
+      playSound('rebet')
       const bet       = Math.min(s.lastBetCents, s.bankrollCents)
       let remaining   = Math.max(0, s.bankrollCents - bet)
       const pogBet    = Math.min(s.lastPotOfGoldBetCents, remaining)
