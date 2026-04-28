@@ -54,6 +54,7 @@ export default function App() {
         if (rank !== null) {
           setQualifyingRank(rank)
           setShowHighScoreEntry(true)
+          playSound('win')
         }
       })
     }
@@ -143,7 +144,7 @@ export default function App() {
     if (dealerBJ && playerBJ)        { bannerTitle = 'Push';             bannerTitleColor = 'text-white' }
     else if (dealerBJ)               { bannerTitle = 'Dealer Blackjack'; bannerTitleColor = 'text-red-400'   }
     else if (playerBJ)               { bannerTitle = 'Player Blackjack'; bannerTitleColor = 'text-amber-400' }
-    else if (dealer22)               { bannerTitle = 'Push 22';          bannerTitleColor = push22Won ? 'text-sky-400' : 'text-stone-300' }
+    else if (dealer22)               { bannerTitle = 'Push 22';          bannerTitleColor = push22Won ? 'text-sky-400' : 'text-white'     }
     else if (allBust)                { bannerTitle = 'Player Bust';      bannerTitleColor = 'text-red-400'   }
     else if (netCents > 0)           { bannerTitle = 'Player Wins';      bannerTitleColor = 'text-emerald-400' }
     else if (netCents < 0)           { bannerTitle = 'Dealer Wins';      bannerTitleColor = 'text-red-400'   }
@@ -151,7 +152,7 @@ export default function App() {
   }
   const isRedBanner = bannerTitleColor === 'text-red-400'
   const dotColor  = isRedBanner ? 'rgba(248,113,113,0.6)' : 'rgba(214,211,209,0.4)'
-  const glowColor = isRedBanner ? 'rgba(248,113,113,1)'   : 'rgba(231,229,228,1)'
+  const glowColor = isRedBanner ? 'rgba(248,113,113,0.45)' : 'rgba(231,229,228,0.45)'
 
   const fmtDollars = (cents: number) => {
     const d = Math.abs(cents) / 100
@@ -217,7 +218,7 @@ export default function App() {
       <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative">
         {/* Left — Bankroll */}
         <div>
-          <div className="text-stone-500 text-[9px] uppercase tracking-widest">Bankroll</div>
+          <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
           <div className="text-white font-bold text-base">
             ${Math.round(animatedBankroll / 100).toLocaleString()}
           </div>
@@ -475,8 +476,8 @@ export default function App() {
                   backgroundRepeat: 'repeat-x, repeat-x',
                 }}
               >
-                <div className="dot-alt-top" style={{ background: glowColor }} />
-                <div className="dot-alt-bottom" style={{ background: glowColor }} />
+                <div className={isRedBanner ? 'dot-sync-top' : 'dot-alt-top'} style={{ background: glowColor }} />
+                <div className={isRedBanner ? 'dot-sync-bottom' : 'dot-alt-bottom'} style={{ background: glowColor }} />
                 <div
                   className="absolute top-0 left-0 right-0 bg-black z-10"
                   style={{
@@ -709,10 +710,10 @@ export default function App() {
         {/* Game over */}
         {isBetting && game.isGameOver && (
           <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-8">
-            <div className="text-stone-300 text-lg font-bold">Out of chips!</div>
+            <div className="text-stone-300 text-lg">Out of chips!</div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-stone-400 uppercase tracking-widest text-[10px]">Peak Bankroll</span>
-              <span className="text-amber-400 font-bold">
+              <span className="text-amber-400 font-medium">
                 ${(game.peakBankrollCents / 100).toLocaleString()}
               </span>
             </div>
@@ -723,7 +724,7 @@ export default function App() {
                 shadow-[0_4px_0px_#14532d]"
             >
               <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>New Game</span>
+              <span className="relative font-extrabold">New Game</span>
             </button>
           </div>
         )}
@@ -750,8 +751,7 @@ export default function App() {
         {isOver && (
           <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-6">
             {/* Net result summary */}
-            <div className={`text-2xl font-bold
-              ${netCents > 0 ? 'text-emerald-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
+            <div className={`text-2xl font-medium ${netCents > 0 ? 'text-emerald-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
             {/* POG result line */}
@@ -760,11 +760,11 @@ export default function App() {
                 <PotOfGoldIcon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Pot of Gold</span>
                 {game.potOfGoldResult.payoutCents > 0 ? (
-                  <span className="text-xs font-bold text-emerald-400">
+                  <span className="text-xs text-emerald-400 font-medium">
                     +${(game.potOfGoldResult.payoutCents / 100).toLocaleString()}
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-red-400">
+                  <span className="text-xs text-red-400 font-medium">
                     -${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
                   </span>
                 )}
@@ -776,11 +776,11 @@ export default function App() {
                 <Push22Icon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Push 22</span>
                 {game.push22Result.payoutCents > 0 ? (
-                  <span className="text-xs font-bold text-emerald-400">
+                  <span className="text-xs text-emerald-400 font-medium">
                     +${(game.push22Result.payoutCents / 100).toLocaleString()}
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-red-400">
+                  <span className="text-xs text-red-400 font-medium">
                     -${(game.lastPush22BetCents / 100).toLocaleString()}
                   </span>
                 )}
@@ -792,11 +792,11 @@ export default function App() {
                 <HellraiserIcon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Hellraiser</span>
                 {game.hellraiserResult.payoutCents > 0 ? (
-                  <span className="text-xs font-bold text-emerald-400">
+                  <span className="text-xs text-emerald-400 font-medium">
                     +${(game.hellraiserResult.payoutCents / 100).toLocaleString()}
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-red-400">
+                  <span className="text-xs text-red-400 font-medium">
                     -${(game.lastHellraiserBetCents / 100).toLocaleString()}
                   </span>
                 )}
@@ -804,7 +804,7 @@ export default function App() {
             )}
             {/* Dealer total */}
             {dealerTotalVisible && (
-              <div className="text-stone-400 text-sm">
+              <div className="text-stone-400 text-sm font-medium">
                 Dealer: {dealerTotal > 22 ? 'Bust' : dealerTotal}
               </div>
             )}
@@ -815,7 +815,7 @@ export default function App() {
                 shadow-[0_4px_0px_#14532d] active:shadow-none active:translate-y-1"
             >
               <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>New Hand</span>
+              <span className="relative font-extrabold">New Hand</span>
             </button>
           </div>
         )}

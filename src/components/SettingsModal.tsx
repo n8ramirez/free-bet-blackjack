@@ -9,7 +9,7 @@ type Props = {
 function Toggle({ label, enabled, onToggle, dimmed }: { label: string; enabled: boolean; onToggle: () => void; dimmed?: boolean }) {
   return (
     <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800">
-      <span className={`text-[10px] uppercase tracking-widest ${dimmed ? 'text-stone-600' : 'text-white'}`} style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>{label}</span>
+      <span className={`text-[10px] uppercase tracking-widest font-extrabold ${dimmed ? 'text-stone-600' : 'text-white'}`}>{label}</span>
       <button
         onClick={onToggle}
         className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0

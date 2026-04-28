@@ -41,7 +41,7 @@ function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color
       `}
     >
       <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-      <span className="relative text-base leading-none" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, ...labelStyle }}>{label}</span>
+      <span className="relative text-base leading-none font-extrabold" style={labelStyle}>{label}</span>
     </SafeButton>
   )
 

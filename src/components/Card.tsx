@@ -44,7 +44,7 @@ export function Card({ card, faceDown = false, dimmed = false, glowing = false, 
     const isRed = RED_SUITS.has(suit)
     const color = isRed ? 'text-red-600' : 'text-stone-900'
     return (
-      <div className={`${base} ${opacity} bg-stone-50 border border-stone-300 shadow-card ${animClass}`}>
+      <div className={`${base} ${opacity} bg-stone-50 border border-stone-300 shadow-card ${animClass} font-sans`}>
         {/* Top-left rank + suit */}
         <div className={`absolute top-[3px] left-[4px] flex flex-col items-center leading-none ${color}`}>
           <span className="text-[11px] font-bold">{rank}</span>

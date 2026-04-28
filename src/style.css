@@ -195,6 +195,25 @@
   100%     { opacity: 1; }
 }
 
+.dot-sync-top,
+.dot-sync-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18px;
+  pointer-events: none;
+  animation: dot-sync-on 1.6s ease-in-out infinite;
+}
+
+.dot-sync-top    { top: 0; }
+.dot-sync-bottom { bottom: 0; }
+
+@keyframes dot-sync-on {
+  0%, 40%  { opacity: 1; }
+  60%, 90% { opacity: 0; }
+  100%     { opacity: 1; }
+}
+
 @keyframes p22-sweep-top {
   0%   { transform: translateX(-80px); }
   100% { transform: translateX(100vw); }
@@ -216,5 +235,6 @@
     background-color: #1a3a27;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    font-family: 'Inter', sans-serif;
   }
 }
