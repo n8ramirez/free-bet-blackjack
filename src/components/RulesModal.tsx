@@ -16,7 +16,7 @@ export function RulesModal({ onClose, onShowSideBets }: Props) {
         <div className="flex items-center justify-between px-5 py-4">
           <div>
             <div className="text-white text-[9px] uppercase tracking-widest">How to play</div>
-            <div className="text-amber-400 font-bold text-base">Free Bet Blackjack</div>
+            <div className="text-amber-400 font-bold text-base">Free Bet Pro Blackjack</div>
           </div>
           <button
             onClick={onClose}
@@ -29,14 +29,16 @@ export function RulesModal({ onClose, onShowSideBets }: Props) {
         {/* Tabs */}
         <div className="flex border-b border-stone-700">
           <button
-            className="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
+            className="flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors
               text-white border-b-2 border-white -mb-px"
           >
             Rules
           </button>
           <button
             onClick={onShowSideBets}
-            className="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
+            className="flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors
               text-stone-500 hover:text-stone-300"
           >
             Side Bets

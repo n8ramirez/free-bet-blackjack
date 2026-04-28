@@ -1,3 +1,4 @@
+import React from 'react'
 import { SafeButton } from './SafeButton'
 
 type ActionBarProps = {
@@ -20,9 +21,10 @@ type BtnProps = {
   free?:      boolean
   freeVariant?: 'gold' | 'purple'
   color:      string
+  labelStyle?: React.CSSProperties
 }
 
-function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color }: BtnProps) {
+function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color, labelStyle }: BtnProps) {
   const btn = (
     <SafeButton
       onClick={onClick}
@@ -39,7 +41,7 @@ function ActionBtn({ label, onClick, disabled, free, freeVariant = 'gold', color
       `}
     >
       <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-      <span className="relative text-base leading-none">{label}</span>
+      <span className="relative text-base leading-none" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, ...labelStyle }}>{label}</span>
     </SafeButton>
   )
 
@@ -78,6 +80,7 @@ export function ActionBar({
         onClick={onHit}
         disabled={!canHit}
         color="bg-emerald-600 hover:bg-emerald-500 shadow-[0_4px_0px_#14532d]"
+
       />
       <ActionBtn
         label="Double"
@@ -93,6 +96,7 @@ export function ActionBar({
         onClick={onSplit}
         disabled={!canSplit}
         color="bg-violet-700 hover:bg-violet-600 shadow-[0_4px_0px_#4c1d95]"
+
       />
     </div>
   )

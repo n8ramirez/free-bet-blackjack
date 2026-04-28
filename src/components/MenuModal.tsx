@@ -19,7 +19,8 @@ function MenuItem({ label, icon, onClick, disabled, comingSoon }: MenuItemProps)
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full text-left px-5 py-4 text-base font-semibold border-b border-stone-800 transition-colors
+      style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
+      className={`w-full text-left px-5 py-4 text-base border-b border-stone-800 transition-colors
         ${disabled
           ? 'text-stone-600 cursor-default'
           : 'text-white hover:bg-stone-800 active:bg-stone-700'}`}

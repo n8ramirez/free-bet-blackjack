@@ -25,13 +25,15 @@ export function RestartConfirmModal({ onConfirm, onCancel }: Props) {
         <div className="flex gap-3 px-5 pb-5">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-xl bg-stone-700 hover:bg-stone-600 text-white font-semibold text-sm transition-colors"
+            className="flex-1 py-3 rounded-xl bg-stone-700 hover:bg-stone-600 text-white text-sm transition-colors"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-sm transition-colors"
+            className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm transition-colors"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
           >
             Restart
           </button>

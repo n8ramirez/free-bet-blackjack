@@ -53,8 +53,9 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip }: Pr
             <button
               type="submit"
               className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400
-                text-amber-950 font-bold text-base active:scale-95 transition-all
+                text-amber-950 text-base active:scale-95 transition-all
                 shadow-[0_3px_0px_rgba(0,0,0,0.4)]"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
             >
               Save Score
             </button>
@@ -63,6 +64,7 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip }: Pr
           <button
             onClick={onSkip}
             className="text-stone-500 hover:text-stone-300 text-sm text-center transition-colors pb-1"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
           >
             No thanks
           </button>
