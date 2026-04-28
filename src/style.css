@@ -168,6 +168,33 @@
   animation: p22-sweep-bottom 4s linear infinite;
 }
 
+.dot-alt-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  pointer-events: none;
+  animation: dot-alt-on 2s ease-in-out infinite;
+}
+
+.dot-alt-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  pointer-events: none;
+  animation: dot-alt-on 2s ease-in-out infinite;
+  animation-delay: -1s;
+}
+
+@keyframes dot-alt-on {
+  0%, 40%  { opacity: 1; }
+  50%, 90% { opacity: 0; }
+  100%     { opacity: 1; }
+}
+
 @keyframes p22-sweep-top {
   0%   { transform: translateX(-80px); }
   100% { transform: translateX(100vw); }

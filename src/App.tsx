@@ -138,17 +138,21 @@ export default function App() {
   const allBust    = isOver && game.results.length > 0 && game.results.every(r => r.reason === 'bust')
   const playerWins = isOver && netCents > 0 && !playerBJ && !dealerBJ
   let bannerTitle = ''
-  let bannerTitleColor = 'text-stone-300'
+  let bannerTitleColor = 'text-white'
   if (isOver) {
-    if (dealerBJ && playerBJ)        { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
+    if (dealerBJ && playerBJ)        { bannerTitle = 'Push';             bannerTitleColor = 'text-white' }
     else if (dealerBJ)               { bannerTitle = 'Dealer Blackjack'; bannerTitleColor = 'text-red-400'   }
     else if (playerBJ)               { bannerTitle = 'Player Blackjack'; bannerTitleColor = 'text-amber-400' }
     else if (dealer22)               { bannerTitle = 'Push 22';          bannerTitleColor = push22Won ? 'text-sky-400' : 'text-stone-300' }
     else if (allBust)                { bannerTitle = 'Player Bust';      bannerTitleColor = 'text-red-400'   }
     else if (netCents > 0)           { bannerTitle = 'Player Wins';      bannerTitleColor = 'text-emerald-400' }
     else if (netCents < 0)           { bannerTitle = 'Dealer Wins';      bannerTitleColor = 'text-red-400'   }
-    else                             { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
+    else                             { bannerTitle = 'Push';             bannerTitleColor = 'text-white' }
   }
+  const isRedBanner = bannerTitleColor === 'text-red-400'
+  const dotColor  = isRedBanner ? 'rgba(248,113,113,0.6)' : 'rgba(214,211,209,0.4)'
+  const glowColor = isRedBanner ? 'rgba(248,113,113,1)'   : 'rgba(231,229,228,1)'
+
   const fmtDollars = (cents: number) => {
     const d = Math.abs(cents) / 100
     const s = d % 1 === 0
@@ -221,8 +225,8 @@ export default function App() {
 
         {/* Center — always perfectly centered */}
         <div className="flex flex-col items-center">
-          <div className="text-white text-[9px] uppercase tracking-widest">Free Bet</div>
-          <div className="text-amber-400 font-bold text-sm">Blackjack</div>
+          <div className="text-white text-[9px] uppercase tracking-widest">Free Bet Pro</div>
+          <div className="text-amber-400 text-sm" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800 }}>Blackjack</div>
         </div>
 
         {/* Right — Hamburger menu */}
@@ -354,8 +358,8 @@ export default function App() {
                   }}
                 />
                 {/* Text — above both strips */}
-                <div className="w-full py-3 flex flex-col items-center relative z-20">
-                  <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
+                  <div className={`text-2xl tracking-wide ${bannerTitleColor}`} style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontStyle: 'normal' }}>
                     {bannerTitle}
                   </div>
                 </div>
@@ -403,8 +407,8 @@ export default function App() {
                     WebkitMaskRepeat: 'repeat',
                   }}
                 />
-                <div className="w-full py-3 flex flex-col items-center relative z-20">
-                  <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
+                  <div className={`text-2xl tracking-wide ${bannerTitleColor}`} style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontStyle: 'normal' }}>
                     {bannerTitle}
                   </div>
                 </div>
@@ -452,16 +456,59 @@ export default function App() {
                     WebkitMaskRepeat: 'repeat',
                   }}
                 />
-                <div className="w-full py-3 flex flex-col items-center relative z-20">
-                  <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
+                  <div className={`text-2xl tracking-wide ${bannerTitleColor}`} style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontStyle: 'normal' }}>
                     {bannerTitle}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
-                <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
-                  {bannerTitle}
+              <div
+                className="w-full bg-black relative overflow-hidden"
+                style={{
+                  backgroundImage: [
+                    `radial-gradient(circle, ${dotColor} 2px, transparent 2.5px)`,
+                    `radial-gradient(circle, ${dotColor} 2px, transparent 2.5px)`,
+                  ].join(', '),
+                  backgroundSize: '13px 18px, 13px 18px',
+                  backgroundPosition: '0 -4.5px, 0 calc(100% + 4.5px)',
+                  backgroundRepeat: 'repeat-x, repeat-x',
+                }}
+              >
+                <div className="dot-alt-top" style={{ background: glowColor }} />
+                <div className="dot-alt-bottom" style={{ background: glowColor }} />
+                <div
+                  className="absolute top-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 -4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 -4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
+                  <div className={`text-2xl tracking-wide ${bannerTitleColor}`} style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontStyle: 'normal' }}>
+                    {bannerTitle}
+                  </div>
                 </div>
               </div>
             )}
@@ -676,7 +723,7 @@ export default function App() {
                 shadow-[0_4px_0px_#14532d]"
             >
               <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <span className="relative">New Game</span>
+              <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>New Game</span>
             </button>
           </div>
         )}
@@ -768,7 +815,7 @@ export default function App() {
                 shadow-[0_4px_0px_#14532d] active:shadow-none active:translate-y-1"
             >
               <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <span className="relative">New Hand</span>
+              <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>New Hand</span>
             </button>
           </div>
         )}

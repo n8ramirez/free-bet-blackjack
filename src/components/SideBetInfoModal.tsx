@@ -37,7 +37,8 @@ export function SideBetInfoModal({ onClose }: Props) {
         <div className="flex border-b border-stone-700">
           <button
             onClick={() => setTab('pot-of-gold')}
-            className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
+            className={`flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors
               ${tab === 'pot-of-gold'
                 ? 'text-amber-400 border-b-2 border-amber-400 -mb-px'
                 : 'text-stone-500 hover:text-stone-300'}`}
@@ -46,7 +47,8 @@ export function SideBetInfoModal({ onClose }: Props) {
           </button>
           <button
             onClick={() => setTab('push-22')}
-            className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
+            className={`flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors
               ${tab === 'push-22'
                 ? 'text-sky-400 border-b-2 border-sky-400 -mb-px'
                 : 'text-stone-500 hover:text-stone-300'}`}
@@ -55,7 +57,8 @@ export function SideBetInfoModal({ onClose }: Props) {
           </button>
           <button
             onClick={() => setTab('hellraiser')}
-            className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
+            className={`flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors
               ${tab === 'hellraiser'
                 ? 'text-orange-400 border-b-2 border-orange-400 -mb-px'
                 : 'text-stone-500 hover:text-stone-300'}`}
