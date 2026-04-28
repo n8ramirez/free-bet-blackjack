@@ -136,13 +136,14 @@ export default function App() {
     r => r.reason === 'blackjack' || r.reason === 'blackjack vs dealer 22' || r.reason === 'blackjack push'
   )
   const allBust    = isOver && game.results.length > 0 && game.results.every(r => r.reason === 'bust')
+  const playerWins = isOver && netCents > 0 && !playerBJ && !dealerBJ
   let bannerTitle = ''
   let bannerTitleColor = 'text-stone-300'
   if (isOver) {
     if (dealerBJ && playerBJ)        { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
     else if (dealerBJ)               { bannerTitle = 'Dealer Blackjack'; bannerTitleColor = 'text-red-400'   }
     else if (playerBJ)               { bannerTitle = 'Player Blackjack'; bannerTitleColor = 'text-amber-400' }
-    else if (dealer22)               { bannerTitle = 'Push 22';          bannerTitleColor = 'text-stone-300' }
+    else if (dealer22)               { bannerTitle = 'Push 22';          bannerTitleColor = push22Won ? 'text-sky-400' : 'text-stone-300' }
     else if (allBust)                { bannerTitle = 'Player Bust';      bannerTitleColor = 'text-red-400'   }
     else if (netCents > 0)           { bannerTitle = 'Player Wins';      bannerTitleColor = 'text-emerald-400' }
     else if (netCents < 0)           { bannerTitle = 'Dealer Wins';      bannerTitleColor = 'text-red-400'   }
@@ -306,11 +307,164 @@ export default function App() {
       <div className={`relative flex-none flex flex-col items-center w-full ${isOver ? 'z-20' : 'z-10'} ${isQuadrant ? '-mt-[240px] pb-[32px]' : ''}`}>
         {isOver ? (
           <>
-            <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
-              <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
-                {bannerTitle}
+            {playerBJ && !dealerBJ ? (
+              <div
+                className="w-full bg-black relative overflow-hidden"
+                style={{
+                  backgroundImage: [
+                    'radial-gradient(circle, rgba(251,191,36,0.75) 2px, transparent 2.5px)',
+                    'radial-gradient(circle, rgba(251,191,36,0.75) 2px, transparent 2.5px)',
+                  ].join(', '),
+                  backgroundSize: '13px 18px, 13px 18px',
+                  backgroundPosition: '0 -4.5px, 0 calc(100% + 4.5px)',
+                  backgroundRepeat: 'repeat-x, repeat-x',
+                }}
+              >
+                {/* Traveling amber glow blobs — behind the dot strips */}
+                <div className="pbj-glow-top" />
+                <div className="pbj-glow-bottom" />
+                {/* Top strip: solid black with circular holes so glow shines through dots */}
+                <div
+                  className="absolute top-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 -4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 -4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                {/* Bottom strip: same mask, dots 4.5px from bottom edge */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                {/* Text — above both strips */}
+                <div className="w-full py-3 flex flex-col items-center relative z-20">
+                  <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                    {bannerTitle}
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : dealer22 && push22Won ? (
+              <div
+                className="w-full bg-black relative overflow-hidden"
+                style={{
+                  backgroundImage: [
+                    'radial-gradient(circle, rgba(56,189,248,0.75) 2px, transparent 2.5px)',
+                    'radial-gradient(circle, rgba(56,189,248,0.75) 2px, transparent 2.5px)',
+                  ].join(', '),
+                  backgroundSize: '13px 18px, 13px 18px',
+                  backgroundPosition: '0 -4.5px, 0 calc(100% + 4.5px)',
+                  backgroundRepeat: 'repeat-x, repeat-x',
+                }}
+              >
+                <div className="p22-glow-top" />
+                <div className="p22-glow-bottom" />
+                <div
+                  className="absolute top-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 -4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 -4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div className="w-full py-3 flex flex-col items-center relative z-20">
+                  <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                    {bannerTitle}
+                  </div>
+                </div>
+              </div>
+            ) : playerWins ? (
+              <div
+                className="w-full bg-black relative overflow-hidden"
+                style={{
+                  backgroundImage: [
+                    'radial-gradient(circle, rgba(52,211,153,0.75) 2px, transparent 2.5px)',
+                    'radial-gradient(circle, rgba(52,211,153,0.75) 2px, transparent 2.5px)',
+                  ].join(', '),
+                  backgroundSize: '13px 18px, 13px 18px',
+                  backgroundPosition: '0 -4.5px, 0 calc(100% + 4.5px)',
+                  backgroundRepeat: 'repeat-x, repeat-x',
+                }}
+              >
+                <div className="pw-glow-top" />
+                <div className="pw-glow-bottom" />
+                <div
+                  className="absolute top-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 -4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 -4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div className="w-full py-3 flex flex-col items-center relative z-20">
+                  <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                    {bannerTitle}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full py-3 bg-black/70 flex flex-col items-center gap-1">
+                <div className={`text-2xl font-bold tracking-wide ${bannerTitleColor}`}>
+                  {bannerTitle}
+                </div>
+              </div>
+            )}
             {game.potOfGoldResult && (
               <div className={`w-full py-1.5 flex items-center justify-center gap-2
                 ${game.potOfGoldResult.payoutCents > 0 ? 'bg-amber-900/60' : 'bg-black/50'}`}>

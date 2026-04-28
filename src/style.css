@@ -76,6 +76,108 @@
   animation: marquee 18s linear infinite;
 }
 
+.pbj-glow-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,220,50,1) 25%, rgba(251,191,36,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: pbj-sweep-top 4s linear infinite;
+}
+
+.pbj-glow-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,220,50,1) 25%, rgba(251,191,36,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: pbj-sweep-bottom 4s linear infinite;
+}
+
+@keyframes pbj-sweep-top {
+  0%   { transform: translateX(-80px); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes pbj-sweep-bottom {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-80px); }
+}
+
+.pw-glow-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(100,255,180,1) 25%, rgba(52,211,153,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: pw-sweep-top 4s linear infinite;
+}
+
+.pw-glow-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(100,255,180,1) 25%, rgba(52,211,153,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: pw-sweep-bottom 4s linear infinite;
+}
+
+@keyframes pw-sweep-top {
+  0%   { transform: translateX(-80px); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes pw-sweep-bottom {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-80px); }
+}
+
+.p22-glow-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(125,225,255,1) 25%, rgba(56,189,248,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: p22-sweep-top 4s linear infinite;
+}
+
+.p22-glow-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(125,225,255,1) 25%, rgba(56,189,248,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: p22-sweep-bottom 4s linear infinite;
+}
+
+@keyframes p22-sweep-top {
+  0%   { transform: translateX(-80px); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes p22-sweep-bottom {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-80px); }
+}
+
 @layer base {
   html, body, #root {
     height: 100%;
