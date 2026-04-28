@@ -133,7 +133,7 @@ export function SideBetPanel({ isOpen, selectedSideBet, potOfGoldBetCents, push2
             >
               <div className="flex items-center gap-1.5">
                 {tab.icon}
-                <span className={`text-[11px] uppercase tracking-wide ${tab.activeColor}`} style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>
+                <span className={`text-[11px] uppercase tracking-wide font-extrabold ${tab.activeColor}`}>
                   {tab.label}
                 </span>
               </div>

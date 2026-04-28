@@ -56,8 +56,7 @@ export function BetPanel({
       <div className="flex w-full border-b border-stone-700">
         <SafeButton
           onClick={sideBetPanelOpen ? onToggleSideBetPanel : undefined}
-          style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
-          className={`flex-1 pb-2 text-[11px] uppercase tracking-widest transition-colors
+          className={`flex-1 pb-2 text-[11px] uppercase tracking-widest font-extrabold transition-colors
             ${!sideBetPanelOpen
               ? 'text-white border-b-2 border-white -mb-px'
               : 'text-stone-500 hover:text-stone-300'}`}
@@ -66,8 +65,7 @@ export function BetPanel({
         </SafeButton>
         <SafeButton
           onClick={onToggleSideBetPanel}
-          style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}
-          className={`flex-1 pb-2 text-[11px] uppercase tracking-widest transition-colors
+          className={`flex-1 pb-2 text-[11px] uppercase tracking-widest font-extrabold transition-colors
             ${sideBetPanelOpen
               ? 'text-amber-400 border-b-2 border-amber-400 -mb-px'
               : 'text-stone-500 hover:text-stone-300'}`}
@@ -131,7 +129,7 @@ export function BetPanel({
               text-white text-lg font-bold active:scale-95 transition-all shadow-[0_4px_0px_#92400e] active:shadow-none active:translate-y-1"
           >
             <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-            <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>{sideBetPanelOpen ? 'Clear Side Bet' : 'Clear'}</span>
+            <span className="relative font-extrabold">{sideBetPanelOpen ? 'Clear Side Bet' : 'Clear'}</span>
           </SafeButton>
         ) : showRebet ? (
           (() => {
@@ -145,7 +143,7 @@ export function BetPanel({
                   text-lg font-bold active:scale-95 transition-all text-white shadow-[0_4px_0px_#4c1d95] active:shadow-none active:translate-y-1`}
               >
                 <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-                <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>Rebet</span>
+                <span className="relative font-extrabold">Rebet</span>
               </SafeButton>
             )
           })()
@@ -164,7 +162,7 @@ export function BetPanel({
           {canDeal && <>
             <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
           </>}
-          <span className="relative" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>Deal</span>
+          <span className="relative font-extrabold">Deal</span>
         </SafeButton>
       </div>
     </div>
