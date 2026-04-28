@@ -142,7 +142,7 @@ export default function App() {
     if (dealerBJ && playerBJ)        { bannerTitle = 'Push';             bannerTitleColor = 'text-stone-300' }
     else if (dealerBJ)               { bannerTitle = 'Dealer Blackjack'; bannerTitleColor = 'text-red-400'   }
     else if (playerBJ)               { bannerTitle = 'Player Blackjack'; bannerTitleColor = 'text-amber-400' }
-    else if (dealer22)               { bannerTitle = '22 Push';          bannerTitleColor = 'text-stone-300' }
+    else if (dealer22)               { bannerTitle = 'Push 22';          bannerTitleColor = 'text-stone-300' }
     else if (allBust)                { bannerTitle = 'Player Bust';      bannerTitleColor = 'text-red-400'   }
     else if (netCents > 0)           { bannerTitle = 'Player Wins';      bannerTitleColor = 'text-emerald-400' }
     else if (netCents < 0)           { bannerTitle = 'Dealer Wins';      bannerTitleColor = 'text-red-400'   }
