@@ -5,14 +5,15 @@ const KEY = 'fbbj_settings'
 type Settings = {
   soundEffects: boolean
   music:        boolean
+  classicMode:  boolean
 }
 
 function load(): Settings {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { soundEffects: true, music: false, ...JSON.parse(raw) }
+    if (raw) return { soundEffects: true, music: false, classicMode: false, ...JSON.parse(raw) }
   } catch {}
-  return { soundEffects: true, music: false }
+  return { soundEffects: true, music: false, classicMode: false }
 }
 
 function save(settings: Settings) {
@@ -23,20 +24,16 @@ export function useSettings() {
   const [settings, setSettings] = useState<Settings>(load)
 
   const setSoundEffects = (v: boolean) => {
-    setSettings(prev => {
-      const next = { ...prev, soundEffects: v }
-      save(next)
-      return next
-    })
+    setSettings(prev => { const next = { ...prev, soundEffects: v }; save(next); return next })
   }
 
   const setMusic = (v: boolean) => {
-    setSettings(prev => {
-      const next = { ...prev, music: v }
-      save(next)
-      return next
-    })
+    setSettings(prev => { const next = { ...prev, music: v }; save(next); return next })
   }
 
-  return { ...settings, setSoundEffects, setMusic }
+  const setClassicMode = (v: boolean) => {
+    setSettings(prev => { const next = { ...prev, classicMode: v }; save(next); return next })
+  }
+
+  return { ...settings, setSoundEffects, setMusic, setClassicMode }
 }

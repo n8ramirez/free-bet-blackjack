@@ -1,9 +1,18 @@
 type Props = {
-  onConfirm: () => void
-  onCancel:  () => void
+  onConfirm:     () => void
+  onCancel:      () => void
+  title?:        string
+  message?:      string
+  confirmLabel?: string
 }
 
-export function RestartConfirmModal({ onConfirm, onCancel }: Props) {
+export function RestartConfirmModal({
+  onConfirm,
+  onCancel,
+  title        = 'Restart Game',
+  message      = 'Are you sure you want to restart? Your current bankroll will be reset.',
+  confirmLabel = 'Restart',
+}: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-[10dvh]"
@@ -14,12 +23,12 @@ export function RestartConfirmModal({ onConfirm, onCancel }: Props) {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-700">
-          <div className="text-amber-400 font-bold text-base">Restart Game</div>
+          <div className="text-amber-400 font-bold text-base">{title}</div>
           <button onClick={onCancel} className="text-stone-400 hover:text-white text-xl leading-none px-2">✕</button>
         </div>
 
         <div className="px-5 py-5 text-stone-300 text-sm">
-          Are you sure you want to restart? Your current bankroll will be reset.
+          {message}
         </div>
 
         <div className="flex gap-3 px-5 pb-5">
@@ -33,7 +42,7 @@ export function RestartConfirmModal({ onConfirm, onCancel }: Props) {
             onClick={onConfirm}
             className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-extrabold transition-colors"
           >
-            Restart
+            {confirmLabel}
           </button>
         </div>
       </div>
