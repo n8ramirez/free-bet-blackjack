@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useGameState, STARTING_BANKROLL } from './hooks/useGameState'
+import { useClassicGameState } from './hooks/useClassicGameState'
 import { useSettings } from './hooks/useSettings'
 import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
+import { ClassicSideBetPanel } from './components/ClassicSideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
@@ -21,8 +23,13 @@ import {
 } from './hooks/useLeaderboard'
 
 export default function App() {
-  const game     = useGameState()
-  const settings = useSettings()
+  const freeBetGame = useGameState()
+  const classicGame = useClassicGameState()
+  const settings    = useSettings()
+  const isClassic   = settings.classicMode
+  const game        = isClassic
+    ? (classicGame as unknown as ReturnType<typeof useGameState>)
+    : freeBetGame
   const [showRules, setShowRules] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showHighScoreEntry, setShowHighScoreEntry] = useState(false)
@@ -32,9 +39,10 @@ export default function App() {
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
   const [debugSplit, setDebugSplit] = useState(false)
   const [showSideBetInfo, setShowSideBetInfo] = useState(false)
-  const [showMenu, setShowMenu]                   = useState(false)
-  const [showSettings, setShowSettings]           = useState(false)
+  const [showMenu, setShowMenu]                     = useState(false)
+  const [showSettings, setShowSettings]             = useState(false)
   const [showRestartConfirm, setShowRestartConfirm] = useState(false)
+  const [showModeConfirm, setShowModeConfirm]       = useState(false)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -103,6 +111,16 @@ export default function App() {
     setShowRestartConfirm(false)
   }
 
+  function handleModeSwitch() {
+    const newClassic = !isClassic
+    settings.setClassicMode(newClassic)
+    snapBankroll(0)
+    if (newClassic) classicGame.restartGame()
+    else            freeBetGame.restartGame()
+    setShowModeConfirm(false)
+    setShowSettings(false)
+  }
+
   const hellraiserWon = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
   const pogGlowActive = game.lastPotOfGoldBetCents > 0
 
@@ -132,7 +150,7 @@ export default function App() {
 
   // Round-result banner
   const dealerBJ = isOver && isBlackjack(game.engine.dealer.cards)
-  const dealer22 = isOver && handTotals(game.engine.dealer.cards).total === 22
+  const dealer22 = !isClassic && isOver && handTotals(game.engine.dealer.cards).total === 22
   const playerBJ   = isOver && game.results.some(
     r => r.reason === 'blackjack' || r.reason === 'blackjack vs dealer 22' || r.reason === 'blackjack push'
   )
@@ -186,8 +204,19 @@ export default function App() {
           onClose={() => setShowSettings(false)}
           soundEffects={settings.soundEffects}
           music={settings.music}
+          classicMode={settings.classicMode}
           onSoundEffects={settings.setSoundEffects}
           onMusic={settings.setMusic}
+          onClassicMode={() => setShowModeConfirm(true)}
+        />
+      )}
+      {showModeConfirm && (
+        <RestartConfirmModal
+          title={isClassic ? 'Switch to Free Bet' : 'Switch to Classic'}
+          message="Switching modes will restart your game. Your current bankroll will not carry over."
+          confirmLabel="Switch"
+          onConfirm={handleModeSwitch}
+          onCancel={() => setShowModeConfirm(false)}
         />
       )}
       {showMenu && (
@@ -581,6 +610,13 @@ export default function App() {
 
       {/* ── Player area ─────────────────────────────────────────── */}
       <div className={`relative z-10 flex-1 flex flex-col items-center min-h-0 w-full ${isQuadrant ? 'justify-start pt-0 -mt-[20px]' : 'justify-center py-4'}`}>
+        {isClassic && (
+          <div className="absolute inset-0 flex items-start justify-center pt-4 pointer-events-none z-0 select-none">
+            <span className="text-[72px] font-extrabold uppercase tracking-[0.3em] text-white opacity-[0.04] rotate-[-20deg]">
+              Classic
+            </span>
+          </div>
+        )}
         {debugSplit ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
             {[
@@ -620,8 +656,8 @@ export default function App() {
                       hasFreeSplit={!!hand.freeSplit}
                       hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                       visibleCount={playerVisibleCount}
-                      hellraiserGlow={hellraiserWon}
-                      pogGlow={pogGlowActive}
+                      hellraiserGlow={!isClassic && hellraiserWon}
+                      pogGlow={!isClassic && pogGlowActive}
                     />
                   </div>
                 )
@@ -644,8 +680,8 @@ export default function App() {
                       hasFreeSplit={!!hand.freeSplit}
                       hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
                       visibleCount={playerVisibleCount}
-                      hellraiserGlow={hellraiserWon}
-                      pogGlow={pogGlowActive}
+                      hellraiserGlow={!isClassic && hellraiserWon}
+                      pogGlow={!isClassic && pogGlowActive}
                     />
                   </div>
                 )
@@ -661,8 +697,8 @@ export default function App() {
                 hasFreeSplit={!!game.engine.playerHands[0].freeSplit}
                 hasFreeDouble={!!(game.engine.playerHands[0].doubled && game.engine.playerHands[0].freeDouble)}
                 visibleCount={playerVisibleCount}
-                hellraiserGlow={hellraiserWon}
-                pogGlow={pogGlowActive}
+                hellraiserGlow={!isClassic && hellraiserWon}
+                pogGlow={!isClassic && pogGlowActive}
               />
             </div>
           )
@@ -673,15 +709,24 @@ export default function App() {
       <div className={`relative flex-none bg-stone-900 rounded-t-2xl shadow-[0_-6px_24px_rgba(0,0,0,0.6)] ${game.sideBetPanelOpen ? 'z-30' : ''}`}>
 
         {/* Side bet drawer — slides up from behind BetPanel */}
-        <SideBetPanel
-          isOpen={game.sideBetPanelOpen}
-          selectedSideBet={game.selectedSideBet}
-          potOfGoldBetCents={game.potOfGoldBetCents}
-          push22BetCents={game.push22BetCents}
-          hellraiserBetCents={game.hellraiserBetCents}
-          onSelectSideBet={game.selectSideBet}
-          onShowInfo={() => setShowSideBetInfo(true)}
-        />
+        {isClassic ? (
+          <ClassicSideBetPanel
+            isOpen={classicGame.sideBetPanelOpen}
+            selectedSideBet={classicGame.selectedSideBet}
+            onSelectSideBet={classicGame.selectSideBet}
+            onShowInfo={() => setShowSideBetInfo(true)}
+          />
+        ) : (
+          <SideBetPanel
+            isOpen={freeBetGame.sideBetPanelOpen}
+            selectedSideBet={freeBetGame.selectedSideBet}
+            potOfGoldBetCents={freeBetGame.potOfGoldBetCents}
+            push22BetCents={freeBetGame.push22BetCents}
+            hellraiserBetCents={freeBetGame.hellraiserBetCents}
+            onSelectSideBet={freeBetGame.selectSideBet}
+            onShowInfo={() => setShowSideBetInfo(true)}
+          />
+        )}
 
         {/* Betting phase */}
         {isBetting && !game.isGameOver && (
@@ -755,7 +800,7 @@ export default function App() {
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
             {/* POG result line */}
-            {game.potOfGoldResult && (
+            {!isClassic && game.potOfGoldResult && (
               <div className="flex items-center gap-1.5">
                 <PotOfGoldIcon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Pot of Gold</span>
@@ -771,7 +816,7 @@ export default function App() {
               </div>
             )}
             {/* Push 22 result line */}
-            {game.push22Result && (
+            {!isClassic && game.push22Result && (
               <div className="flex items-center gap-1.5">
                 <Push22Icon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Push 22</span>
@@ -787,7 +832,7 @@ export default function App() {
               </div>
             )}
             {/* Hellraiser result line */}
-            {game.hellraiserResult && (
+            {!isClassic && game.hellraiserResult && (
               <div className="flex items-center gap-1.5">
                 <HellraiserIcon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="text-stone-400 text-xs uppercase tracking-widest">Hellraiser</span>
