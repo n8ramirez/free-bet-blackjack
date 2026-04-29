@@ -1,9 +1,11 @@
 type Props = {
-  onClose:        () => void
-  soundEffects:   boolean
-  music:          boolean
-  onSoundEffects: (v: boolean) => void
-  onMusic:        (v: boolean) => void
+  onClose:          () => void
+  soundEffects:     boolean
+  music:            boolean
+  classicMode:      boolean
+  onSoundEffects:   (v: boolean) => void
+  onMusic:          (v: boolean) => void
+  onClassicMode:    () => void
 }
 
 function Toggle({ label, enabled, onToggle, dimmed }: { label: string; enabled: boolean; onToggle: () => void; dimmed?: boolean }) {
@@ -23,7 +25,7 @@ function Toggle({ label, enabled, onToggle, dimmed }: { label: string; enabled: 
   )
 }
 
-export function SettingsModal({ onClose, soundEffects, music, onSoundEffects, onMusic }: Props) {
+export function SettingsModal({ onClose, soundEffects, music, classicMode, onSoundEffects, onMusic, onClassicMode }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-[10dvh]"
@@ -41,6 +43,7 @@ export function SettingsModal({ onClose, soundEffects, music, onSoundEffects, on
         <div className="flex flex-col">
           <Toggle label="Sound Effects"       enabled={soundEffects} onToggle={() => onSoundEffects(!soundEffects)} />
           <Toggle label="Music - Coming Soon" enabled={music}        onToggle={() => onMusic(!music)} dimmed />
+          <Toggle label="Classic Blackjack"   enabled={classicMode}  onToggle={onClassicMode} />
         </div>
       </div>
     </div>
