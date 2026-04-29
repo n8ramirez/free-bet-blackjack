@@ -610,6 +610,13 @@ export default function App() {
 
       {/* ── Player area ─────────────────────────────────────────── */}
       <div className={`relative z-10 flex-1 flex flex-col items-center min-h-0 w-full ${isQuadrant ? 'justify-start pt-0 -mt-[20px]' : 'justify-center py-4'}`}>
+        {isClassic && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none">
+            <span className="text-[72px] font-extrabold uppercase tracking-[0.3em] text-white opacity-[0.04] rotate-[-20deg]">
+              Classic
+            </span>
+          </div>
+        )}
         {debugSplit ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
             {[
