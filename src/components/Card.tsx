@@ -9,9 +9,10 @@ type CardProps = {
   dimmed?: boolean   // non-active hand in split
   glowing?: boolean  // hellraiser win glow
   push22Glow?: boolean
+  luckyLadiesGlow?: boolean
 }
 
-export function Card({ card, faceDown = false, dimmed = false, glowing = false, push22Glow = false }: CardProps) {
+export function Card({ card, faceDown = false, dimmed = false, glowing = false, push22Glow = false, luckyLadiesGlow = false }: CardProps) {
   const prevFaceDown = useRef(faceDown)
   const isRevealing  = prevFaceDown.current === true && faceDown === false
   prevFaceDown.current = faceDown
@@ -63,8 +64,9 @@ export function Card({ card, faceDown = false, dimmed = false, glowing = false, 
     )
   })()
 
-  if (push22Glow) return <div className="push22-glow inline-block">{cardEl}</div>
-  if (glowing)    return <div className="hellraiser-glow inline-block">{cardEl}</div>
+  if (push22Glow)      return <div className="push22-glow inline-block">{cardEl}</div>
+  if (glowing)         return <div className="hellraiser-glow inline-block">{cardEl}</div>
+  if (luckyLadiesGlow) return <div className="lucky-ladies-glow inline-block">{cardEl}</div>
 
   return cardEl
 }

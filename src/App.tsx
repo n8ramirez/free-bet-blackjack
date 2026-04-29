@@ -6,8 +6,9 @@ import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
-import { ClassicSideBetPanel } from './components/ClassicSideBetPanel'
+import { ClassicSideBetPanel, LuckyLadiesIcon } from './components/ClassicSideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
+import { ClassicSideBetInfoModal } from './components/ClassicSideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
 import { RulesModal } from './components/RulesModal'
 import { LeaderboardModal } from './components/LeaderboardModal'
@@ -121,8 +122,10 @@ export default function App() {
     setShowSettings(false)
   }
 
-  const hellraiserWon = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
-  const pogGlowActive = game.lastPotOfGoldBetCents > 0
+  const hellraiserWon      = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
+  const pogGlowActive      = game.lastPotOfGoldBetCents > 0
+  const luckyLadiesWon     = classicGame.luckyLadiesBannerVisible && (classicGame.luckyLadiesResult?.payoutCents ?? 0) > 0
+  const luckyLadiesDealerBJ = luckyLadiesWon && classicGame.luckyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -198,7 +201,10 @@ export default function App() {
           onClose={() => { setShowLeaderboard(false); setHighlightIndex(undefined) }}
         />
       )}
-      {showSideBetInfo && <SideBetInfoModal onClose={() => setShowSideBetInfo(false)} />}
+      {showSideBetInfo && (isClassic
+        ? <ClassicSideBetInfoModal onClose={() => setShowSideBetInfo(false)} />
+        : <SideBetInfoModal onClose={() => setShowSideBetInfo(false)} />
+      )}
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
@@ -276,7 +282,7 @@ export default function App() {
       {isBetting && (game.lastBetCents === 0 || game.isGameOver) && (
       <div className="flex-none bg-sky-300 overflow-hidden h-6 flex items-center mt-2">
         <span className="marquee-track text-[10px] font-bold text-sky-950 uppercase tracking-wide px-4">
-          🏆&nbsp; Thank you for playing Free Bet Blackjack. Check back often for new features and updates! &nbsp;🏆
+          🏆&nbsp; Thank you for playing Free Bet Pro Blackjack. Check back often for new features and updates! &nbsp;🏆
         </span>
       </div>
       )}
@@ -291,7 +297,15 @@ export default function App() {
             <div className="text-amber-400 font-bold text-base">
               ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
             </div>
-            {game.lastPotOfGoldBetCents > 0 && (
+            {isClassic && classicGame.lastLuckyLadiesBetCents > 0 && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <LuckyLadiesIcon className="w-4 h-4" />
+                <span className="text-pink-400 text-[10px] font-bold">
+                  ${(classicGame.lastLuckyLadiesBetCents / 100).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {!isClassic && game.lastPotOfGoldBetCents > 0 && (
               <div className="flex items-center gap-1 mt-0.5">
                 <PotOfGoldIcon className="w-4 h-4" />
                 <span className="text-amber-400 text-[10px] font-bold">
@@ -299,7 +313,7 @@ export default function App() {
                 </span>
               </div>
             )}
-            {game.lastPush22BetCents > 0 && (
+            {!isClassic && game.lastPush22BetCents > 0 && (
               <div className="flex items-center gap-1">
                 <Push22Icon className="w-4 h-4" />
                 <span className="text-sky-400 text-[10px] font-bold">
@@ -307,7 +321,7 @@ export default function App() {
                 </span>
               </div>
             )}
-            {game.lastHellraiserBetCents > 0 && (
+            {!isClassic && game.lastHellraiserBetCents > 0 && (
               <div className="flex items-center gap-1">
                 <HellraiserIcon className="w-4 h-4" />
                 <span className="text-orange-400 text-[10px] font-bold">
@@ -329,6 +343,7 @@ export default function App() {
             hellraiserGlow={hellraiserWon}
             hellraiserGlowFirstOnly={hellraiserWon}
             push22Glow={push22Won}
+            luckyLadiesGlow={luckyLadiesDealerBJ}
           />
         ) : (
           <div className="text-white text-sm uppercase tracking-widest">
@@ -542,7 +557,7 @@ export default function App() {
                 </div>
               </div>
             )}
-            {game.potOfGoldResult && (
+            {!isClassic && game.potOfGoldResult && (
               <div className={`w-full py-1.5 flex items-center justify-center gap-2
                 ${game.potOfGoldResult.payoutCents > 0 ? 'bg-amber-900/60' : 'bg-black/50'}`}>
                 <PotOfGoldIcon className="w-4 h-4 flex-shrink-0" />
@@ -582,6 +597,18 @@ export default function App() {
               </div>
             )}
           </>
+        ) : isClassic && (isPlayerTurn || isDealerTurn) && classicGame.luckyLadiesBannerVisible && classicGame.luckyLadiesResult ? (
+          <div className="w-full py-2 flex items-center justify-center gap-2 bg-black/60">
+            <LuckyLadiesIcon className="w-4 h-4 flex-shrink-0" />
+            <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lucky Ladies</span>
+            {classicGame.luckyLadiesResult.handName ? (
+              <span className="text-[11px] font-bold text-emerald-400">
+                {classicGame.luckyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.luckyLadiesResult.payoutCents)}
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold text-red-400">Lose</span>
+            )}
+          </div>
         ) : isPlayerTurn && game.hellraiserBannerVisible && game.hellraiserResult ? (
           <div className={`w-full py-2 flex items-center justify-center gap-2
             ${game.hellraiserResult.handName ? 'bg-black/60' : 'bg-black/60'}`}>
@@ -658,6 +685,7 @@ export default function App() {
                       visibleCount={playerVisibleCount}
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
+                      luckyLadiesGlow={isClassic && luckyLadiesWon}
                     />
                   </div>
                 )
@@ -682,6 +710,7 @@ export default function App() {
                       visibleCount={playerVisibleCount}
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
+                      luckyLadiesGlow={isClassic && luckyLadiesWon}
                     />
                   </div>
                 )
@@ -699,6 +728,7 @@ export default function App() {
                 visibleCount={playerVisibleCount}
                 hellraiserGlow={!isClassic && hellraiserWon}
                 pogGlow={!isClassic && pogGlowActive}
+                luckyLadiesGlow={isClassic && luckyLadiesWon}
               />
             </div>
           )
@@ -713,6 +743,7 @@ export default function App() {
           <ClassicSideBetPanel
             isOpen={classicGame.sideBetPanelOpen}
             selectedSideBet={classicGame.selectedSideBet}
+            luckyLadiesBetCents={classicGame.luckyLadiesBetCents}
             onSelectSideBet={classicGame.selectSideBet}
             onShowInfo={() => setShowSideBetInfo(true)}
           />
@@ -799,6 +830,25 @@ export default function App() {
             <div className={`text-2xl font-medium ${netCents > 0 ? 'text-emerald-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
+            {/* Lucky Ladies result line */}
+            {isClassic && classicGame.luckyLadiesResult && (
+              <div className="flex items-center gap-1.5">
+                <LuckyLadiesIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Lucky Ladies</span>
+                {classicGame.luckyLadiesResult.payoutCents > 0 ? (
+                  <span className="text-xs text-emerald-400 font-medium">
+                    +${(classicGame.luckyLadiesResult.payoutCents / 100).toLocaleString()}
+                    {classicGame.luckyLadiesResult.handName && (
+                      <span className="text-pink-400 ml-1">({classicGame.luckyLadiesResult.handName})</span>
+                    )}
+                  </span>
+                ) : (
+                  <span className="text-xs text-red-400 font-medium">
+                    -${(classicGame.lastLuckyLadiesBetCents / 100).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            )}
             {/* POG result line */}
             {!isClassic && game.potOfGoldResult && (
               <div className="flex items-center gap-1.5">

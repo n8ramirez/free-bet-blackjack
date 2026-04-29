@@ -32,6 +32,7 @@ export const PUSH22_PAYOUT = 11
 export const HELLRAISER_PAYOUTS: [string, number][] = [
   ['Three of a Kind Suited', 270],
   ['Straight Flush',         180],
+  ['Triple Six',               125],
   ['Three of a Kind',         90],
   ['Flush',                    9],
   ['Straight',                 9],
@@ -73,6 +74,7 @@ function resolveHellraiser(c1: string, c2: string, c3: string, betCents: number)
 
   if (sameRank && sameSuit)     { handName = 'Three of a Kind Suited'; multiplier = 270 }
   else if (straight && sameSuit){ handName = 'Straight Flush';         multiplier = 180 }
+  else if (sameRank && r1 === '6'){ handName = 'Triple Six';            multiplier = 125 }
   else if (sameRank)            { handName = 'Three of a Kind';        multiplier = 90  }
   else if (sameSuit)            { handName = 'Flush';                  multiplier = 9   }
   else if (straight)            { handName = 'Straight';               multiplier = 9   }
