@@ -1,11 +1,17 @@
 import type { ClassicSideBetType } from '../hooks/useClassicGameState'
 import { SafeButton } from './SafeButton'
 
+function fmtDollars(cents: number): string {
+  const d = cents / 100
+  return d % 1 === 0 ? `$${d.toLocaleString()}` : `$${d.toFixed(2)}`
+}
+
 type ClassicSideBetPanelProps = {
-  isOpen:          boolean
-  selectedSideBet: ClassicSideBetType
-  onSelectSideBet: (type: ClassicSideBetType) => void
-  onShowInfo:      () => void
+  isOpen:               boolean
+  selectedSideBet:      ClassicSideBetType
+  luckyLadiesBetCents:  number
+  onSelectSideBet:      (type: ClassicSideBetType) => void
+  onShowInfo:           () => void
 }
 
 export const LuckyLadiesIcon = ({ className = '' }: { className?: string }) => (
@@ -45,7 +51,7 @@ type TabConfig = {
   barColor:    string
 }
 
-export function ClassicSideBetPanel({ isOpen, selectedSideBet, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
+export function ClassicSideBetPanel({ isOpen, selectedSideBet, luckyLadiesBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
   const tabs: TabConfig[] = [
     {
       key:         'lucky-ladies',
@@ -108,9 +114,15 @@ export function ClassicSideBetPanel({ isOpen, selectedSideBet, onSelectSideBet, 
                     {tab.label}
                   </span>
                 </div>
-                <div className="text-stone-600 text-[10px] uppercase tracking-widest">
-                  Coming Soon
-                </div>
+                {tab.key === 'lucky-ladies' ? (
+                  <div className={`text-base font-bold transition-colors ${luckyLadiesBetCents > 0 ? 'text-pink-400' : 'text-stone-500'}`}>
+                    {luckyLadiesBetCents > 0 ? fmtDollars(luckyLadiesBetCents) : '—'}
+                  </div>
+                ) : (
+                  <div className="text-stone-600 text-[10px] uppercase tracking-widest">
+                    Coming Soon
+                  </div>
+                )}
                 <div className={`h-0.5 w-8 rounded-full ${isActive ? tab.barColor : 'bg-transparent'}`} />
               </SafeButton>
             )

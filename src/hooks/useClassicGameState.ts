@@ -1,19 +1,63 @@
 import { useState, useCallback, useEffect } from 'react'
 import { playSound } from '../sounds'
+import { getDebugShoePrefix } from '../debug'
 import {
   GameState, Hand, HandResult,
   createGameState, dealInitial,
   playerHit, dealerPlay,
   canSplit, canDouble, playerDouble, playerSplit,
-  isBlackjack, handTotals, resolveRound,
+  isBlackjack, handTotals, resolveRound, cardRank,
 } from '../engine/classicEngine'
+
+// ---------------------------------------------------------------------------
+// Lucky Ladies side bet
+// ---------------------------------------------------------------------------
+export type LuckyLadiesResult = {
+  handName: string | null
+  payoutCents: number
+}
+
+export const LUCKY_LADIES_PAYOUTS: [string, number][] = [
+  ['Queen of Hearts Pair + Dealer Blackjack', 1000],
+  ['Queen of Hearts Pair', 200],
+  ['Matched 20',            25],
+  ['Suited 20',             10],
+  ['Any 20',                 4],
+]
+
+function resolveLuckyLadies(
+  c1: string, c2: string,
+  dealerBJ: boolean,
+  betCents: number,
+): LuckyLadiesResult {
+  const r1 = cardRank(c1), r2 = cardRank(c2)
+  const s1 = c1[c1.length - 1], s2 = c2[c2.length - 1]
+
+  const { total } = handTotals([c1, c2])
+  if (total !== 20) return { handName: null, payoutCents: -betCents }
+
+  const bothQueens = r1 === 'Q' && r2 === 'Q'
+  const bothQH     = bothQueens && s1 === '♥' && s2 === '♥'
+  const sameRank   = r1 === r2
+  const sameSuit   = s1 === s2
+
+  let handName: string | null
+  let multiplier: number
+
+  if (bothQH && dealerBJ)    { handName = 'Queen of Hearts Pair + Dealer Blackjack';     multiplier = 1000 }
+  else if (bothQH)           { handName = 'Queen of Hearts Pair'; multiplier = 200  }
+  else if (sameRank && sameSuit) { handName = 'Matched 20';       multiplier = 25   }
+  else if (sameSuit)         { handName = 'Suited 20';            multiplier = 10   }
+  else                       { handName = 'Any 20';               multiplier = 4    }
+
+  return { handName, payoutCents: betCents * multiplier }
+}
 
 export const CLASSIC_STARTING_BANKROLL = 50_000
 export const CLASSIC_MIN_BET           = 500
 export const CHIPS                     = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 500_000]
 export const CHIP_LABELS               = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K', '$5K']
 
-// Placeholder type — side bets not yet implemented
 export type ClassicSideBetType = 'lucky-ladies' | 'buster-blackjack' | 'insurance'
 
 function handIsDone(hand: Hand): boolean {
@@ -48,8 +92,12 @@ export type ClassicUIState = {
   dealerRevealCount:  number
   dealerStartDelay:   number
   pendingDealerTurn:  boolean
-  sideBetPanelOpen:   boolean
-  selectedSideBet:    ClassicSideBetType
+  sideBetPanelOpen:        boolean
+  selectedSideBet:         ClassicSideBetType
+  luckyLadiesBetCents:      number
+  lastLuckyLadiesBetCents:  number
+  luckyLadiesResult:        LuckyLadiesResult | null
+  luckyLadiesBannerVisible: boolean
 }
 
 const BANKROLL_KEY = 'fbbj_classic_bankroll'
@@ -91,8 +139,12 @@ function initial(): ClassicUIState {
     dealerRevealCount: 0,
     dealerStartDelay:  0,
     pendingDealerTurn: false,
-    sideBetPanelOpen:  false,
-    selectedSideBet:   'lucky-ladies',
+    sideBetPanelOpen:        false,
+    selectedSideBet:         'lucky-ladies',
+    luckyLadiesBetCents:      0,
+    lastLuckyLadiesBetCents:  0,
+    luckyLadiesResult:        null,
+    luckyLadiesBannerVisible: false,
   }
 }
 
@@ -118,9 +170,10 @@ function finishFromDealerTurn(base: ClassicUIState): ClassicUIState {
   })
 
   const netCents = results.reduce((sum, r) => sum + r.payoutCents, 0)
-  if (netCents > 0)      playSound('win')
-  else if (netCents < 0) playSound('lose')
-  else                   playSound('push')
+  const llDealerBJ = base.luckyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  if (netCents > 0)           playSound('win')
+  else if (netCents < 0 && !llDealerBJ) playSound('lose')
+  else if (netCents === 0)    playSound('push')
 
   return {
     ...base,
@@ -166,8 +219,30 @@ export function useClassicGameState() {
         const TEN      = new Set(['10', 'J', 'Q', 'K'])
         const dealerBJ = (upcard === 'A' || TEN.has(upcard)) && isBlackjack(engine.dealer.cards)
 
-        if (playerBJ || dealerBJ) return startDealerTurn(s, engine)
-        return { ...s, engine, phase: 'player-turn' }
+        // Resolve Lucky Ladies on first two player cards
+        const llResult = s.lastLuckyLadiesBetCents > 0
+          ? resolveLuckyLadies(
+              engine.playerHands[0].cards[0],
+              engine.playerHands[0].cards[1],
+              dealerBJ,
+              s.lastLuckyLadiesBetCents,
+            )
+          : null
+        const llPayout = llResult ? s.lastLuckyLadiesBetCents + llResult.payoutCents : 0
+        if (llResult) {
+          if (llResult.handName === 'Queen of Hearts Pair + Dealer Blackjack') playSound('win')
+          else if (llResult.handName) playSound('side-bet-win')
+          else playSound('hellraiser-lose')
+        }
+        const sWithLL = {
+          ...s,
+          luckyLadiesResult:        llResult,
+          luckyLadiesBannerVisible: llResult !== null,
+          bankrollCents:            s.bankrollCents + llPayout,
+        }
+
+        if (playerBJ || dealerBJ) return startDealerTurn(sWithLL, engine)
+        return { ...sWithLL, engine, phase: 'player-turn' }
       })
       return
     }
@@ -217,8 +292,11 @@ export function useClassicGameState() {
   const addChip = useCallback((cents: number) => {
     setState(s => {
       if (s.phase !== 'betting') return s
-      if (s.pendingBetCents + cents > s.bankrollCents) return s
-      // Classic side bets not yet implemented — chips always go to main bet
+      if (s.pendingBetCents + s.luckyLadiesBetCents + cents > s.bankrollCents) return s
+      if (s.sideBetPanelOpen && s.selectedSideBet === 'lucky-ladies') {
+        playSound('chip-side')
+        return { ...s, luckyLadiesBetCents: s.luckyLadiesBetCents + cents }
+      }
       playSound('chip-main')
       return { ...s, pendingBetCents: s.pendingBetCents + cents }
     })
@@ -227,6 +305,10 @@ export function useClassicGameState() {
   const clearBet = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting') return s
+      if (s.sideBetPanelOpen && s.selectedSideBet === 'lucky-ladies' && s.luckyLadiesBetCents > 0) {
+        playSound('clear-side')
+        return { ...s, luckyLadiesBetCents: 0 }
+      }
       if (s.pendingBetCents > 0) playSound('clear-main')
       return { ...s, pendingBetCents: 0 }
     })
@@ -236,7 +318,9 @@ export function useClassicGameState() {
     setState(s => {
       if (s.phase !== 'betting' || s.lastBetCents === 0) return s
       playSound('rebet')
-      return { ...s, pendingBetCents: Math.min(s.lastBetCents, s.bankrollCents) }
+      const mainBet = Math.min(s.lastBetCents, s.bankrollCents)
+      const llBet   = Math.min(s.lastLuckyLadiesBetCents, s.bankrollCents - mainBet)
+      return { ...s, pendingBetCents: mainBet, luckyLadiesBetCents: llBet }
     })
   }, [])
 
@@ -257,21 +341,28 @@ export function useClassicGameState() {
       if (s.phase !== 'betting') return s
       if (s.pendingBetCents < CLASSIC_MIN_BET) return s
       if (s.pendingBetCents > s.bankrollCents) return s
+      const totalCost = s.pendingBetCents + s.luckyLadiesBetCents
+      if (totalCost > s.bankrollCents) return s
       const shoe = s.engine.shoe.length < 52 ? createGameState().shoe : [...s.engine.shoe]
+      const debugPrefix = getDebugShoePrefix()
+      debugPrefix.forEach((card, i) => { shoe[i] = card })
       const engine: GameState = { shoe, playerHands: [], dealer: { cards: [], betCents: 0 } }
       dealInitial(engine, s.pendingBetCents)
       return {
         ...s,
-        phase:            'dealing',
+        phase:                   'dealing',
         engine,
-        bankrollCents:    s.bankrollCents - s.pendingBetCents,
-        pendingBetCents:  0,
-        lastBetCents:     s.pendingBetCents,
-        activeHandIndex:  0,
-        results:          [],
-        dealerRevealed:   false,
-        revealCount:      0,
-        sideBetPanelOpen: false,
+        bankrollCents:           s.bankrollCents - totalCost,
+        pendingBetCents:         0,
+        lastBetCents:            s.pendingBetCents,
+        lastLuckyLadiesBetCents: s.luckyLadiesBetCents,
+        luckyLadiesBetCents:     0,
+        luckyLadiesResult:       null,
+        activeHandIndex:         0,
+        results:                 [],
+        dealerRevealed:          false,
+        revealCount:             0,
+        sideBetPanelOpen:        false,
       }
     })
   }, [])
@@ -282,7 +373,7 @@ export function useClassicGameState() {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
       playerHit(engine, s.activeHandIndex)
-      return afterHit(s, engine)
+      return afterHit({ ...s, luckyLadiesBannerVisible: false }, engine)
     })
   }, [])
 
@@ -291,7 +382,7 @@ export function useClassicGameState() {
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
-      return advanceFrom(s, engine, s.activeHandIndex)
+      return advanceFrom({ ...s, luckyLadiesBannerVisible: false }, engine, s.activeHandIndex)
     })
   }, [])
 
@@ -304,7 +395,7 @@ export function useClassicGameState() {
       if (s.bankrollCents < hand.betCents) return s
       const engine = cloneEngine(s.engine)
       playerDouble(engine, s.activeHandIndex)
-      const base    = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents }
+      const base    = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents, luckyLadiesBannerVisible: false }
       let nextIdx   = s.activeHandIndex + 1
       while (nextIdx < engine.playerHands.length && handIsDone(engine.playerHands[nextIdx])) nextIdx++
       if (nextIdx >= engine.playerHands.length) return { ...base, pendingDealerTurn: true }
@@ -322,7 +413,7 @@ export function useClassicGameState() {
       if (s.bankrollCents < hand.betCents) return s
       const engine = cloneEngine(s.engine)
       playerSplit(engine, s.activeHandIndex)
-      const base = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents }
+      const base = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents, luckyLadiesBannerVisible: false }
       if (engine.playerHands[s.activeHandIndex].isSplitAce) return advanceFrom(base, engine, s.activeHandIndex)
       return base
     })
@@ -334,12 +425,13 @@ export function useClassicGameState() {
       if (s.phase !== 'round-over') return s
       return {
         ...initial(),
-        engine:           { ...s.engine, playerHands: [], dealer: { cards: [], betCents: 0 } },
-        bankrollCents:    s.bankrollCents,
-        peakBankrollCents: s.peakBankrollCents,
-        lastBetCents:     s.lastBetCents,
-        sideBetPanelOpen: s.sideBetPanelOpen,
-        selectedSideBet:  s.selectedSideBet,
+        engine:                  { ...s.engine, playerHands: [], dealer: { cards: [], betCents: 0 } },
+        bankrollCents:           s.bankrollCents,
+        peakBankrollCents:       s.peakBankrollCents,
+        lastBetCents:            s.lastBetCents,
+        lastLuckyLadiesBetCents: s.lastLuckyLadiesBetCents,
+        sideBetPanelOpen:        s.sideBetPanelOpen,
+        selectedSideBet:         s.selectedSideBet,
       }
     })
   }, [])
@@ -369,11 +461,17 @@ export function useClassicGameState() {
     isGameOver:             state.phase === 'betting' && state.bankrollCents < CLASSIC_MIN_BET,
     pendingDealerTurn,
     currentPuckCount:       0,
-    // Stub side-bet fields to keep App.tsx interface uniform
-    potOfGoldBetCents:      0,
+    // Lucky Ladies exposed directly
+    luckyLadiesBetCents:      state.luckyLadiesBetCents,
+    lastLuckyLadiesBetCents:  state.lastLuckyLadiesBetCents,
+    luckyLadiesResult:        state.luckyLadiesResult,
+    luckyLadiesBannerVisible: state.luckyLadiesBannerVisible,
+    // Map lucky ladies into potOfGold slot so BetPanel budget tracking works
+    potOfGoldBetCents:      state.luckyLadiesBetCents,
+    lastPotOfGoldBetCents:  state.lastLuckyLadiesBetCents,
+    // Stub remaining free-bet side-bet fields
     push22BetCents:         0,
     hellraiserBetCents:     0,
-    lastPotOfGoldBetCents:  0,
     lastPush22BetCents:     0,
     lastHellraiserBetCents: 0,
     potOfGoldResult:        null,

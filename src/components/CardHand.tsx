@@ -18,6 +18,7 @@ type CardHandProps = {
   hellraiserGlowFirstOnly?: boolean
   push22Glow?:              boolean
   pogGlow?:                 boolean
+  luckyLadiesGlow?:         boolean
 }
 
 const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; left?: number; zIndex?: number; glowing?: boolean }) => (
@@ -33,7 +34,7 @@ const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; 
 export function CardHand({
   hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result,
   hasFreeSplit, hasFreeDouble, showPushOn22, visibleCount,
-  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow,
+  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow, luckyLadiesGlow,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -109,6 +110,7 @@ export function CardHand({
                 dimmed={isDimmed}
                 glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
                 push22Glow={push22Glow}
+                luckyLadiesGlow={luckyLadiesGlow}
               />
             </div>
           ))}
@@ -126,6 +128,7 @@ export function CardHand({
               dimmed={isDimmed}
               glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
                 push22Glow={push22Glow}
+                luckyLadiesGlow={luckyLadiesGlow}
             />
           ))}
         </div>
