@@ -186,6 +186,40 @@
   animation: p22-sweep-bottom 4s linear infinite;
 }
 
+.ll-glow-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,150,220,1) 25%, rgba(236,72,153,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: ll-sweep-top 4s linear infinite;
+}
+
+.ll-glow-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,150,220,1) 25%, rgba(236,72,153,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: ll-sweep-bottom 4s linear infinite;
+}
+
+@keyframes ll-sweep-top {
+  0%   { transform: translateX(-80px); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes ll-sweep-bottom {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-80px); }
+}
+
 .dot-alt-top {
   position: absolute;
   top: 0;

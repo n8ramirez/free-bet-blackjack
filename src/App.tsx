@@ -124,8 +124,8 @@ export default function App() {
 
   const hellraiserWon      = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
   const pogGlowActive      = game.lastPotOfGoldBetCents > 0
-  const luckyLadiesWon     = classicGame.luckyLadiesBannerVisible && (classicGame.luckyLadiesResult?.payoutCents ?? 0) > 0
-  const luckyLadiesDealerBJ = luckyLadiesWon && classicGame.luckyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  const luckyLadiesWon      = classicGame.luckyLadiesBannerVisible && (classicGame.luckyLadiesResult?.payoutCents ?? 0) > 0
+  const luckyLadiesDealerBJ = classicGame.luckyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -356,7 +356,56 @@ export default function App() {
       <div className={`relative flex-none flex flex-col items-center w-full ${isOver ? 'z-20' : 'z-10'} ${isQuadrant ? '-mt-[240px] pb-[32px]' : ''}`}>
         {isOver ? (
           <>
-            {playerBJ && !dealerBJ ? (
+            {isClassic && luckyLadiesDealerBJ ? (
+              <div
+                className="w-full bg-black relative overflow-hidden"
+                style={{
+                  backgroundImage: [
+                    'radial-gradient(circle, rgba(236,72,153,0.75) 2px, transparent 2.5px)',
+                    'radial-gradient(circle, rgba(236,72,153,0.75) 2px, transparent 2.5px)',
+                  ].join(', '),
+                  backgroundSize: '13px 18px, 13px 18px',
+                  backgroundPosition: '0 -4.5px, 0 calc(100% + 4.5px)',
+                  backgroundRepeat: 'repeat-x, repeat-x',
+                }}
+              >
+                <div className="ll-glow-top" />
+                <div className="ll-glow-bottom" />
+                <div
+                  className="absolute top-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 -4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 -4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
+                  <div className="text-2xl tracking-wide text-pink-400" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800 }}>
+                    Dealer Blackjack
+                  </div>
+                </div>
+              </div>
+            ) : playerBJ && !dealerBJ ? (
               <div
                 className="w-full bg-black relative overflow-hidden"
                 style={{
@@ -576,6 +625,21 @@ export default function App() {
                 <span className="text-[11px] font-bold uppercase tracking-wide text-sky-300">Push 22</span>
                 {game.push22Result.payoutCents > 0 ? (
                   <span className="text-[11px] font-bold text-emerald-400">Win</span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
+            )}
+            {/* Lucky Ladies strip in round-over */}
+            {isClassic && classicGame.luckyLadiesResult && (
+              <div className={`w-full py-1.5 flex items-center justify-center gap-2
+                ${classicGame.luckyLadiesResult.handName ? 'bg-pink-950/60' : 'bg-black/50'}`}>
+                <LuckyLadiesIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lucky Ladies</span>
+                {classicGame.luckyLadiesResult.handName ? (
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    {classicGame.luckyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.luckyLadiesResult.payoutCents)}
+                  </span>
                 ) : (
                   <span className="text-[11px] font-bold text-red-400">Lose</span>
                 )}
@@ -838,9 +902,6 @@ export default function App() {
                 {classicGame.luckyLadiesResult.payoutCents > 0 ? (
                   <span className="text-xs text-emerald-400 font-medium">
                     +${(classicGame.luckyLadiesResult.payoutCents / 100).toLocaleString()}
-                    {classicGame.luckyLadiesResult.handName && (
-                      <span className="text-pink-400 ml-1">({classicGame.luckyLadiesResult.handName})</span>
-                    )}
                   </span>
                 ) : (
                   <span className="text-xs text-red-400 font-medium">

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { playSound } from '../sounds'
+import { getDebugShoePrefix } from '../debug'
 import {
   GameState, Hand, HandResult,
   createGameState, dealInitial,
@@ -36,7 +37,7 @@ function resolveLuckyLadies(
   if (total !== 20) return { handName: null, payoutCents: -betCents }
 
   const bothQueens = r1 === 'Q' && r2 === 'Q'
-  const bothQH     = bothQueens && s1 === 'H' && s2 === 'H'
+  const bothQH     = bothQueens && s1 === '♥' && s2 === '♥'
   const sameRank   = r1 === r2
   const sameSuit   = s1 === s2
 
@@ -169,9 +170,10 @@ function finishFromDealerTurn(base: ClassicUIState): ClassicUIState {
   })
 
   const netCents = results.reduce((sum, r) => sum + r.payoutCents, 0)
-  if (netCents > 0)      playSound('win')
-  else if (netCents < 0) playSound('lose')
-  else                   playSound('push')
+  const llDealerBJ = base.luckyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  if (netCents > 0)           playSound('win')
+  else if (netCents < 0 && !llDealerBJ) playSound('lose')
+  else if (netCents === 0)    playSound('push')
 
   return {
     ...base,
@@ -228,7 +230,8 @@ export function useClassicGameState() {
           : null
         const llPayout = llResult ? s.lastLuckyLadiesBetCents + llResult.payoutCents : 0
         if (llResult) {
-          if (llResult.handName) playSound('side-bet-win')
+          if (llResult.handName === 'Queen of Hearts Pair + Dealer Blackjack') playSound('win')
+          else if (llResult.handName) playSound('side-bet-win')
           else playSound('hellraiser-lose')
         }
         const sWithLL = {
@@ -341,6 +344,8 @@ export function useClassicGameState() {
       const totalCost = s.pendingBetCents + s.luckyLadiesBetCents
       if (totalCost > s.bankrollCents) return s
       const shoe = s.engine.shoe.length < 52 ? createGameState().shoe : [...s.engine.shoe]
+      const debugPrefix = getDebugShoePrefix()
+      debugPrefix.forEach((card, i) => { shoe[i] = card })
       const engine: GameState = { shoe, playerHands: [], dealer: { cards: [], betCents: 0 } }
       dealInitial(engine, s.pendingBetCents)
       return {

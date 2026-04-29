@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { playSound } from '../sounds'
+import { getDebugShoePrefix } from '../debug'
 import {
   GameState, Hand, HandResult,
   createGameState, dealInitial,
@@ -482,6 +483,8 @@ export function useGameState() {
       const totalCost = s.pendingBetCents + s.potOfGoldBetCents + s.push22BetCents + s.hellraiserBetCents
       if (totalCost > s.bankrollCents) return s
       const shoe = s.engine.shoe.length < 52 ? createGameState().shoe : [...s.engine.shoe]
+      const debugPrefix = getDebugShoePrefix()
+      debugPrefix.forEach((card, i) => { shoe[i] = card })
       const engine: GameState = { shoe, playerHands: [], dealer: { cards: [], betCents: 0 } }
       dealInitial(engine, s.pendingBetCents)
       return {
