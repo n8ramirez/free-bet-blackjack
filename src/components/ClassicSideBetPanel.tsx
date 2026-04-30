@@ -9,13 +9,13 @@ function fmtDollars(cents: number): string {
 type ClassicSideBetPanelProps = {
   isOpen:                      boolean
   selectedSideBet:             ClassicSideBetType
-  lovelyLadiesBetCents:         number
+  ladyLuckBetCents:         number
   busterBlackjackBetCents:     number
   onSelectSideBet:             (type: ClassicSideBetType) => void
   onShowInfo:                  () => void
 }
 
-export const LovelyLadiesIcon = ({ className = '' }: { className?: string }) => (
+export const LadyLuckIcon = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 26 26" className={className} aria-hidden>
     <circle cx="13" cy="13" r="11.5" fill="#db2777" stroke="#f9a8d4" strokeWidth="1.2" />
     <path
@@ -33,14 +33,16 @@ export const BusterBlackjackIcon = ({ className = '' }: { className?: string }) 
   </svg>
 )
 
-export const TwtwinsuranceIcon = ({ className = '' }: { className?: string }) => (
+export const Wild7sIcon = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 26 26" className={className} aria-hidden>
     <circle cx="13" cy="13" r="11.5" fill="#059669" stroke="#6ee7b7" strokeWidth="1.2" />
     <path
-      d="M13,5.5 L19.5,8.5 L19.5,14 C19.5,18 13,21 13,21 C13,21 6.5,18 6.5,14 L6.5,8.5 Z"
-      fill="white"
+      d="M 13,13 C 14,12 16,12 16,14 C 16,16 14,17 12,17 C 9,17 8,14 8,12 C 8,9 11,7 14,7 C 18,7 20,10 20,13 C 20,17 17,19 13,19"
+      fill="none"
+      stroke="white"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
-    <text x="13" y="15.5" textAnchor="middle" fontSize="6" fontWeight="900" fill="#059669">+</text>
   </svg>
 )
 
@@ -52,12 +54,12 @@ type TabConfig = {
   barColor:    string
 }
 
-export function ClassicSideBetPanel({ isOpen, selectedSideBet, lovelyLadiesBetCents, busterBlackjackBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
+export function ClassicSideBetPanel({ isOpen, selectedSideBet, ladyLuckBetCents, busterBlackjackBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
   const tabs: TabConfig[] = [
     {
-      key:         'lovely-ladies',
-      label:       'Lovely Ladies',
-      icon:        <LovelyLadiesIcon className="w-4 h-4" />,
+      key:         'lady-luck',
+      label:       'Lady Luck',
+      icon:        <LadyLuckIcon className="w-4 h-4" />,
       activeColor: 'text-pink-400',
       barColor:    'bg-pink-400',
     },
@@ -69,9 +71,9 @@ export function ClassicSideBetPanel({ isOpen, selectedSideBet, lovelyLadiesBetCe
       barColor:    'bg-blue-400',
     },
     {
-      key:         'twinsurance',
-      label:       'Twinsurance',
-      icon:        <TwtwinsuranceIcon className="w-4 h-4" />,
+      key:         'wild-7s',
+      label:       'Wild 7s',
+      icon:        <Wild7sIcon className="w-4 h-4" />,
       activeColor: 'text-emerald-400',
       barColor:    'bg-emerald-400',
     },
@@ -115,9 +117,9 @@ export function ClassicSideBetPanel({ isOpen, selectedSideBet, lovelyLadiesBetCe
                     {tab.label}
                   </span>
                 </div>
-                {tab.key === 'lovely-ladies' ? (
-                  <div className={`text-base font-bold transition-colors ${lovelyLadiesBetCents > 0 ? 'text-pink-400' : 'text-stone-500'}`}>
-                    {lovelyLadiesBetCents > 0 ? fmtDollars(lovelyLadiesBetCents) : '—'}
+                {tab.key === 'lady-luck' ? (
+                  <div className={`text-base font-bold transition-colors ${ladyLuckBetCents > 0 ? 'text-pink-400' : 'text-stone-500'}`}>
+                    {ladyLuckBetCents > 0 ? fmtDollars(ladyLuckBetCents) : '—'}
                   </div>
                 ) : tab.key === 'buster-blackjack' ? (
                   <div className={`text-base font-bold transition-colors ${busterBlackjackBetCents > 0 ? 'text-blue-400' : 'text-stone-500'}`}>

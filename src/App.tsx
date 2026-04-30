@@ -6,7 +6,7 @@ import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
-import { ClassicSideBetPanel, LovelyLadiesIcon, BusterBlackjackIcon } from './components/ClassicSideBetPanel'
+import { ClassicSideBetPanel, LadyLuckIcon, BusterBlackjackIcon } from './components/ClassicSideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ClassicSideBetInfoModal } from './components/ClassicSideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
@@ -124,8 +124,8 @@ export default function App() {
 
   const hellraiserWon      = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
   const pogGlowActive      = game.lastPotOfGoldBetCents > 0
-  const lovelyLadiesWon      = classicGame.lovelyLadiesBannerVisible && (classicGame.lovelyLadiesResult?.payoutCents ?? 0) > 0
-  const lovelyLadiesDealerBJ = classicGame.lovelyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  const ladyLuckWon      = classicGame.ladyLuckBannerVisible && (classicGame.ladyLuckResult?.payoutCents ?? 0) > 0
+  const ladyLuckDealerBJ = classicGame.ladyLuckResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -301,11 +301,11 @@ export default function App() {
             <div className="text-amber-400 font-bold text-base">
               ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
             </div>
-            {isClassic && classicGame.lastLuckyLadiesBetCents > 0 && (
+            {isClassic && classicGame.lastLadyLuckBetCents > 0 && (
               <div className="flex items-center gap-1 mt-0.5">
-                <LovelyLadiesIcon className="w-4 h-4" />
+                <LadyLuckIcon className="w-4 h-4" />
                 <span className="text-pink-400 text-[10px] font-bold">
-                  ${(classicGame.lastLuckyLadiesBetCents / 100).toLocaleString()}
+                  ${(classicGame.lastLadyLuckBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -355,7 +355,7 @@ export default function App() {
             hellraiserGlow={hellraiserWon}
             hellraiserGlowFirstOnly={hellraiserWon}
             push22Glow={push22Won}
-            lovelyLadiesGlow={lovelyLadiesDealerBJ}
+            ladyLuckGlow={ladyLuckDealerBJ}
           />
         ) : (
           <div className="text-white text-sm uppercase tracking-widest">
@@ -368,7 +368,7 @@ export default function App() {
       <div className={`relative flex-none flex flex-col items-center w-full ${isOver ? 'z-20' : 'z-10'} ${isQuadrant ? '-mt-[240px] pb-[32px]' : ''}`}>
         {isOver ? (
           <>
-            {isClassic && lovelyLadiesDealerBJ ? (
+            {isClassic && ladyLuckDealerBJ ? (
               <div
                 className="w-full bg-black relative overflow-hidden"
                 style={{
@@ -691,15 +691,15 @@ export default function App() {
                 )}
               </div>
             )}
-            {/* Lucky Ladies strip in round-over */}
-            {isClassic && classicGame.lovelyLadiesResult && (
+            {/* Lady Luck strip in round-over */}
+            {isClassic && classicGame.ladyLuckResult && (
               <div className={`w-full py-1.5 flex items-center justify-center gap-2
-                ${classicGame.lovelyLadiesResult.handName ? 'bg-pink-950/60' : 'bg-black/50'}`}>
-                <LovelyLadiesIcon className="w-4 h-4 flex-shrink-0" />
-                <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lovely Ladies</span>
-                {classicGame.lovelyLadiesResult.handName ? (
+                ${classicGame.ladyLuckResult.handName ? 'bg-pink-950/60' : 'bg-black/50'}`}>
+                <LadyLuckIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lady Luck</span>
+                {classicGame.ladyLuckResult.handName ? (
                   <span className="text-[11px] font-bold text-emerald-400">
-                    {classicGame.lovelyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.lovelyLadiesResult.payoutCents)}
+                    {classicGame.ladyLuckResult.handName} &nbsp;+{fmtDollars(classicGame.ladyLuckResult.payoutCents)}
                   </span>
                 ) : (
                   <span className="text-[11px] font-bold text-red-400">Lose</span>
@@ -737,13 +737,13 @@ export default function App() {
               </div>
             )}
           </>
-        ) : isClassic && (isPlayerTurn || isDealerTurn) && classicGame.lovelyLadiesBannerVisible && classicGame.lovelyLadiesResult ? (
+        ) : isClassic && (isPlayerTurn || isDealerTurn) && classicGame.ladyLuckBannerVisible && classicGame.ladyLuckResult ? (
           <div className="w-full py-2 flex items-center justify-center gap-2 bg-black/60">
-            <LovelyLadiesIcon className="w-4 h-4 flex-shrink-0" />
-            <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lovely Ladies</span>
-            {classicGame.lovelyLadiesResult.handName ? (
+            <LadyLuckIcon className="w-4 h-4 flex-shrink-0" />
+            <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lady Luck</span>
+            {classicGame.ladyLuckResult.handName ? (
               <span className="text-[11px] font-bold text-emerald-400">
-                {classicGame.lovelyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.lovelyLadiesResult.payoutCents)}
+                {classicGame.ladyLuckResult.handName} &nbsp;+{fmtDollars(classicGame.ladyLuckResult.payoutCents)}
               </span>
             ) : (
               <span className="text-[11px] font-bold text-red-400">Lose</span>
@@ -825,7 +825,7 @@ export default function App() {
                       visibleCount={playerVisibleCount}
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
-                      lovelyLadiesGlow={isClassic && lovelyLadiesWon}
+                      ladyLuckGlow={isClassic && ladyLuckWon}
                     />
                   </div>
                 )
@@ -850,7 +850,7 @@ export default function App() {
                       visibleCount={playerVisibleCount}
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
-                      lovelyLadiesGlow={isClassic && lovelyLadiesWon}
+                      ladyLuckGlow={isClassic && ladyLuckWon}
                     />
                   </div>
                 )
@@ -868,7 +868,7 @@ export default function App() {
                 visibleCount={playerVisibleCount}
                 hellraiserGlow={!isClassic && hellraiserWon}
                 pogGlow={!isClassic && pogGlowActive}
-                lovelyLadiesGlow={isClassic && lovelyLadiesWon}
+                ladyLuckGlow={isClassic && ladyLuckWon}
               />
             </div>
           )
@@ -883,7 +883,7 @@ export default function App() {
           <ClassicSideBetPanel
             isOpen={classicGame.sideBetPanelOpen}
             selectedSideBet={classicGame.selectedSideBet}
-            lovelyLadiesBetCents={classicGame.lovelyLadiesBetCents}
+            ladyLuckBetCents={classicGame.ladyLuckBetCents}
             busterBlackjackBetCents={classicGame.busterBlackjackBetCents}
             onSelectSideBet={classicGame.selectSideBet}
             onShowInfo={() => setShowSideBetInfo(true)}
@@ -971,18 +971,18 @@ export default function App() {
             <div className={`text-2xl font-medium ${netCents > 0 ? 'text-emerald-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
-            {/* Lucky Ladies result line */}
-            {isClassic && classicGame.lovelyLadiesResult && (
+            {/* Lady Luck result line */}
+            {isClassic && classicGame.ladyLuckResult && (
               <div className="flex items-center gap-1.5">
-                <LovelyLadiesIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="text-stone-400 text-xs uppercase tracking-widest">Lovely Ladies</span>
-                {classicGame.lovelyLadiesResult.payoutCents > 0 ? (
+                <LadyLuckIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Lady Luck</span>
+                {classicGame.ladyLuckResult.payoutCents > 0 ? (
                   <span className="text-xs text-emerald-400 font-medium">
-                    +${(classicGame.lovelyLadiesResult.payoutCents / 100).toLocaleString()}
+                    +${(classicGame.ladyLuckResult.payoutCents / 100).toLocaleString()}
                   </span>
                 ) : (
                   <span className="text-xs text-red-400 font-medium">
-                    -${(classicGame.lastLuckyLadiesBetCents / 100).toLocaleString()}
+                    -${(classicGame.lastLadyLuckBetCents / 100).toLocaleString()}
                   </span>
                 )}
               </div>

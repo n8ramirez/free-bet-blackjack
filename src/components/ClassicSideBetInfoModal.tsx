@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { LOVELY_LADIES_PAYOUTS, BUSTER_BLACKJACK_PAYOUTS } from '../hooks/useClassicGameState'
-import { LovelyLadiesIcon, BusterBlackjackIcon } from './ClassicSideBetPanel'
+import { LADY_LUCK_PAYOUTS, BUSTER_BLACKJACK_PAYOUTS } from '../hooks/useClassicGameState'
+import { LadyLuckIcon, BusterBlackjackIcon } from './ClassicSideBetPanel'
 
 type Props = { onClose: () => void }
 
@@ -23,7 +23,7 @@ function Rule({ children }: { children: React.ReactNode }) {
 }
 
 export function ClassicSideBetInfoModal({ onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<'lucky-ladies' | 'buster-blackjack'>('lucky-ladies')
+  const [activeTab, setActiveTab] = useState<'lady-luck' | 'buster-blackjack'>('lady-luck')
 
   return (
     <div
@@ -52,13 +52,13 @@ export function ClassicSideBetInfoModal({ onClose }: Props) {
         {/* Tab bar */}
         <div className="flex border-b border-stone-700">
           <button
-            onClick={() => setActiveTab('lucky-ladies')}
+            onClick={() => setActiveTab('lady-luck')}
             className={`flex-1 py-2.5 text-center text-[10px] uppercase tracking-widest font-extrabold transition-colors
-              ${activeTab === 'lucky-ladies'
+              ${activeTab === 'lady-luck'
                 ? 'text-pink-400 border-b-2 border-pink-400 -mb-px'
                 : 'text-stone-500 hover:text-stone-300'}`}
           >
-            Lovely Ladies
+            Lady Luck
           </button>
           <button
             onClick={() => setActiveTab('buster-blackjack')}
@@ -71,11 +71,11 @@ export function ClassicSideBetInfoModal({ onClose }: Props) {
           </button>
         </div>
 
-        {/* Lovely Ladies content */}
-        {activeTab === 'lucky-ladies' && (
+        {/* Lady Luck content */}
+        {activeTab === 'lady-luck' && (
           <div className="flex flex-col gap-4 text-sm p-5">
             <div className="flex items-center gap-2">
-              <LovelyLadiesIcon className="w-8 h-8 flex-shrink-0" />
+              <LadyLuckIcon className="w-8 h-8 flex-shrink-0" />
               <p className="text-stone-300">
                 Based on your first two cards. Wins pay on any total of{' '}
                 <span className="text-pink-400 font-semibold">20</span>, with bonuses for
@@ -89,13 +89,13 @@ export function ClassicSideBetInfoModal({ onClose }: Props) {
                   <span className="text-stone-500 text-[9px] uppercase tracking-widest">Hand</span>
                   <span className="text-stone-500 text-[9px] uppercase tracking-widest text-right">Pays</span>
                 </div>
-                {LOVELY_LADIES_PAYOUTS.map(([name, mult], i) => (
+                {LADY_LUCK_PAYOUTS.map(([name, mult], i) => (
                   <div key={name} className={`grid grid-cols-2 px-3 py-2 ${i % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
                     <span className="text-pink-400 font-bold text-xs">{name}</span>
                     <span className="text-stone-200 font-semibold text-right">{mult} : 1</span>
                   </div>
                 ))}
-                <div className={`grid grid-cols-2 px-3 py-2 ${LOVELY_LADIES_PAYOUTS.length % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
+                <div className={`grid grid-cols-2 px-3 py-2 ${LADY_LUCK_PAYOUTS.length % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
                   <span className="text-stone-400 font-bold text-xs">All others</span>
                   <span className="text-stone-400 font-semibold text-right">Lose</span>
                 </div>

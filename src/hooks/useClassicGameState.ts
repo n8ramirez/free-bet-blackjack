@@ -10,9 +10,9 @@ import {
 } from '../engine/classicEngine'
 
 // ---------------------------------------------------------------------------
-// Lucky Ladies side bet
+// Lady Luck side bet
 // ---------------------------------------------------------------------------
-export type LovelyLadiesResult = {
+export type LadyLuckResult = {
   handName: string | null
   payoutCents: number
 }
@@ -58,7 +58,7 @@ function resolveBusterBlackjack(
   return { handName, payoutCents: betCents * multiplier }
 }
 
-export const LOVELY_LADIES_PAYOUTS: [string, number][] = [
+export const LADY_LUCK_PAYOUTS: [string, number][] = [
   ['Queen of Hearts Pair + Dealer Blackjack', 1000],
   ['Queen of Hearts Pair', 200],
   ['Matched 20',            25],
@@ -66,11 +66,11 @@ export const LOVELY_LADIES_PAYOUTS: [string, number][] = [
   ['Any 20',                 4],
 ]
 
-function resolveLovelyLadies(
+function resolveLadyLuck(
   c1: string, c2: string,
   dealerBJ: boolean,
   betCents: number,
-): LovelyLadiesResult {
+): LadyLuckResult {
   const r1 = cardRank(c1), r2 = cardRank(c2)
   const s1 = c1[c1.length - 1], s2 = c2[c2.length - 1]
 
@@ -99,7 +99,7 @@ export const CLASSIC_MIN_BET           = 500
 export const CHIPS                     = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 500_000]
 export const CHIP_LABELS               = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K', '$5K']
 
-export type ClassicSideBetType = 'lovely-ladies' | 'buster-blackjack' | 'twinsurance'
+export type ClassicSideBetType = 'lady-luck' | 'buster-blackjack' | 'wild-7s'
 
 function handIsDone(hand: Hand): boolean {
   return hand.isSplitAce === true || handTotals(hand.cards).total >= 21
@@ -135,10 +135,10 @@ export type ClassicUIState = {
   pendingDealerTurn:  boolean
   sideBetPanelOpen:        boolean
   selectedSideBet:         ClassicSideBetType
-  lovelyLadiesBetCents:          number
-  lastLuckyLadiesBetCents:      number
-  lovelyLadiesResult:            LovelyLadiesResult | null
-  lovelyLadiesBannerVisible:     boolean
+  ladyLuckBetCents:          number
+  lastLadyLuckBetCents:      number
+  ladyLuckResult:            LadyLuckResult | null
+  ladyLuckBannerVisible:     boolean
   busterBlackjackBetCents:      number
   lastBusterBlackjackBetCents:  number
   busterBlackjackResult:        BusterBlackjackResult | null
@@ -184,11 +184,11 @@ function initial(): ClassicUIState {
     dealerStartDelay:  0,
     pendingDealerTurn: false,
     sideBetPanelOpen:        false,
-    selectedSideBet:         'lovely-ladies',
-    lovelyLadiesBetCents:          0,
-    lastLuckyLadiesBetCents:      0,
-    lovelyLadiesResult:            null,
-    lovelyLadiesBannerVisible:     false,
+    selectedSideBet:         'lady-luck',
+    ladyLuckBetCents:          0,
+    lastLadyLuckBetCents:      0,
+    ladyLuckResult:            null,
+    ladyLuckBannerVisible:     false,
     busterBlackjackBetCents:      0,
     lastBusterBlackjackBetCents:  0,
     busterBlackjackResult:        null,
@@ -226,7 +226,7 @@ function finishFromDealerTurn(base: ClassicUIState): ClassicUIState {
 
   const mainNet    = results.reduce((sum, r) => sum + r.payoutCents, 0)
   const netCents   = mainNet + (bbResult?.payoutCents ?? 0)
-  const llDealerBJ = base.lovelyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  const llDealerBJ = base.ladyLuckResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
   if (netCents > 0)                       playSound('win')
   else if (netCents < 0 && !llDealerBJ)   playSound('lose')
   else if (netCents === 0)                playSound('push')
@@ -276,16 +276,16 @@ export function useClassicGameState() {
         const TEN      = new Set(['10', 'J', 'Q', 'K'])
         const dealerBJ = (upcard === 'A' || TEN.has(upcard)) && isBlackjack(engine.dealer.cards)
 
-        // Resolve Lucky Ladies on first two player cards
-        const llResult = s.lastLuckyLadiesBetCents > 0
-          ? resolveLovelyLadies(
+        // Resolve Lady Luck on first two player cards
+        const llResult = s.lastLadyLuckBetCents > 0
+          ? resolveLadyLuck(
               engine.playerHands[0].cards[0],
               engine.playerHands[0].cards[1],
               dealerBJ,
-              s.lastLuckyLadiesBetCents,
+              s.lastLadyLuckBetCents,
             )
           : null
-        const llPayout = llResult ? s.lastLuckyLadiesBetCents + llResult.payoutCents : 0
+        const llPayout = llResult ? s.lastLadyLuckBetCents + llResult.payoutCents : 0
         if (llResult) {
           if (llResult.handName === 'Queen of Hearts Pair + Dealer Blackjack') playSound('win')
           else if (llResult.handName) playSound('side-bet-win')
@@ -293,8 +293,8 @@ export function useClassicGameState() {
         }
         const sWithLL = {
           ...s,
-          lovelyLadiesResult:        llResult,
-          lovelyLadiesBannerVisible: llResult !== null,
+          ladyLuckResult:        llResult,
+          ladyLuckBannerVisible: llResult !== null,
           bankrollCents:            s.bankrollCents + llPayout,
         }
 
@@ -349,10 +349,10 @@ export function useClassicGameState() {
   const addChip = useCallback((cents: number) => {
     setState(s => {
       if (s.phase !== 'betting') return s
-      if (s.pendingBetCents + s.lovelyLadiesBetCents + s.busterBlackjackBetCents + cents > s.bankrollCents) return s
-      if (s.sideBetPanelOpen && s.selectedSideBet === 'lovely-ladies') {
+      if (s.pendingBetCents + s.ladyLuckBetCents + s.busterBlackjackBetCents + cents > s.bankrollCents) return s
+      if (s.sideBetPanelOpen && s.selectedSideBet === 'lady-luck') {
         playSound('chip-side')
-        return { ...s, lovelyLadiesBetCents: s.lovelyLadiesBetCents + cents }
+        return { ...s, ladyLuckBetCents: s.ladyLuckBetCents + cents }
       }
       if (s.sideBetPanelOpen && s.selectedSideBet === 'buster-blackjack') {
         playSound('chip-side')
@@ -366,9 +366,9 @@ export function useClassicGameState() {
   const clearBet = useCallback(() => {
     setState(s => {
       if (s.phase !== 'betting') return s
-      if (s.sideBetPanelOpen && s.selectedSideBet === 'lovely-ladies' && s.lovelyLadiesBetCents > 0) {
+      if (s.sideBetPanelOpen && s.selectedSideBet === 'lady-luck' && s.ladyLuckBetCents > 0) {
         playSound('clear-side')
-        return { ...s, lovelyLadiesBetCents: 0 }
+        return { ...s, ladyLuckBetCents: 0 }
       }
       if (s.sideBetPanelOpen && s.selectedSideBet === 'buster-blackjack' && s.busterBlackjackBetCents > 0) {
         playSound('clear-side')
@@ -384,9 +384,9 @@ export function useClassicGameState() {
       if (s.phase !== 'betting' || s.lastBetCents === 0) return s
       playSound('rebet')
       const mainBet = Math.min(s.lastBetCents, s.bankrollCents)
-      const llBet   = Math.min(s.lastLuckyLadiesBetCents, s.bankrollCents - mainBet)
+      const llBet   = Math.min(s.lastLadyLuckBetCents, s.bankrollCents - mainBet)
       const bbBet   = Math.min(s.lastBusterBlackjackBetCents, s.bankrollCents - mainBet - llBet)
-      return { ...s, pendingBetCents: mainBet, lovelyLadiesBetCents: llBet, busterBlackjackBetCents: bbBet }
+      return { ...s, pendingBetCents: mainBet, ladyLuckBetCents: llBet, busterBlackjackBetCents: bbBet }
     })
   }, [])
 
@@ -407,7 +407,7 @@ export function useClassicGameState() {
       if (s.phase !== 'betting') return s
       if (s.pendingBetCents < CLASSIC_MIN_BET) return s
       if (s.pendingBetCents > s.bankrollCents) return s
-      const totalCost = s.pendingBetCents + s.lovelyLadiesBetCents + s.busterBlackjackBetCents
+      const totalCost = s.pendingBetCents + s.ladyLuckBetCents + s.busterBlackjackBetCents
       if (totalCost > s.bankrollCents) return s
       const shoe = s.engine.shoe.length < 52 ? createGameState().shoe : [...s.engine.shoe]
       const debugPrefix = getDebugShoePrefix()
@@ -421,9 +421,9 @@ export function useClassicGameState() {
         bankrollCents:                s.bankrollCents - totalCost,
         pendingBetCents:              0,
         lastBetCents:                 s.pendingBetCents,
-        lastLuckyLadiesBetCents:      s.lovelyLadiesBetCents,
-        lovelyLadiesBetCents:          0,
-        lovelyLadiesResult:            null,
+        lastLadyLuckBetCents:      s.ladyLuckBetCents,
+        ladyLuckBetCents:          0,
+        ladyLuckResult:            null,
         lastBusterBlackjackBetCents:  s.busterBlackjackBetCents,
         busterBlackjackBetCents:      0,
         busterBlackjackResult:        null,
@@ -442,7 +442,7 @@ export function useClassicGameState() {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
       playerHit(engine, s.activeHandIndex)
-      return afterHit({ ...s, lovelyLadiesBannerVisible: false }, engine)
+      return afterHit({ ...s, ladyLuckBannerVisible: false }, engine)
     })
   }, [])
 
@@ -451,7 +451,7 @@ export function useClassicGameState() {
     setState(s => {
       if (s.phase !== 'player-turn') return s
       const engine = cloneEngine(s.engine)
-      return advanceFrom({ ...s, lovelyLadiesBannerVisible: false }, engine, s.activeHandIndex)
+      return advanceFrom({ ...s, ladyLuckBannerVisible: false }, engine, s.activeHandIndex)
     })
   }, [])
 
@@ -464,7 +464,7 @@ export function useClassicGameState() {
       if (s.bankrollCents < hand.betCents) return s
       const engine = cloneEngine(s.engine)
       playerDouble(engine, s.activeHandIndex)
-      const base    = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents, lovelyLadiesBannerVisible: false }
+      const base    = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents, ladyLuckBannerVisible: false }
       let nextIdx   = s.activeHandIndex + 1
       while (nextIdx < engine.playerHands.length && handIsDone(engine.playerHands[nextIdx])) nextIdx++
       if (nextIdx >= engine.playerHands.length) return { ...base, pendingDealerTurn: true }
@@ -482,7 +482,7 @@ export function useClassicGameState() {
       if (s.bankrollCents < hand.betCents) return s
       const engine = cloneEngine(s.engine)
       playerSplit(engine, s.activeHandIndex)
-      const base = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents, lovelyLadiesBannerVisible: false }
+      const base = { ...s, engine, bankrollCents: s.bankrollCents - hand.betCents, ladyLuckBannerVisible: false }
       if (engine.playerHands[s.activeHandIndex].isSplitAce) return advanceFrom(base, engine, s.activeHandIndex)
       return base
     })
@@ -498,7 +498,7 @@ export function useClassicGameState() {
         bankrollCents:           s.bankrollCents,
         peakBankrollCents:       s.peakBankrollCents,
         lastBetCents:                s.lastBetCents,
-        lastLuckyLadiesBetCents:     s.lastLuckyLadiesBetCents,
+        lastLadyLuckBetCents:     s.lastLadyLuckBetCents,
         lastBusterBlackjackBetCents: s.lastBusterBlackjackBetCents,
         sideBetPanelOpen:            s.sideBetPanelOpen,
         selectedSideBet:             s.selectedSideBet,
@@ -531,18 +531,18 @@ export function useClassicGameState() {
     isGameOver:             state.phase === 'betting' && state.bankrollCents < CLASSIC_MIN_BET,
     pendingDealerTurn,
     currentPuckCount:       0,
-    // Lucky Ladies exposed directly
-    lovelyLadiesBetCents:      state.lovelyLadiesBetCents,
-    lastLuckyLadiesBetCents:  state.lastLuckyLadiesBetCents,
-    lovelyLadiesResult:        state.lovelyLadiesResult,
-    lovelyLadiesBannerVisible: state.lovelyLadiesBannerVisible,
+    // Lady Luck exposed directly
+    ladyLuckBetCents:      state.ladyLuckBetCents,
+    lastLadyLuckBetCents:  state.lastLadyLuckBetCents,
+    ladyLuckResult:        state.ladyLuckResult,
+    ladyLuckBannerVisible: state.ladyLuckBannerVisible,
     // Buster Blackjack exposed directly
     busterBlackjackBetCents:      state.busterBlackjackBetCents,
     lastBusterBlackjackBetCents:  state.lastBusterBlackjackBetCents,
     busterBlackjackResult:        state.busterBlackjackResult,
     // Map total Classic side bets into potOfGold slot so BetPanel budget tracking works
-    potOfGoldBetCents:      state.lovelyLadiesBetCents + state.busterBlackjackBetCents,
-    lastPotOfGoldBetCents:  state.lastLuckyLadiesBetCents + state.lastBusterBlackjackBetCents,
+    potOfGoldBetCents:      state.ladyLuckBetCents + state.busterBlackjackBetCents,
+    lastPotOfGoldBetCents:  state.lastLadyLuckBetCents + state.lastBusterBlackjackBetCents,
     // Stub remaining free-bet side-bet fields
     push22BetCents:         0,
     hellraiserBetCents:     0,

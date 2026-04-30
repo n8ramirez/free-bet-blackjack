@@ -47,7 +47,7 @@
   border-radius: 0.5rem;
 }
 
-@keyframes lovely-ladies-glow {
+@keyframes lady-luck-glow {
   0%, 100% {
     box-shadow:
       0 0 10px 3px rgba(236,72,153,0.9),
@@ -60,8 +60,8 @@
   }
 }
 
-.lovely-ladies-glow {
-  animation: lovely-ladies-glow 1.2s ease-in-out infinite;
+.lady-luck-glow {
+  animation: lady-luck-glow 1.2s ease-in-out infinite;
   border-radius: 0.5rem;
 }
 
