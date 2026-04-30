@@ -47,7 +47,7 @@
   border-radius: 0.5rem;
 }
 
-@keyframes lucky-ladies-glow {
+@keyframes lovely-ladies-glow {
   0%, 100% {
     box-shadow:
       0 0 10px 3px rgba(236,72,153,0.9),
@@ -60,8 +60,8 @@
   }
 }
 
-.lucky-ladies-glow {
-  animation: lucky-ladies-glow 1.2s ease-in-out infinite;
+.lovely-ladies-glow {
+  animation: lovely-ladies-glow 1.2s ease-in-out infinite;
   border-radius: 0.5rem;
 }
 
@@ -216,6 +216,40 @@
 }
 
 @keyframes ll-sweep-bottom {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-80px); }
+}
+
+.bbj-glow-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(147,197,253,1) 25%, rgba(96,165,250,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: bbj-sweep-top 4s linear infinite;
+}
+
+.bbj-glow-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(147,197,253,1) 25%, rgba(96,165,250,0.9) 55%, transparent 100%);
+  pointer-events: none;
+  animation: bbj-sweep-bottom 4s linear infinite;
+}
+
+@keyframes bbj-sweep-top {
+  0%   { transform: translateX(-80px); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes bbj-sweep-bottom {
   0%   { transform: translateX(100vw); }
   100% { transform: translateX(-80px); }
 }
