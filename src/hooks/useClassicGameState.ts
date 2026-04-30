@@ -99,7 +99,7 @@ export const CLASSIC_MIN_BET           = 500
 export const CHIPS                     = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 500_000]
 export const CHIP_LABELS               = ['$5', '$10', '$25', '$50', '$100', '$250', '$500', '$1K', '$5K']
 
-export type ClassicSideBetType = 'lovely-ladies' | 'buster-blackjack' | 'insurance'
+export type ClassicSideBetType = 'lovely-ladies' | 'buster-blackjack' | 'twinsurance'
 
 function handIsDone(hand: Hand): boolean {
   return hand.isSplitAce === true || handTotals(hand.cards).total >= 21
