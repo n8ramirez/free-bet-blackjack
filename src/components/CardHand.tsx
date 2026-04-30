@@ -18,7 +18,7 @@ type CardHandProps = {
   hellraiserGlowFirstOnly?: boolean
   push22Glow?:              boolean
   pogGlow?:                 boolean
-  luckyLadiesGlow?:         boolean
+  lovelyLadiesGlow?:         boolean
 }
 
 const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; left?: number; zIndex?: number; glowing?: boolean }) => (
@@ -34,7 +34,7 @@ const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; 
 export function CardHand({
   hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result,
   hasFreeSplit, hasFreeDouble, showPushOn22, visibleCount,
-  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow, luckyLadiesGlow,
+  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow, lovelyLadiesGlow,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -43,6 +43,8 @@ export function CardHand({
   const push22   = showPushOn22 && total === 22
   const showAll  = !hideSecond
   const hasAnyFreeBet = hasFreeSplit || hasFreeDouble
+  const n = visibleCards.length
+  const horizOffset = !isSplit && n >= 5 ? Math.max(20, Math.round(188 / (n - 1))) : 0
 
   const totalLabel = bj
     ? 'BLACKJACK'
@@ -110,11 +112,26 @@ export function CardHand({
                 dimmed={isDimmed}
                 glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
                 push22Glow={push22Glow}
-                luckyLadiesGlow={luckyLadiesGlow}
+                lovelyLadiesGlow={lovelyLadiesGlow}
               />
             </div>
           ))}
           {pucks}
+        </div>
+      ) : horizOffset > 0 ? (
+        <div className="relative" style={{ width: 52 + (n - 1) * horizOffset, height: 74 }}>
+          {visibleCards.map((c, i) => (
+            <div key={i} className="absolute" style={{ top: 0, left: i * horizOffset, zIndex: i }}>
+              <Card
+                card={c}
+                faceDown={hideSecond && i === 1}
+                dimmed={isDimmed}
+                glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
+                push22Glow={push22Glow}
+                lovelyLadiesGlow={lovelyLadiesGlow}
+              />
+            </div>
+          ))}
         </div>
       ) : (
         <div className="relative flex gap-1.5 flex-wrap justify-center">
@@ -128,7 +145,7 @@ export function CardHand({
               dimmed={isDimmed}
               glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
                 push22Glow={push22Glow}
-                luckyLadiesGlow={luckyLadiesGlow}
+                lovelyLadiesGlow={lovelyLadiesGlow}
             />
           ))}
         </div>

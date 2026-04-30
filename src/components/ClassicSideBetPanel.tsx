@@ -7,14 +7,15 @@ function fmtDollars(cents: number): string {
 }
 
 type ClassicSideBetPanelProps = {
-  isOpen:               boolean
-  selectedSideBet:      ClassicSideBetType
-  luckyLadiesBetCents:  number
-  onSelectSideBet:      (type: ClassicSideBetType) => void
-  onShowInfo:           () => void
+  isOpen:                      boolean
+  selectedSideBet:             ClassicSideBetType
+  lovelyLadiesBetCents:         number
+  busterBlackjackBetCents:     number
+  onSelectSideBet:             (type: ClassicSideBetType) => void
+  onShowInfo:                  () => void
 }
 
-export const LuckyLadiesIcon = ({ className = '' }: { className?: string }) => (
+export const LovelyLadiesIcon = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 26 26" className={className} aria-hidden>
     <circle cx="13" cy="13" r="11.5" fill="#db2777" stroke="#f9a8d4" strokeWidth="1.2" />
     <path
@@ -51,12 +52,12 @@ type TabConfig = {
   barColor:    string
 }
 
-export function ClassicSideBetPanel({ isOpen, selectedSideBet, luckyLadiesBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
+export function ClassicSideBetPanel({ isOpen, selectedSideBet, lovelyLadiesBetCents, busterBlackjackBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
   const tabs: TabConfig[] = [
     {
-      key:         'lucky-ladies',
-      label:       'Lucky Ladies',
-      icon:        <LuckyLadiesIcon className="w-4 h-4" />,
+      key:         'lovely-ladies',
+      label:       'Lovely Ladies',
+      icon:        <LovelyLadiesIcon className="w-4 h-4" />,
       activeColor: 'text-pink-400',
       barColor:    'bg-pink-400',
     },
@@ -114,9 +115,13 @@ export function ClassicSideBetPanel({ isOpen, selectedSideBet, luckyLadiesBetCen
                     {tab.label}
                   </span>
                 </div>
-                {tab.key === 'lucky-ladies' ? (
-                  <div className={`text-base font-bold transition-colors ${luckyLadiesBetCents > 0 ? 'text-pink-400' : 'text-stone-500'}`}>
-                    {luckyLadiesBetCents > 0 ? fmtDollars(luckyLadiesBetCents) : '—'}
+                {tab.key === 'lovely-ladies' ? (
+                  <div className={`text-base font-bold transition-colors ${lovelyLadiesBetCents > 0 ? 'text-pink-400' : 'text-stone-500'}`}>
+                    {lovelyLadiesBetCents > 0 ? fmtDollars(lovelyLadiesBetCents) : '—'}
+                  </div>
+                ) : tab.key === 'buster-blackjack' ? (
+                  <div className={`text-base font-bold transition-colors ${busterBlackjackBetCents > 0 ? 'text-blue-400' : 'text-stone-500'}`}>
+                    {busterBlackjackBetCents > 0 ? fmtDollars(busterBlackjackBetCents) : '—'}
                   </div>
                 ) : (
                   <div className="text-stone-600 text-[10px] uppercase tracking-widest">

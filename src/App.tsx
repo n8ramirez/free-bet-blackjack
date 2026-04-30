@@ -6,7 +6,7 @@ import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
-import { ClassicSideBetPanel, LuckyLadiesIcon } from './components/ClassicSideBetPanel'
+import { ClassicSideBetPanel, LovelyLadiesIcon, BusterBlackjackIcon } from './components/ClassicSideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ClassicSideBetInfoModal } from './components/ClassicSideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
@@ -124,14 +124,18 @@ export default function App() {
 
   const hellraiserWon      = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
   const pogGlowActive      = game.lastPotOfGoldBetCents > 0
-  const luckyLadiesWon      = classicGame.luckyLadiesBannerVisible && (classicGame.luckyLadiesResult?.payoutCents ?? 0) > 0
-  const luckyLadiesDealerBJ = classicGame.luckyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  const lovelyLadiesWon      = classicGame.lovelyLadiesBannerVisible && (classicGame.lovelyLadiesResult?.payoutCents ?? 0) > 0
+  const lovelyLadiesDealerBJ = classicGame.lovelyLadiesResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
   const isPlayerTurn = game.phase === 'player-turn'
   const isDealerTurn = game.phase === 'dealer-turn'
   const isOver       = game.phase === 'round-over'
+
+  const busterBJPlayerBJWon = isOver && isClassic &&
+    (classicGame.busterBlackjackResult?.handName === '7 Cards + Player Blackjack' ||
+     classicGame.busterBlackjackResult?.handName === '8+ Cards + Player Blackjack')
 
   const push22Won = isOver && (game.push22Result?.payoutCents ?? 0) > 0
 
@@ -299,9 +303,17 @@ export default function App() {
             </div>
             {isClassic && classicGame.lastLuckyLadiesBetCents > 0 && (
               <div className="flex items-center gap-1 mt-0.5">
-                <LuckyLadiesIcon className="w-4 h-4" />
+                <LovelyLadiesIcon className="w-4 h-4" />
                 <span className="text-pink-400 text-[10px] font-bold">
                   ${(classicGame.lastLuckyLadiesBetCents / 100).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {isClassic && classicGame.lastBusterBlackjackBetCents > 0 && (
+              <div className="flex items-center gap-1">
+                <BusterBlackjackIcon className="w-4 h-4" />
+                <span className="text-blue-400 text-[10px] font-bold">
+                  ${(classicGame.lastBusterBlackjackBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -338,12 +350,12 @@ export default function App() {
             label="Dealer"
             hideSecond={isPlayerTurn}
             hideTotal={!game.dealerRevealed}
-            showPushOn22={game.dealerRevealed && dealerTotal === 22}
+            showPushOn22={!isClassic && game.dealerRevealed && dealerTotal === 22}
             visibleCount={dealerVisibleCount}
             hellraiserGlow={hellraiserWon}
             hellraiserGlowFirstOnly={hellraiserWon}
             push22Glow={push22Won}
-            luckyLadiesGlow={luckyLadiesDealerBJ}
+            lovelyLadiesGlow={lovelyLadiesDealerBJ}
           />
         ) : (
           <div className="text-white text-sm uppercase tracking-widest">
@@ -356,7 +368,7 @@ export default function App() {
       <div className={`relative flex-none flex flex-col items-center w-full ${isOver ? 'z-20' : 'z-10'} ${isQuadrant ? '-mt-[240px] pb-[32px]' : ''}`}>
         {isOver ? (
           <>
-            {isClassic && luckyLadiesDealerBJ ? (
+            {isClassic && lovelyLadiesDealerBJ ? (
               <div
                 className="w-full bg-black relative overflow-hidden"
                 style={{
@@ -402,6 +414,55 @@ export default function App() {
                 <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
                   <div className="text-2xl tracking-wide text-pink-400" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800 }}>
                     Dealer Blackjack
+                  </div>
+                </div>
+              </div>
+            ) : busterBJPlayerBJWon ? (
+              <div
+                className="w-full bg-black relative overflow-hidden"
+                style={{
+                  backgroundImage: [
+                    'radial-gradient(circle, rgba(96,165,250,0.75) 2px, transparent 2.5px)',
+                    'radial-gradient(circle, rgba(96,165,250,0.75) 2px, transparent 2.5px)',
+                  ].join(', '),
+                  backgroundSize: '13px 18px, 13px 18px',
+                  backgroundPosition: '0 -4.5px, 0 calc(100% + 4.5px)',
+                  backgroundRepeat: 'repeat-x, repeat-x',
+                }}
+              >
+                <div className="bbj-glow-top" />
+                <div className="bbj-glow-bottom" />
+                <div
+                  className="absolute top-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 -4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 -4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-black z-10"
+                  style={{
+                    height: '18px',
+                    maskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    maskSize: '13px 18px',
+                    maskPosition: '0 4.5px',
+                    maskRepeat: 'repeat',
+                    WebkitMaskImage: 'radial-gradient(circle, transparent 2px, white 2.5px)',
+                    WebkitMaskSize: '13px 18px',
+                    WebkitMaskPosition: '0 4.5px',
+                    WebkitMaskRepeat: 'repeat',
+                  }}
+                />
+                <div className="w-full flex flex-col items-center relative z-20" style={{ paddingTop: '14px', paddingBottom: '18px' }}>
+                  <div className="text-2xl tracking-wide text-blue-400" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800 }}>
+                    Player Blackjack
                   </div>
                 </div>
               </div>
@@ -631,14 +692,29 @@ export default function App() {
               </div>
             )}
             {/* Lucky Ladies strip in round-over */}
-            {isClassic && classicGame.luckyLadiesResult && (
+            {isClassic && classicGame.lovelyLadiesResult && (
               <div className={`w-full py-1.5 flex items-center justify-center gap-2
-                ${classicGame.luckyLadiesResult.handName ? 'bg-pink-950/60' : 'bg-black/50'}`}>
-                <LuckyLadiesIcon className="w-4 h-4 flex-shrink-0" />
-                <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lucky Ladies</span>
-                {classicGame.luckyLadiesResult.handName ? (
+                ${classicGame.lovelyLadiesResult.handName ? 'bg-pink-950/60' : 'bg-black/50'}`}>
+                <LovelyLadiesIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lovely Ladies</span>
+                {classicGame.lovelyLadiesResult.handName ? (
                   <span className="text-[11px] font-bold text-emerald-400">
-                    {classicGame.luckyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.luckyLadiesResult.payoutCents)}
+                    {classicGame.lovelyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.lovelyLadiesResult.payoutCents)}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
+            )}
+            {/* Buster Blackjack strip in round-over */}
+            {isClassic && classicGame.busterBlackjackResult && (
+              <div className={`w-full py-1.5 flex items-center justify-center gap-2
+                ${classicGame.busterBlackjackResult.handName ? 'bg-blue-950/60' : 'bg-black/50'}`}>
+                <BusterBlackjackIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-blue-300">Buster BJ</span>
+                {classicGame.busterBlackjackResult.handName ? (
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    {classicGame.busterBlackjackResult.handName} &nbsp;+{fmtDollars(classicGame.busterBlackjackResult.payoutCents)}
                   </span>
                 ) : (
                   <span className="text-[11px] font-bold text-red-400">Lose</span>
@@ -661,13 +737,13 @@ export default function App() {
               </div>
             )}
           </>
-        ) : isClassic && (isPlayerTurn || isDealerTurn) && classicGame.luckyLadiesBannerVisible && classicGame.luckyLadiesResult ? (
+        ) : isClassic && (isPlayerTurn || isDealerTurn) && classicGame.lovelyLadiesBannerVisible && classicGame.lovelyLadiesResult ? (
           <div className="w-full py-2 flex items-center justify-center gap-2 bg-black/60">
-            <LuckyLadiesIcon className="w-4 h-4 flex-shrink-0" />
-            <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lucky Ladies</span>
-            {classicGame.luckyLadiesResult.handName ? (
+            <LovelyLadiesIcon className="w-4 h-4 flex-shrink-0" />
+            <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lovely Ladies</span>
+            {classicGame.lovelyLadiesResult.handName ? (
               <span className="text-[11px] font-bold text-emerald-400">
-                {classicGame.luckyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.luckyLadiesResult.payoutCents)}
+                {classicGame.lovelyLadiesResult.handName} &nbsp;+{fmtDollars(classicGame.lovelyLadiesResult.payoutCents)}
               </span>
             ) : (
               <span className="text-[11px] font-bold text-red-400">Lose</span>
@@ -749,7 +825,7 @@ export default function App() {
                       visibleCount={playerVisibleCount}
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
-                      luckyLadiesGlow={isClassic && luckyLadiesWon}
+                      lovelyLadiesGlow={isClassic && lovelyLadiesWon}
                     />
                   </div>
                 )
@@ -774,7 +850,7 @@ export default function App() {
                       visibleCount={playerVisibleCount}
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
-                      luckyLadiesGlow={isClassic && luckyLadiesWon}
+                      lovelyLadiesGlow={isClassic && lovelyLadiesWon}
                     />
                   </div>
                 )
@@ -792,7 +868,7 @@ export default function App() {
                 visibleCount={playerVisibleCount}
                 hellraiserGlow={!isClassic && hellraiserWon}
                 pogGlow={!isClassic && pogGlowActive}
-                luckyLadiesGlow={isClassic && luckyLadiesWon}
+                lovelyLadiesGlow={isClassic && lovelyLadiesWon}
               />
             </div>
           )
@@ -807,7 +883,8 @@ export default function App() {
           <ClassicSideBetPanel
             isOpen={classicGame.sideBetPanelOpen}
             selectedSideBet={classicGame.selectedSideBet}
-            luckyLadiesBetCents={classicGame.luckyLadiesBetCents}
+            lovelyLadiesBetCents={classicGame.lovelyLadiesBetCents}
+            busterBlackjackBetCents={classicGame.busterBlackjackBetCents}
             onSelectSideBet={classicGame.selectSideBet}
             onShowInfo={() => setShowSideBetInfo(true)}
           />
@@ -895,17 +972,33 @@ export default function App() {
               {netCents !== 0 ? formatNet(netCents) : 'Push'}
             </div>
             {/* Lucky Ladies result line */}
-            {isClassic && classicGame.luckyLadiesResult && (
+            {isClassic && classicGame.lovelyLadiesResult && (
               <div className="flex items-center gap-1.5">
-                <LuckyLadiesIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="text-stone-400 text-xs uppercase tracking-widest">Lucky Ladies</span>
-                {classicGame.luckyLadiesResult.payoutCents > 0 ? (
+                <LovelyLadiesIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Lovely Ladies</span>
+                {classicGame.lovelyLadiesResult.payoutCents > 0 ? (
                   <span className="text-xs text-emerald-400 font-medium">
-                    +${(classicGame.luckyLadiesResult.payoutCents / 100).toLocaleString()}
+                    +${(classicGame.lovelyLadiesResult.payoutCents / 100).toLocaleString()}
                   </span>
                 ) : (
                   <span className="text-xs text-red-400 font-medium">
                     -${(classicGame.lastLuckyLadiesBetCents / 100).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Buster BJ result line */}
+            {isClassic && classicGame.busterBlackjackResult && (
+              <div className="flex items-center gap-1.5">
+                <BusterBlackjackIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Buster BJ</span>
+                {classicGame.busterBlackjackResult.payoutCents > 0 ? (
+                  <span className="text-xs text-emerald-400 font-medium">
+                    +${(classicGame.busterBlackjackResult.payoutCents / 100).toLocaleString()}
+                  </span>
+                ) : (
+                  <span className="text-xs text-red-400 font-medium">
+                    -${(classicGame.lastBusterBlackjackBetCents / 100).toLocaleString()}
                   </span>
                 )}
               </div>
