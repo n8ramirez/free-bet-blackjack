@@ -33,7 +33,7 @@ export const BusterBlackjackIcon = ({ className = '' }: { className?: string }) 
   </svg>
 )
 
-export const InsuranceIcon = ({ className = '' }: { className?: string }) => (
+export const TwtwinsuranceIcon = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 26 26" className={className} aria-hidden>
     <circle cx="13" cy="13" r="11.5" fill="#059669" stroke="#6ee7b7" strokeWidth="1.2" />
     <path
@@ -69,9 +69,9 @@ export function ClassicSideBetPanel({ isOpen, selectedSideBet, lovelyLadiesBetCe
       barColor:    'bg-blue-400',
     },
     {
-      key:         'insurance',
-      label:       'Insurance',
-      icon:        <InsuranceIcon className="w-4 h-4" />,
+      key:         'twinsurance',
+      label:       'Twinsurance',
+      icon:        <TwtwinsuranceIcon className="w-4 h-4" />,
       activeColor: 'text-emerald-400',
       barColor:    'bg-emerald-400',
     },
