@@ -218,9 +218,11 @@ export default function App() {
           soundEffects={settings.soundEffects}
           music={settings.music}
           classicMode={settings.classicMode}
+          cardBackColor={settings.cardBackColor}
           onSoundEffects={settings.setSoundEffects}
           onMusic={settings.setMusic}
           onClassicMode={() => setShowModeConfirm(true)}
+          onCardBackColor={settings.setCardBackColor}
         />
       )}
       {showModeConfirm && (
@@ -368,6 +370,7 @@ export default function App() {
             push22Glow={push22Won}
             ladyLuckGlow={ladyLuckDealerBJ}
             wildSevensGlowIndices={wildSevensDealerGlow ? [0] : []}
+            cardBackColor={settings.cardBackColor}
           />
         ) : (
           <div className="text-white text-sm uppercase tracking-widest">
@@ -847,6 +850,7 @@ export default function App() {
                   isDimmed={i !== 0}
                   hasFreeSplit={!!hand.freeSplit}
                   hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
+                  cardBackColor={settings.cardBackColor}
                 />
               </div>
             ))}
@@ -873,6 +877,7 @@ export default function App() {
                       pogGlow={!isClassic && pogGlowActive}
                       ladyLuckGlow={isClassic && ladyLuckWon}
                       wildSevensGlowIndices={isClassic ? wildSevensPlayerGlowIndices : []}
+                      cardBackColor={settings.cardBackColor}
                     />
                   </div>
                 )
@@ -899,6 +904,7 @@ export default function App() {
                       pogGlow={!isClassic && pogGlowActive}
                       ladyLuckGlow={isClassic && ladyLuckWon}
                       wildSevensGlowIndices={isClassic ? wildSevensPlayerGlowIndices : []}
+                      cardBackColor={settings.cardBackColor}
                     />
                   </div>
                 )
@@ -918,6 +924,7 @@ export default function App() {
                 pogGlow={!isClassic && pogGlowActive}
                 ladyLuckGlow={isClassic && ladyLuckWon}
                 wildSevensGlowIndices={isClassic ? wildSevensPlayerGlowIndices : []}
+                cardBackColor={settings.cardBackColor}
               />
             </div>
           )

@@ -2,18 +2,21 @@ import { useState } from 'react'
 
 const KEY = 'fbbj_settings'
 
+export type CardBackColor = 'purple' | 'red' | 'blue' | 'green' | 'black'
+
 type Settings = {
-  soundEffects: boolean
-  music:        boolean
-  classicMode:  boolean
+  soundEffects:  boolean
+  music:         boolean
+  classicMode:   boolean
+  cardBackColor: CardBackColor
 }
 
 function load(): Settings {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { soundEffects: true, music: false, classicMode: false, ...JSON.parse(raw) }
+    if (raw) return { soundEffects: true, music: false, classicMode: false, cardBackColor: 'purple', ...JSON.parse(raw) }
   } catch {}
-  return { soundEffects: true, music: false, classicMode: false }
+  return { soundEffects: true, music: false, classicMode: false, cardBackColor: 'purple' }
 }
 
 function save(settings: Settings) {
@@ -35,5 +38,9 @@ export function useSettings() {
     setSettings(prev => { const next = { ...prev, classicMode: v }; save(next); return next })
   }
 
-  return { ...settings, setSoundEffects, setMusic, setClassicMode }
+  const setCardBackColor = (v: CardBackColor) => {
+    setSettings(prev => { const next = { ...prev, cardBackColor: v }; save(next); return next })
+  }
+
+  return { ...settings, setSoundEffects, setMusic, setClassicMode, setCardBackColor }
 }
