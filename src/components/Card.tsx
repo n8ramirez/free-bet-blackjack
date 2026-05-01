@@ -3,14 +3,15 @@ import { useRef } from 'react'
 
 const RED_SUITS = new Set(['♥', '♦'])
 
-export type CardBackColor = 'purple' | 'red' | 'blue' | 'green' | 'black'
+export type CardBackColor = 'purple' | 'red' | 'blue' | 'green' | 'black' | 'gold'
 
 const BACK_PALETTE: Record<CardBackColor, { bg: string; border: string; pattern: string; inner: string }> = {
-  purple: { bg: '#4c1d95', border: '#6d28d9', pattern: 'rgba(139,92,246,0.25)', inner: 'rgba(139,92,246,0.4)' },
-  red:    { bg: '#7f1d1d', border: '#b91c1c', pattern: 'rgba(239,68,68,0.25)',   inner: 'rgba(220,38,38,0.4)'  },
-  blue:   { bg: '#0d1b3e', border: '#1e3a8a', pattern: 'rgba(29,78,216,0.3)',   inner: 'rgba(29,78,216,0.45)' },
-  green:  { bg: '#14532d', border: '#15803d', pattern: 'rgba(34,197,94,0.25)',   inner: 'rgba(22,163,74,0.4)'  },
-  black:  { bg: '#1c1917', border: '#57534e', pattern: 'rgba(245,158,11,0.25)',  inner: 'rgba(245,158,11,0.4)' },
+  purple: { bg: '#4c1d95', border: '#6d28d9', pattern: 'rgba(139,92,246,0.25)', inner: 'rgba(139,92,246,0.4)'  },
+  red:    { bg: '#7f1d1d', border: '#b91c1c', pattern: 'rgba(239,68,68,0.25)',   inner: 'rgba(220,38,38,0.4)'   },
+  blue:   { bg: '#0d1b3e', border: '#1e3a8a', pattern: 'rgba(29,78,216,0.3)',    inner: 'rgba(29,78,216,0.45)'  },
+  green:  { bg: '#14532d', border: '#15803d', pattern: 'rgba(34,197,94,0.25)',   inner: 'rgba(22,163,74,0.4)'   },
+  black:  { bg: '#1c1917', border: '#57534e', pattern: 'rgba(245,158,11,0.25)',  inner: 'rgba(245,158,11,0.4)'  },
+  gold:   { bg: '#a67c00', border: '#bf9b30', pattern: 'rgba(191,155,48,0.7)',   inner: '#bf9b30'               },
 }
 
 type CardProps = {
