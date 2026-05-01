@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { LADY_LUCK_PAYOUTS, BUSTER_BLACKJACK_PAYOUTS } from '../hooks/useClassicGameState'
-import { LadyLuckIcon, BusterBlackjackIcon } from './ClassicSideBetPanel'
+import { LADY_LUCK_PAYOUTS, BUSTER_BLACKJACK_PAYOUTS, WILD_SEVENS_PAYOUTS } from '../hooks/useClassicGameState'
+import { LadyLuckIcon, BusterBlackjackIcon, Wild7sIcon } from './ClassicSideBetPanel'
 
 type Props = { onClose: () => void }
 
@@ -23,7 +23,7 @@ function Rule({ children }: { children: React.ReactNode }) {
 }
 
 export function ClassicSideBetInfoModal({ onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<'lady-luck' | 'buster-blackjack'>('lady-luck')
+  const [activeTab, setActiveTab] = useState<'lady-luck' | 'buster-blackjack' | 'wild-7s'>('lady-luck')
 
   return (
     <div
@@ -69,6 +69,15 @@ export function ClassicSideBetInfoModal({ onClose }: Props) {
           >
             Buster BJ
           </button>
+          <button
+            onClick={() => setActiveTab('wild-7s')}
+            className={`flex-1 py-2.5 text-center text-[10px] uppercase tracking-widest font-extrabold transition-colors
+              ${activeTab === 'wild-7s'
+                ? 'text-emerald-400 border-b-2 border-emerald-400 -mb-px'
+                : 'text-stone-500 hover:text-stone-300'}`}
+          >
+            Wild 7s
+          </button>
         </div>
 
         {/* Lady Luck content */}
@@ -108,6 +117,47 @@ export function ClassicSideBetInfoModal({ onClose }: Props) {
               <Rule><span className="text-pink-400 font-semibold">Suited 20</span> = same suit, any ranks totalling 20.</Rule>
               <Rule>The <span className="text-pink-400 font-semibold">1000:1</span> bonus requires both Queens of Hearts <em>and</em> dealer blackjack.</Rule>
               <Rule>Pays out even if you bust or the dealer wins the main hand.</Rule>
+            </Section>
+          </div>
+        )}
+
+        {/* Wild 7s content */}
+        {activeTab === 'wild-7s' && (
+          <div className="flex flex-col gap-4 text-sm p-5">
+            <div className="flex items-center gap-2">
+              <Wild7sIcon className="w-8 h-8 flex-shrink-0" />
+              <p className="text-stone-300">
+                Bet on your first two cards and the dealer's{' '}
+                <span className="text-emerald-400 font-semibold">upcard</span> containing 7s.
+                More 7s — and matching suits — means bigger payouts.
+              </p>
+            </div>
+
+            <Section title="Payout table">
+              <div className="mt-1 rounded-xl overflow-hidden border border-stone-700">
+                <div className="grid grid-cols-2 bg-stone-800 px-3 py-1.5">
+                  <span className="text-stone-500 text-[9px] uppercase tracking-widest">Hand</span>
+                  <span className="text-stone-500 text-[9px] uppercase tracking-widest text-right">Pays</span>
+                </div>
+                {WILD_SEVENS_PAYOUTS.map(([name, mult], i) => (
+                  <div key={name} className={`grid grid-cols-2 px-3 py-2 ${i % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
+                    <span className="text-emerald-400 font-bold text-xs">{name}</span>
+                    <span className="text-stone-200 font-semibold text-right">{mult} : 1</span>
+                  </div>
+                ))}
+                <div className={`grid grid-cols-2 px-3 py-2 ${WILD_SEVENS_PAYOUTS.length % 2 === 0 ? 'bg-stone-900' : 'bg-stone-800/50'}`}>
+                  <span className="text-stone-400 font-bold text-xs">No 7s</span>
+                  <span className="text-stone-400 font-semibold text-right">Lose</span>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="How it works">
+              <Rule>Based on your first two cards <em>and</em> the dealer's face-up card — three cards total.</Rule>
+              <Rule>Resolved immediately after the deal, before you act.</Rule>
+              <Rule><span className="text-emerald-400 font-semibold">Suited</span> = all 7s share the same suit.</Rule>
+              <Rule>The <span className="text-emerald-400 font-semibold">1000:1</span> bonus requires all three cards to be the 7♦.</Rule>
+              <Rule>Pays out regardless of the main hand result.</Rule>
             </Section>
           </div>
         )}

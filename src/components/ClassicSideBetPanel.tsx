@@ -9,8 +9,9 @@ function fmtDollars(cents: number): string {
 type ClassicSideBetPanelProps = {
   isOpen:                      boolean
   selectedSideBet:             ClassicSideBetType
-  ladyLuckBetCents:         number
+  ladyLuckBetCents:            number
   busterBlackjackBetCents:     number
+  wildSevensBetCents:          number
   onSelectSideBet:             (type: ClassicSideBetType) => void
   onShowInfo:                  () => void
 }
@@ -54,7 +55,7 @@ type TabConfig = {
   barColor:    string
 }
 
-export function ClassicSideBetPanel({ isOpen, selectedSideBet, ladyLuckBetCents, busterBlackjackBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
+export function ClassicSideBetPanel({ isOpen, selectedSideBet, ladyLuckBetCents, busterBlackjackBetCents, wildSevensBetCents, onSelectSideBet, onShowInfo }: ClassicSideBetPanelProps) {
   const tabs: TabConfig[] = [
     {
       key:         'lady-luck',
@@ -126,8 +127,8 @@ export function ClassicSideBetPanel({ isOpen, selectedSideBet, ladyLuckBetCents,
                     {busterBlackjackBetCents > 0 ? fmtDollars(busterBlackjackBetCents) : '—'}
                   </div>
                 ) : (
-                  <div className="text-stone-600 text-[10px] uppercase tracking-widest">
-                    Coming Soon
+                  <div className={`text-base font-bold transition-colors ${wildSevensBetCents > 0 ? 'text-emerald-400' : 'text-stone-500'}`}>
+                    {wildSevensBetCents > 0 ? fmtDollars(wildSevensBetCents) : '—'}
                   </div>
                 )}
                 <div className={`h-0.5 w-8 rounded-full ${isActive ? tab.barColor : 'bg-transparent'}`} />

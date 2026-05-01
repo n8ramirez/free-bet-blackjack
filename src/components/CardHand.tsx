@@ -18,7 +18,8 @@ type CardHandProps = {
   hellraiserGlowFirstOnly?: boolean
   push22Glow?:              boolean
   pogGlow?:                 boolean
-  ladyLuckGlow?:         boolean
+  ladyLuckGlow?:            boolean
+  wildSevensGlowIndices?:   number[]
 }
 
 const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; left?: number; zIndex?: number; glowing?: boolean }) => (
@@ -34,7 +35,7 @@ const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; 
 export function CardHand({
   hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result,
   hasFreeSplit, hasFreeDouble, showPushOn22, visibleCount,
-  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow, ladyLuckGlow,
+  hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow, ladyLuckGlow, wildSevensGlowIndices,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -113,6 +114,7 @@ export function CardHand({
                 glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
                 push22Glow={push22Glow}
                 ladyLuckGlow={ladyLuckGlow}
+                wildSevensGlow={wildSevensGlowIndices?.includes(i)}
               />
             </div>
           ))}
@@ -129,6 +131,7 @@ export function CardHand({
                 glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
                 push22Glow={push22Glow}
                 ladyLuckGlow={ladyLuckGlow}
+                wildSevensGlow={wildSevensGlowIndices?.includes(i)}
               />
             </div>
           ))}
@@ -144,8 +147,9 @@ export function CardHand({
               faceDown={hideSecond && i === 1}
               dimmed={isDimmed}
               glowing={hellraiserGlow && (!hellraiserGlowFirstOnly || i === 0)}
-                push22Glow={push22Glow}
-                ladyLuckGlow={ladyLuckGlow}
+              push22Glow={push22Glow}
+              ladyLuckGlow={ladyLuckGlow}
+              wildSevensGlow={wildSevensGlowIndices?.includes(i)}
             />
           ))}
         </div>
