@@ -6,7 +6,7 @@ import { useCountUp } from './hooks/useCountUp'
 import { CardHand } from './components/CardHand'
 import { BetPanel } from './components/BetPanel'
 import { SideBetPanel, PotOfGoldIcon, Push22Icon, HellraiserIcon } from './components/SideBetPanel'
-import { ClassicSideBetPanel, LadyLuckIcon, BusterBlackjackIcon } from './components/ClassicSideBetPanel'
+import { ClassicSideBetPanel, LadyLuckIcon, BusterBlackjackIcon, Wild7sIcon } from './components/ClassicSideBetPanel'
 import { SideBetInfoModal } from './components/SideBetInfoModal'
 import { ClassicSideBetInfoModal } from './components/ClassicSideBetInfoModal'
 import { ActionBar } from './components/ActionBar'
@@ -126,6 +126,9 @@ export default function App() {
   const pogGlowActive      = game.lastPotOfGoldBetCents > 0
   const ladyLuckWon      = classicGame.ladyLuckBannerVisible && (classicGame.ladyLuckResult?.payoutCents ?? 0) > 0
   const ladyLuckDealerBJ = classicGame.ladyLuckResult?.handName === 'Queen of Hearts Pair + Dealer Blackjack'
+  const wildSevensWon    = classicGame.wildSevensBannerVisible && (classicGame.wildSevensResult?.payoutCents ?? 0) > 0
+  const wildSevensPlayerGlowIndices = wildSevensWon ? (classicGame.wildSevensResult?.sevenPlayerIndices ?? []) : []
+  const wildSevensDealerGlow        = wildSevensWon && (classicGame.wildSevensResult?.dealerUpcardIsSeven ?? false)
 
   const isBetting    = game.phase === 'betting'
   const isDealing    = game.phase === 'dealing'
@@ -356,6 +359,7 @@ export default function App() {
             hellraiserGlowFirstOnly={hellraiserWon}
             push22Glow={push22Won}
             ladyLuckGlow={ladyLuckDealerBJ}
+            wildSevensGlowIndices={wildSevensDealerGlow ? [0] : []}
           />
         ) : (
           <div className="text-white text-sm uppercase tracking-widest">
@@ -721,6 +725,21 @@ export default function App() {
                 )}
               </div>
             )}
+            {/* Wild 7s strip in round-over */}
+            {isClassic && classicGame.wildSevensResult && (
+              <div className={`w-full py-1.5 flex items-center justify-center gap-2
+                ${classicGame.wildSevensResult.handName ? 'bg-emerald-950/60' : 'bg-black/50'}`}>
+                <Wild7sIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-emerald-300">Wild 7s</span>
+                {classicGame.wildSevensResult.handName ? (
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    {classicGame.wildSevensResult.handName} &nbsp;+{fmtDollars(classicGame.wildSevensResult.payoutCents)}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
+            )}
             {/* Hellraiser strip in round-over — only shown on BJ hands (otherwise shown during player-turn) */}
             {game.hellraiserResult && (dealerBJ || playerBJ) && (
               <div className={`w-full py-1.5 flex items-center justify-center gap-2
@@ -737,16 +756,35 @@ export default function App() {
               </div>
             )}
           </>
-        ) : isClassic && (isPlayerTurn || isDealerTurn) && classicGame.ladyLuckBannerVisible && classicGame.ladyLuckResult ? (
-          <div className="w-full py-2 flex items-center justify-center gap-2 bg-black/60">
-            <LadyLuckIcon className="w-4 h-4 flex-shrink-0" />
-            <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lady Luck</span>
-            {classicGame.ladyLuckResult.handName ? (
-              <span className="text-[11px] font-bold text-emerald-400">
-                {classicGame.ladyLuckResult.handName} &nbsp;+{fmtDollars(classicGame.ladyLuckResult.payoutCents)}
-              </span>
-            ) : (
-              <span className="text-[11px] font-bold text-red-400">Lose</span>
+        ) : isClassic && (isPlayerTurn || isDealerTurn) &&
+            ((classicGame.ladyLuckBannerVisible && classicGame.ladyLuckResult) ||
+             (classicGame.wildSevensBannerVisible && classicGame.wildSevensResult)) ? (
+          <div className="w-full flex flex-col bg-black/60">
+            {classicGame.ladyLuckBannerVisible && classicGame.ladyLuckResult && (
+              <div className="py-1.5 flex items-center justify-center gap-2">
+                <LadyLuckIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-pink-300">Lady Luck</span>
+                {classicGame.ladyLuckResult.handName ? (
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    {classicGame.ladyLuckResult.handName} &nbsp;+{fmtDollars(classicGame.ladyLuckResult.payoutCents)}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
+            )}
+            {classicGame.wildSevensBannerVisible && classicGame.wildSevensResult && (
+              <div className="py-1.5 flex items-center justify-center gap-2">
+                <Wild7sIcon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide text-emerald-300">Wild 7s</span>
+                {classicGame.wildSevensResult.handName ? (
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    {classicGame.wildSevensResult.handName} &nbsp;+{fmtDollars(classicGame.wildSevensResult.payoutCents)}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-400">Lose</span>
+                )}
+              </div>
             )}
           </div>
         ) : isPlayerTurn && game.hellraiserBannerVisible && game.hellraiserResult ? (
@@ -826,6 +864,7 @@ export default function App() {
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
                       ladyLuckGlow={isClassic && ladyLuckWon}
+                      wildSevensGlowIndices={isClassic ? wildSevensPlayerGlowIndices : []}
                     />
                   </div>
                 )
@@ -851,6 +890,7 @@ export default function App() {
                       hellraiserGlow={!isClassic && hellraiserWon}
                       pogGlow={!isClassic && pogGlowActive}
                       ladyLuckGlow={isClassic && ladyLuckWon}
+                      wildSevensGlowIndices={isClassic ? wildSevensPlayerGlowIndices : []}
                     />
                   </div>
                 )
@@ -869,6 +909,7 @@ export default function App() {
                 hellraiserGlow={!isClassic && hellraiserWon}
                 pogGlow={!isClassic && pogGlowActive}
                 ladyLuckGlow={isClassic && ladyLuckWon}
+                wildSevensGlowIndices={isClassic ? wildSevensPlayerGlowIndices : []}
               />
             </div>
           )
@@ -885,6 +926,7 @@ export default function App() {
             selectedSideBet={classicGame.selectedSideBet}
             ladyLuckBetCents={classicGame.ladyLuckBetCents}
             busterBlackjackBetCents={classicGame.busterBlackjackBetCents}
+            wildSevensBetCents={classicGame.wildSevensBetCents}
             onSelectSideBet={classicGame.selectSideBet}
             onShowInfo={() => setShowSideBetInfo(true)}
           />
@@ -999,6 +1041,22 @@ export default function App() {
                 ) : (
                   <span className="text-xs text-red-400 font-medium">
                     -${(classicGame.lastBusterBlackjackBetCents / 100).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Wild 7s result line */}
+            {isClassic && classicGame.wildSevensResult && (
+              <div className="flex items-center gap-1.5">
+                <Wild7sIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="text-stone-400 text-xs uppercase tracking-widest">Wild 7s</span>
+                {classicGame.wildSevensResult.payoutCents > 0 ? (
+                  <span className="text-xs text-emerald-400 font-medium">
+                    +${(classicGame.wildSevensResult.payoutCents / 100).toLocaleString()}
+                  </span>
+                ) : (
+                  <span className="text-xs text-red-400 font-medium">
+                    -${(classicGame.lastWildSevensBetCents / 100).toLocaleString()}
                   </span>
                 )}
               </div>
