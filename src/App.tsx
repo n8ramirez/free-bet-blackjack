@@ -320,6 +320,14 @@ export default function App() {
                 </span>
               </div>
             )}
+            {isClassic && classicGame.lastWildSevensBetCents > 0 && (
+              <div className="flex items-center gap-1">
+                <Wild7sIcon className="w-4 h-4" />
+                <span className="text-emerald-400 text-[10px] font-bold">
+                  ${(classicGame.lastWildSevensBetCents / 100).toLocaleString()}
+                </span>
+              </div>
+            )}
             {!isClassic && game.lastPotOfGoldBetCents > 0 && (
               <div className="flex items-center gap-1 mt-0.5">
                 <PotOfGoldIcon className="w-4 h-4" />
