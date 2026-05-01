@@ -1,4 +1,4 @@
-import { Card } from './Card'
+import { Card, CardBackColor } from './Card'
 import { Hand, HandResult, handTotals, isBlackjack } from '../engine'
 
 type CardHandProps = {
@@ -20,6 +20,7 @@ type CardHandProps = {
   pogGlow?:                 boolean
   ladyLuckGlow?:            boolean
   wildSevensGlowIndices?:   number[]
+  cardBackColor?:           CardBackColor
 }
 
 const Puck = ({ top, left = -16, zIndex = 10, glowing = false }: { top: number; left?: number; zIndex?: number; glowing?: boolean }) => (
@@ -36,6 +37,7 @@ export function CardHand({
   hand, label, hideSecond, hideTotal, isActive, isDimmed, isSplit, result,
   hasFreeSplit, hasFreeDouble, showPushOn22, visibleCount,
   hellraiserGlow, hellraiserGlowFirstOnly, push22Glow, pogGlow, ladyLuckGlow, wildSevensGlowIndices,
+  cardBackColor,
 }: CardHandProps) {
   const visibleCards = hand.cards.slice(0, visibleCount ?? hand.cards.length)
   const { total, isSoft } = handTotals(visibleCards)
@@ -115,6 +117,7 @@ export function CardHand({
                 push22Glow={push22Glow}
                 ladyLuckGlow={ladyLuckGlow}
                 wildSevensGlow={wildSevensGlowIndices?.includes(i)}
+                cardBackColor={cardBackColor}
               />
             </div>
           ))}
@@ -132,6 +135,7 @@ export function CardHand({
                 push22Glow={push22Glow}
                 ladyLuckGlow={ladyLuckGlow}
                 wildSevensGlow={wildSevensGlowIndices?.includes(i)}
+                cardBackColor={cardBackColor}
               />
             </div>
           ))}
@@ -150,6 +154,7 @@ export function CardHand({
               push22Glow={push22Glow}
               ladyLuckGlow={ladyLuckGlow}
               wildSevensGlow={wildSevensGlowIndices?.includes(i)}
+              cardBackColor={cardBackColor}
             />
           ))}
         </div>
