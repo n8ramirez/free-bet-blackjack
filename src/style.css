@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --felt:        #1a3a27;
+  --felt-light:  #1f4a31;
+  --felt-dark:   #102416;
+  --felt-border: #0d1f12;
+}
+
 @keyframes glow-pulse {
   0%, 100% { box-shadow: 0 0 32px 20px rgba(56,189,248,0.7); }
   50%       { box-shadow: 0 0 28px 17px rgba(56,189,248,0.55); }
@@ -336,7 +343,7 @@
     overscroll-behavior: none;
   }
   body {
-    background-color: #1a3a27;
+    background-color: var(--felt);
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     font-family: 'Inter', sans-serif;
