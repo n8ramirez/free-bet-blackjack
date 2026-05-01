@@ -5,10 +5,10 @@ module.exports = {
     extend: {
       colors: {
         felt: {
-          DEFAULT: '#1a3a27',
-          light:   '#1f4a31',
-          dark:    '#102416',
-          border:  '#0d1f12',
+          DEFAULT: 'var(--felt)',
+          light:   'var(--felt-light)',
+          dark:    'var(--felt-dark)',
+          border:  'var(--felt-border)',
         },
       },
       fontFamily: {

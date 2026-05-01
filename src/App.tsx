@@ -18,6 +18,7 @@ import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
 import { initSounds, setSoundEnabled, playSound, resumeAudio } from './sounds'
+import { TABLE_PALETTES } from './hooks/useSettings'
 import {
   getLeaderboard, getQualifyingRank, addToLeaderboard,
   type LeaderboardEntry,
@@ -90,6 +91,15 @@ export default function App() {
     const entries = await getLeaderboard()
     setLeaderboardEntries(entries)
   }
+
+  useEffect(() => {
+    const p = TABLE_PALETTES[settings.tableTheme]
+    const root = document.documentElement
+    root.style.setProperty('--felt',        p.felt)
+    root.style.setProperty('--felt-light',  p.light)
+    root.style.setProperty('--felt-dark',   p.dark)
+    root.style.setProperty('--felt-border', p.border)
+  }, [settings.tableTheme])
 
   useEffect(() => { initSounds() }, [])
   useEffect(() => { setSoundEnabled(settings.soundEffects) }, [settings.soundEffects])
@@ -219,10 +229,12 @@ export default function App() {
           music={settings.music}
           classicMode={settings.classicMode}
           cardBackColor={settings.cardBackColor}
+          tableTheme={settings.tableTheme}
           onSoundEffects={settings.setSoundEffects}
           onMusic={settings.setMusic}
           onClassicMode={() => setShowModeConfirm(true)}
           onCardBackColor={settings.setCardBackColor}
+          onTableTheme={settings.setTableTheme}
         />
       )}
       {showModeConfirm && (
