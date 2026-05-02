@@ -5,9 +5,10 @@ type Props = {
   rank: number
   onSubmit: (name: string) => void
   onSkip: () => void
+  mode?: 'freebet' | 'classic'
 }
 
-export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip }: Props) {
+export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip, mode = 'freebet' }: Props) {
   const [name, setName] = useState('')
 
   const dollars = peakBankrollCents / 100
@@ -28,7 +29,9 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip }: Pr
       >
         {/* Header */}
         <div className="px-5 pt-6 pb-5 border-b border-stone-700 text-center">
-          <div className="text-white text-[9px] uppercase tracking-widest mb-2">New High Score</div>
+          <div className="text-white text-[9px] uppercase tracking-widest mb-2">
+            {mode === 'classic' ? 'Classic Mode · New High Score' : 'Free Bet Mode · New High Score'}
+          </div>
           <div className="text-amber-400 font-bold text-4xl">#{rank}</div>
         </div>
 
