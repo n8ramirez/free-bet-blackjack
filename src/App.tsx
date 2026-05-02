@@ -14,6 +14,7 @@ import { RulesModal } from './components/RulesModal'
 import { LeaderboardModal } from './components/LeaderboardModal'
 import { MenuModal } from './components/MenuModal'
 import { SettingsModal } from './components/SettingsModal'
+import { GameplayModal } from './components/GameplayModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
 import { handTotals, isBlackjack } from './engine'
@@ -43,6 +44,7 @@ export default function App() {
   const [showSideBetInfo, setShowSideBetInfo] = useState(false)
   const [showMenu, setShowMenu]                     = useState(false)
   const [showSettings, setShowSettings]             = useState(false)
+  const [showGameplay, setShowGameplay]             = useState(false)
   const [showRestartConfirm, setShowRestartConfirm] = useState(false)
   const [showModeConfirm, setShowModeConfirm]       = useState(false)
 
@@ -231,14 +233,19 @@ export default function App() {
           onClose={() => setShowSettings(false)}
           soundEffects={settings.soundEffects}
           music={settings.music}
-          classicMode={settings.classicMode}
           cardBackColor={settings.cardBackColor}
           tableTheme={settings.tableTheme}
           onSoundEffects={settings.setSoundEffects}
           onMusic={settings.setMusic}
-          onClassicMode={() => setShowModeConfirm(true)}
           onCardBackColor={settings.setCardBackColor}
           onTableTheme={settings.setTableTheme}
+        />
+      )}
+      {showGameplay && (
+        <GameplayModal
+          onClose={() => setShowGameplay(false)}
+          classicMode={settings.classicMode}
+          onClassicMode={() => { setShowGameplay(false); setShowModeConfirm(true) }}
         />
       )}
       {showModeConfirm && (
@@ -256,6 +263,7 @@ export default function App() {
           onHowToPlay={() => setShowRules(true)}
           onLeaderboard={handleOpenLeaderboard}
           onSettings={() => setShowSettings(true)}
+          onGameplay={() => setShowGameplay(true)}
           onRestartGame={() => setShowRestartConfirm(true)}
         />
       )}
@@ -277,11 +285,19 @@ export default function App() {
 
       {/* ── Top bar + Marquee ───────────────────────────────────── */}
       <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative">
-        {/* Left — Bankroll */}
-        <div>
-          <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
-          <div className="text-white font-bold text-base">
-            ${Math.round(animatedBankroll / 100).toLocaleString()}
+        {/* Left — Avatar + Bankroll */}
+        <div className="flex items-center gap-2">
+          <button className="w-7 h-10 rounded-lg bg-stone-800 border border-stone-600 flex items-center justify-center flex-shrink-0">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" className="text-stone-500">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </button>
+          <div>
+            <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
+            <div className="text-white font-bold text-base">
+              ${Math.round(animatedBankroll / 100).toLocaleString()}
+            </div>
           </div>
         </div>
 

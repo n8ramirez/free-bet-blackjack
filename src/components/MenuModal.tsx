@@ -3,6 +3,7 @@ type Props = {
   onHowToPlay:    () => void
   onLeaderboard:  () => void
   onSettings:     () => void
+  onGameplay:     () => void
   onRestartGame:  () => void
 }
 
@@ -36,7 +37,7 @@ function MenuItem({ label, icon, onClick, disabled, comingSoon }: MenuItemProps)
   )
 }
 
-export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onRestartGame }: Props) {
+export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onGameplay, onRestartGame }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-[10dvh]"
@@ -95,6 +96,18 @@ export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onR
               </span>
             }
             onClick={() => { onClose(); onSettings() }}
+          />
+          <MenuItem
+            label="Gameplay"
+            icon={
+              <span className="w-5 h-5 rounded-full border-2 border-amber-400 text-amber-400 flex-shrink-0"
+                style={{ display: 'grid', placeItems: 'center' }}>
+                <svg viewBox="0 0 14 14" width="10" height="10" fill="currentColor">
+                  <polygon points="3,1 13,7 3,13" />
+                </svg>
+              </span>
+            }
+            onClick={() => { onClose(); onGameplay() }}
           />
           <MenuItem
             label="Restart Game"
