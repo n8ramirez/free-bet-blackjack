@@ -45,7 +45,6 @@ export default function App() {
   const [highlightIndex, setHighlightIndex] = useState<number | undefined>(undefined)
   const [highScoreHandled, setHighScoreHandled] = useState(false)
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
-  const [debugSplit, setDebugSplit] = useState(false)
   const [showSideBetInfo, setShowSideBetInfo] = useState(false)
   const [showMenu, setShowMenu]                     = useState(false)
   const [showSettings, setShowSettings]             = useState(false)
@@ -53,14 +52,6 @@ export default function App() {
   const [showRestartConfirm, setShowRestartConfirm] = useState(false)
   const [showModeConfirm, setShowModeConfirm]       = useState(false)
   const [showProfile, setShowProfile]               = useState(false)
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.shiftKey && e.key === 'D') setDebugSplit(v => !v)
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
 
   // When game ends, fetch the leaderboard to check if the score qualifies
   useEffect(() => {
@@ -174,7 +165,7 @@ export default function App() {
     : undefined
 
   const multiHand  = game.engine.playerHands.length > 1
-  const isQuadrant = debugSplit || game.engine.playerHands.length >= 3
+  const isQuadrant = game.engine.playerHands.length >= 3
 
   // Net result across all hands for the round-over summary
   const netCents = game.results.reduce((sum, r) => sum + r.payoutCents, 0)
@@ -877,29 +868,7 @@ export default function App() {
             </span>
           </div>
         )}
-        {debugSplit ? (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
-            {[
-              { cards: ['8♠', 'K♦'],        betCents: 50000, freeSplit: true,  doubled: false, freeDouble: false, isSplit: true },
-              { cards: ['8♥', '5♦', '3♣'],  betCents: 50000, freeSplit: true,  doubled: true,  freeDouble: true,  isSplit: true },
-              { cards: ['8♣', 'J♠'],         betCents: 50000, freeSplit: false, doubled: false, freeDouble: false, isSplit: true },
-              { cards: ['8♦', '7♥', '2♠'],   betCents: 50000, freeSplit: true,  doubled: false, freeDouble: false, isSplit: true },
-            ].map((hand, i) => (
-              <div key={i} className={`flex items-start justify-center pt-3 ${i >= 2 ? '-mt-[20px]' : ''}`}>
-                <CardHand
-                  hand={hand}
-                  label={`Hand ${i + 1}`}
-                  isSplit
-                  isActive={i === 0}
-                  isDimmed={i !== 0}
-                  hasFreeSplit={!!hand.freeSplit}
-                  hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
-                  cardBackColor={settings.cardBackColor}
-                />
-              </div>
-            ))}
-          </div>
-        ) : game.engine.playerHands.length > 0 ? (
+        {game.engine.playerHands.length > 0 ? (
           isQuadrant ? (
             <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
               {game.engine.playerHands.map((hand, i) => {

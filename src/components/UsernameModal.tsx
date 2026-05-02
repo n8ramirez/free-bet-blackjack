@@ -53,7 +53,7 @@ export function UsernameModal({ onSubmit, onSkip }: Props) {
               placeholder="Username"
               autoFocus
               className="w-full px-4 py-3 rounded-xl bg-stone-800 border border-stone-600
-                text-white placeholder-stone-500 text-sm
+                text-white placeholder-stone-500 text-base
                 focus:outline-none focus:border-amber-500 transition-colors"
             />
             {check && (
