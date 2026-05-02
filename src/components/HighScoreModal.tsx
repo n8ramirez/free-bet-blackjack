@@ -13,8 +13,8 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip, mode
 
   const dollars = peakBankrollCents / 100
   const fmt = dollars % 1 === 0
-    ? `$${dollars.toLocaleString()}`
-    : `$${dollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    ? `${dollars.toLocaleString()}`
+    : `${dollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

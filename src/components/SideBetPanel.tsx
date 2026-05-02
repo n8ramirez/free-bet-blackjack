@@ -59,7 +59,7 @@ export const HellraiserIcon = ({ className = '' }: { className?: string }) => (
 
 function fmtDollars(cents: number): string {
   const d = Math.abs(cents) / 100
-  return d % 1 === 0 ? `$${d.toLocaleString()}` : `$${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return d % 1 === 0 ? `${d.toLocaleString()}` : `${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 type TabConfig = {

@@ -3,7 +3,7 @@ import { SafeButton } from './SafeButton'
 
 function fmtDollars(cents: number): string {
   const d = cents / 100
-  return d % 1 === 0 ? `$${d.toLocaleString()}` : `$${d.toFixed(2)}`
+  return d % 1 === 0 ? `${d.toLocaleString()}` : `${d.toFixed(2)}`
 }
 
 type ClassicSideBetPanelProps = {

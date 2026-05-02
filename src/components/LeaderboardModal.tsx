@@ -1,4 +1,5 @@
 import { LeaderboardEntry } from '../hooks/useLeaderboard'
+import chipIconAmber from '../assets/chips/chip-icon-amber.svg'
 
 type Props = {
   entries: LeaderboardEntry[]
@@ -11,8 +12,8 @@ export function LeaderboardModal({ entries, highlightIndex, onClose, mode = 'fre
   const formatDollars = (cents: number) => {
     const d = cents / 100
     return d % 1 === 0
-      ? `$${d.toLocaleString()}`
-      : `$${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      ? `${d.toLocaleString()}`
+      : `${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
   const rankColor = (i: number) => {
@@ -38,7 +39,10 @@ export function LeaderboardModal({ entries, highlightIndex, onClose, mode = 'fre
             <div className="text-white text-[9px] uppercase tracking-widest">
               {mode === 'classic' ? 'Classic Mode · All Time' : 'Free Bet Pro · All Time'}
             </div>
-            <div className="text-amber-400 font-bold text-base">Peak Bankroll Leaderboard</div>
+            <div className="flex items-center gap-1.5 text-amber-400 font-bold text-base">
+              <img src={chipIconAmber} width="16" height="16" className="flex-shrink-0" />
+              Peak Bankroll Leaderboard
+            </div>
           </div>
           <button
             onClick={onClose}
