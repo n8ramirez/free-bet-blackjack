@@ -13,12 +13,14 @@ export type LeaderboardEntry = {
   created_at?: string
 }
 
+export type LeaderboardTable = 'leaderboard' | 'leaderboard_classic'
+
 const MAX_ENTRIES = 10
 
 /** Fetch the current top-10 from Supabase, sorted highest first. */
-export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+export async function getLeaderboard(table: LeaderboardTable = 'leaderboard'): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
-    .from('leaderboard')
+    .from(table)
     .select('id, name, peak_bankroll_cents, created_at')
     .order('peak_bankroll_cents', { ascending: false })
     .limit(MAX_ENTRIES)
@@ -51,16 +53,17 @@ export function getQualifyingRank(
 export async function addToLeaderboard(
   name: string,
   peakBankrollCents: number,
+  table: LeaderboardTable = 'leaderboard',
 ): Promise<{ entries: LeaderboardEntry[]; newIndex: number }> {
   const { error } = await supabase
-    .from('leaderboard')
+    .from(table)
     .insert({ name: name.trim() || 'Anonymous', peak_bankroll_cents: peakBankrollCents })
 
   if (error) {
     console.error('Failed to save score:', error.message)
   }
 
-  const entries = await getLeaderboard()
+  const entries = await getLeaderboard(table)
   // Find the highest-ranked entry matching this name + score (most recently inserted wins ties)
   const newIndex = entries.findIndex(
     e => e.name === (name.trim() || 'Anonymous') && e.peak_bankroll_cents === peakBankrollCents,

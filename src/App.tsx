@@ -58,7 +58,7 @@ export default function App() {
   useEffect(() => {
     if (game.isGameOver && !highScoreHandled) {
       setHighScoreHandled(true)
-      getLeaderboard().then(entries => {
+      getLeaderboard(leaderboardTable).then(entries => {
         setLeaderboardEntries(entries)
         const rank = getQualifyingRank(game.peakBankrollCents, entries)
         if (rank !== null) {
@@ -74,7 +74,7 @@ export default function App() {
   }, [game.isGameOver, game.peakBankrollCents, highScoreHandled])
 
   async function handleHighScoreSubmit(name: string) {
-    const { entries, newIndex } = await addToLeaderboard(name, game.peakBankrollCents)
+    const { entries, newIndex } = await addToLeaderboard(name, game.peakBankrollCents, leaderboardTable)
     setLeaderboardEntries(entries)
     setHighlightIndex(newIndex)
     setShowHighScoreEntry(false)
@@ -88,7 +88,7 @@ export default function App() {
   async function handleOpenLeaderboard() {
     setHighlightIndex(undefined)
     setShowLeaderboard(true)
-    const entries = await getLeaderboard()
+    const entries = await getLeaderboard(leaderboardTable)
     setLeaderboardEntries(entries)
   }
 
@@ -131,6 +131,9 @@ export default function App() {
     setShowModeConfirm(false)
     setShowSettings(false)
   }
+
+  const leaderboardTable = isClassic ? 'leaderboard_classic' as const : 'leaderboard' as const
+  const leaderboardMode  = isClassic ? 'classic' as const : 'freebet' as const
 
   const hellraiserWon      = game.hellraiserBannerVisible && (game.hellraiserResult?.payoutCents ?? 0) > 0
   const pogGlowActive      = game.lastPotOfGoldBetCents > 0
@@ -216,6 +219,7 @@ export default function App() {
           entries={leaderboardEntries}
           highlightIndex={highlightIndex}
           onClose={() => { setShowLeaderboard(false); setHighlightIndex(undefined) }}
+          mode={leaderboardMode}
         />
       )}
       {showSideBetInfo && (isClassic
@@ -267,6 +271,7 @@ export default function App() {
           rank={qualifyingRank}
           onSubmit={handleHighScoreSubmit}
           onSkip={handleHighScoreSkip}
+          mode={leaderboardMode}
         />
       )}
 
