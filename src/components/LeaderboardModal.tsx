@@ -37,7 +37,7 @@ export function LeaderboardModal({ entries, highlightIndex, onClose, mode = 'fre
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-700">
           <div>
             <div className="text-white text-[9px] uppercase tracking-widest">
-              {mode === 'classic' ? 'Classic Mode · All Time' : 'Free Bet Pro · All Time'}
+              {mode === 'classic' ? 'Classic · All Time' : 'Free Bet Pro · All Time'}
             </div>
             <div className="flex items-center gap-1.5 text-amber-400 font-bold text-base">
               <img src={chipIconAmber} width="16" height="16" className="flex-shrink-0" />

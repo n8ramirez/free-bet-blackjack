@@ -18,6 +18,9 @@ import { SettingsModal } from './components/SettingsModal'
 import { GameplayModal } from './components/GameplayModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
+import { UsernameModal } from './components/UsernameModal'
+import { ProfileModal } from './components/ProfileModal'
+import { useUsername } from './hooks/useUsername'
 import { handTotals, isBlackjack } from './engine'
 import { initSounds, setSoundEnabled, playSound, resumeAudio } from './sounds'
 import { TABLE_PALETTES } from './hooks/useSettings'
@@ -30,6 +33,7 @@ export default function App() {
   const freeBetGame = useGameState()
   const classicGame = useClassicGameState()
   const settings    = useSettings()
+  const { username, showPrompt: showUsernamePrompt, saveUsername, skipUsername } = useUsername()
   const isClassic   = settings.classicMode
   const game        = isClassic
     ? (classicGame as unknown as ReturnType<typeof useGameState>)
@@ -41,21 +45,13 @@ export default function App() {
   const [highlightIndex, setHighlightIndex] = useState<number | undefined>(undefined)
   const [highScoreHandled, setHighScoreHandled] = useState(false)
   const [qualifyingRank, setQualifyingRank] = useState<number | null>(null)
-  const [debugSplit, setDebugSplit] = useState(false)
   const [showSideBetInfo, setShowSideBetInfo] = useState(false)
   const [showMenu, setShowMenu]                     = useState(false)
   const [showSettings, setShowSettings]             = useState(false)
   const [showGameplay, setShowGameplay]             = useState(false)
   const [showRestartConfirm, setShowRestartConfirm] = useState(false)
   const [showModeConfirm, setShowModeConfirm]       = useState(false)
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.shiftKey && e.key === 'D') setDebugSplit(v => !v)
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
+  const [showProfile, setShowProfile]               = useState(false)
 
   // When game ends, fetch the leaderboard to check if the score qualifies
   useEffect(() => {
@@ -76,8 +72,8 @@ export default function App() {
     }
   }, [game.isGameOver, game.peakBankrollCents, highScoreHandled])
 
-  async function handleHighScoreSubmit(name: string) {
-    const { entries, newIndex } = await addToLeaderboard(name, game.peakBankrollCents, leaderboardTable)
+  async function handleHighScoreSubmit() {
+    const { entries, newIndex } = await addToLeaderboard(username, game.peakBankrollCents, leaderboardTable)
     setLeaderboardEntries(entries)
     setHighlightIndex(newIndex)
     setShowHighScoreEntry(false)
@@ -169,7 +165,7 @@ export default function App() {
     : undefined
 
   const multiHand  = game.engine.playerHands.length > 1
-  const isQuadrant = debugSplit || game.engine.playerHands.length >= 3
+  const isQuadrant = game.engine.playerHands.length >= 3
 
   // Net result across all hands for the round-over summary
   const netCents = game.results.reduce((sum, r) => sum + r.payoutCents, 0)
@@ -258,6 +254,14 @@ export default function App() {
           onCancel={() => setShowModeConfirm(false)}
         />
       )}
+      {showProfile && (
+        <ProfileModal
+          onClose={() => setShowProfile(false)}
+          onBack={() => { setShowProfile(false); setShowMenu(true) }}
+          username={username}
+          onSaveUsername={saveUsername}
+        />
+      )}
       {showMenu && (
         <MenuModal
           onClose={() => setShowMenu(false)}
@@ -266,6 +270,8 @@ export default function App() {
           onSettings={() => setShowSettings(true)}
           onGameplay={() => setShowGameplay(true)}
           onRestartGame={() => setShowRestartConfirm(true)}
+          onShowProfile={() => setShowProfile(true)}
+          username={username}
         />
       )}
       {showRestartConfirm && (
@@ -274,10 +280,14 @@ export default function App() {
           onCancel={() => setShowRestartConfirm(false)}
         />
       )}
+      {showUsernamePrompt && (
+        <UsernameModal onSubmit={saveUsername} onSkip={skipUsername} />
+      )}
       {showHighScoreEntry && qualifyingRank !== null && (
         <HighScoreModal
           peakBankrollCents={game.peakBankrollCents}
           rank={qualifyingRank}
+          username={username}
           onSubmit={handleHighScoreSubmit}
           onSkip={handleHighScoreSkip}
           mode={leaderboardMode}
@@ -860,29 +870,7 @@ export default function App() {
             </span>
           </div>
         )}
-        {debugSplit ? (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
-            {[
-              { cards: ['8♠', 'K♦'],        betCents: 50000, freeSplit: true,  doubled: false, freeDouble: false, isSplit: true },
-              { cards: ['8♥', '5♦', '3♣'],  betCents: 50000, freeSplit: true,  doubled: true,  freeDouble: true,  isSplit: true },
-              { cards: ['8♣', 'J♠'],         betCents: 50000, freeSplit: false, doubled: false, freeDouble: false, isSplit: true },
-              { cards: ['8♦', '7♥', '2♠'],   betCents: 50000, freeSplit: true,  doubled: false, freeDouble: false, isSplit: true },
-            ].map((hand, i) => (
-              <div key={i} className={`flex items-start justify-center pt-3 ${i >= 2 ? '-mt-[20px]' : ''}`}>
-                <CardHand
-                  hand={hand}
-                  label={`Hand ${i + 1}`}
-                  isSplit
-                  isActive={i === 0}
-                  isDimmed={i !== 0}
-                  hasFreeSplit={!!hand.freeSplit}
-                  hasFreeDouble={!!(hand.doubled && hand.freeDouble)}
-                  cardBackColor={settings.cardBackColor}
-                />
-              </div>
-            ))}
-          </div>
-        ) : game.engine.playerHands.length > 0 ? (
+        {game.engine.playerHands.length > 0 ? (
           isQuadrant ? (
             <div className="grid grid-cols-2 gap-x-3 gap-y-0 w-full px-4">
               {game.engine.playerHands.map((hand, i) => {
