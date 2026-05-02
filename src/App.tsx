@@ -18,6 +18,9 @@ import { SettingsModal } from './components/SettingsModal'
 import { GameplayModal } from './components/GameplayModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
+import { UsernameModal } from './components/UsernameModal'
+import { ProfileModal } from './components/ProfileModal'
+import { useUsername } from './hooks/useUsername'
 import { handTotals, isBlackjack } from './engine'
 import { initSounds, setSoundEnabled, playSound, resumeAudio } from './sounds'
 import { TABLE_PALETTES } from './hooks/useSettings'
@@ -30,6 +33,7 @@ export default function App() {
   const freeBetGame = useGameState()
   const classicGame = useClassicGameState()
   const settings    = useSettings()
+  const { username, showPrompt: showUsernamePrompt, saveUsername, skipUsername } = useUsername()
   const isClassic   = settings.classicMode
   const game        = isClassic
     ? (classicGame as unknown as ReturnType<typeof useGameState>)
@@ -48,6 +52,7 @@ export default function App() {
   const [showGameplay, setShowGameplay]             = useState(false)
   const [showRestartConfirm, setShowRestartConfirm] = useState(false)
   const [showModeConfirm, setShowModeConfirm]       = useState(false)
+  const [showProfile, setShowProfile]               = useState(false)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -258,6 +263,13 @@ export default function App() {
           onCancel={() => setShowModeConfirm(false)}
         />
       )}
+      {showProfile && (
+        <ProfileModal
+          onClose={() => setShowProfile(false)}
+          onBack={() => { setShowProfile(false); setShowMenu(true) }}
+          username={username}
+        />
+      )}
       {showMenu && (
         <MenuModal
           onClose={() => setShowMenu(false)}
@@ -266,6 +278,8 @@ export default function App() {
           onSettings={() => setShowSettings(true)}
           onGameplay={() => setShowGameplay(true)}
           onRestartGame={() => setShowRestartConfirm(true)}
+          onShowProfile={() => setShowProfile(true)}
+          username={username}
         />
       )}
       {showRestartConfirm && (
@@ -273,6 +287,9 @@ export default function App() {
           onConfirm={handleRestartGame}
           onCancel={() => setShowRestartConfirm(false)}
         />
+      )}
+      {showUsernamePrompt && (
+        <UsernameModal onSubmit={saveUsername} onSkip={skipUsername} />
       )}
       {showHighScoreEntry && qualifyingRank !== null && (
         <HighScoreModal

@@ -5,6 +5,8 @@ type Props = {
   onSettings:     () => void
   onGameplay:     () => void
   onRestartGame:  () => void
+  onShowProfile:  () => void
+  username:       string
 }
 
 type MenuItemProps = {
@@ -37,7 +39,7 @@ function MenuItem({ label, icon, onClick, disabled, comingSoon }: MenuItemProps)
   )
 }
 
-export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onGameplay, onRestartGame }: Props) {
+export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onGameplay, onRestartGame, onShowProfile, username }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-[10dvh]"
@@ -49,11 +51,30 @@ export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onG
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-700">
-          <div className="text-amber-400 font-bold text-base">Menu</div>
+        <div className="flex items-start justify-between pl-3 pr-5 pt-3 pb-4 border-b border-stone-700">
+          {/* Player avatar placeholder */}
+          <div
+            onClick={() => { onClose(); onShowProfile() }}
+            className="flex items-end gap-2.5 cursor-pointer hover:opacity-80 transition-opacity active:opacity-60"
+          >
+            <div className="w-8 h-10 rounded-lg border border-stone-600 bg-stone-800 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 28" width="18" height="21" fill="none" aria-hidden>
+                <circle cx="12" cy="8" r="5" fill="#57534e" />
+                <path d="M2,26 C2,18 22,18 22,26" fill="#57534e" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-stone-400 text-[9px] uppercase tracking-widest leading-none mb-1">Guest</div>
+              <div className="text-white font-bold text-base leading-none">
+                {username.startsWith('Player#')
+                  ? <><span>Player</span><span className="text-stone-400 font-medium">{username.slice(6)}</span></>
+                  : username}
+              </div>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-white text-xl leading-none px-2"
+            className="text-stone-400 hover:text-white text-xl leading-none px-2 self-center"
           >
             ✕
           </button>
