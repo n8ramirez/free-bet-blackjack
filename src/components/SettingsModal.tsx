@@ -6,12 +6,10 @@ type Props = {
   onClose:          () => void
   soundEffects:     boolean
   music:            boolean
-  classicMode:      boolean
   cardBackColor:    CardBackColor
   tableTheme:       TableTheme
   onSoundEffects:   (v: boolean) => void
   onMusic:          (v: boolean) => void
-  onClassicMode:    () => void
   onCardBackColor:  (v: CardBackColor) => void
   onTableTheme:     (v: TableTheme) => void
 }
@@ -52,7 +50,7 @@ function Toggle({ label, enabled, onToggle, dimmed }: { label: string; enabled: 
 
 type View = 'main' | 'deckTheme' | 'tableTheme'
 
-export function SettingsModal({ onClose, soundEffects, music, classicMode, cardBackColor, tableTheme, onSoundEffects, onMusic, onClassicMode, onCardBackColor, onTableTheme }: Props) {
+export function SettingsModal({ onClose, soundEffects, music, cardBackColor, tableTheme, onSoundEffects, onMusic, onCardBackColor, onTableTheme }: Props) {
   const [view, setView] = useState<View>('main')
 
   return (
@@ -131,7 +129,7 @@ export function SettingsModal({ onClose, soundEffects, music, classicMode, cardB
             <div className="flex flex-col">
               <Toggle label="Sound Effects"       enabled={soundEffects} onToggle={() => onSoundEffects(!soundEffects)} />
               <Toggle label="Music - Coming Soon" enabled={music}        onToggle={() => onMusic(!music)} dimmed />
-              <Toggle label="Classic Blackjack"   enabled={classicMode}  onToggle={onClassicMode} />
+
               <button
                 onClick={() => setView('deckTheme')}
                 className="flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/40 transition-colors"
