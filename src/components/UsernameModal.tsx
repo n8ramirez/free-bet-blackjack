@@ -5,12 +5,14 @@ import chipIconAmber from '../assets/chips/chip-icon-amber.svg'
 filter.addWhitelist(['ass', 'butt'])
 
 type Props = {
-  onSubmit: (name: string) => void
-  onSkip:   () => void
+  onSubmit:      (name: string) => void
+  onSkip:        () => void
+  mode?:         'create' | 'change'
+  initialValue?: string
 }
 
-export function UsernameModal({ onSubmit, onSkip }: Props) {
-  const [name, setName] = useState('')
+export function UsernameModal({ onSubmit, onSkip, mode = 'create', initialValue = '' }: Props) {
+  const [name, setName] = useState(initialValue)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))
@@ -33,10 +35,10 @@ export function UsernameModal({ onSubmit, onSkip }: Props) {
       >
         {/* Header */}
         <div className="px-5 pt-6 pb-5 border-b border-stone-700">
-          <div className="text-white text-[9px] uppercase tracking-widest mb-1">Welcome</div>
+          <div className="text-white text-[9px] uppercase tracking-widest mb-1">{mode === 'change' ? 'Profile' : 'Welcome'}</div>
           <div className="flex items-center gap-1.5 text-amber-400 font-bold text-base">
             <img src={chipIconAmber} width="16" height="16" className="flex-shrink-0" />
-            Create a Username
+            {mode === 'change' ? 'Change Username' : 'Create a Username'}
           </div>
         </div>
 
@@ -97,7 +99,7 @@ export function UsernameModal({ onSubmit, onSkip }: Props) {
             onClick={onSkip}
             className="text-stone-400 hover:text-stone-300 text-[9px] uppercase tracking-widest text-center transition-colors pb-1 underline"
           >
-            Skip
+            {mode === 'change' ? 'Cancel' : 'Skip'}
           </button>
         </div>
       </div>

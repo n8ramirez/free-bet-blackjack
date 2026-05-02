@@ -72,8 +72,8 @@ export default function App() {
     }
   }, [game.isGameOver, game.peakBankrollCents, highScoreHandled])
 
-  async function handleHighScoreSubmit(name: string) {
-    const { entries, newIndex } = await addToLeaderboard(name, game.peakBankrollCents, leaderboardTable)
+  async function handleHighScoreSubmit() {
+    const { entries, newIndex } = await addToLeaderboard(username, game.peakBankrollCents, leaderboardTable)
     setLeaderboardEntries(entries)
     setHighlightIndex(newIndex)
     setShowHighScoreEntry(false)
@@ -259,6 +259,7 @@ export default function App() {
           onClose={() => setShowProfile(false)}
           onBack={() => { setShowProfile(false); setShowMenu(true) }}
           username={username}
+          onSaveUsername={saveUsername}
         />
       )}
       {showMenu && (
@@ -286,6 +287,7 @@ export default function App() {
         <HighScoreModal
           peakBankrollCents={game.peakBankrollCents}
           rank={qualifyingRank}
+          username={username}
           onSubmit={handleHighScoreSubmit}
           onSkip={handleHighScoreSkip}
           mode={leaderboardMode}

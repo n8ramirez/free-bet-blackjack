@@ -1,25 +1,17 @@
-import { useState } from 'react'
-
 type Props = {
   peakBankrollCents: number
   rank: number
-  onSubmit: (name: string) => void
+  username: string
+  onSubmit: () => void
   onSkip: () => void
   mode?: 'freebet' | 'classic'
 }
 
-export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip, mode = 'freebet' }: Props) {
-  const [name, setName] = useState('')
-
+export function HighScoreModal({ peakBankrollCents, rank, username, onSubmit, onSkip, mode = 'freebet' }: Props) {
   const dollars = peakBankrollCents / 100
   const fmt = dollars % 1 === 0
     ? `${dollars.toLocaleString()}`
     : `${dollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(name.trim() || 'Anonymous')
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
@@ -30,7 +22,7 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip, mode
         {/* Header */}
         <div className="px-5 pt-6 pb-5 border-b border-stone-700 text-center">
           <div className="text-white text-[9px] uppercase tracking-widest mb-2">
-            {mode === 'classic' ? 'Classic Mode · New High Score' : 'Free Bet Mode · New High Score'}
+            {mode === 'classic' ? 'Classic · New High Score' : 'Free Bet Pro · New High Score'}
           </div>
           <div className="text-amber-400 font-bold text-4xl">#{rank}</div>
         </div>
@@ -41,33 +33,38 @@ export function HighScoreModal({ peakBankrollCents, rank, onSubmit, onSkip, mode
             <div className="text-emerald-400 font-bold text-2xl">{fmt}</div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Enter your name"
-              maxLength={20}
-              autoFocus
-              className="w-full px-4 py-3 rounded-xl bg-stone-800 border border-stone-600
-                text-white placeholder-stone-500 text-sm
-                focus:outline-none focus:border-amber-500 transition-colors"
-            />
-            <button
-              type="submit"
-              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400
-                text-amber-950 text-base font-extrabold active:scale-95 transition-all
-                shadow-[0_3px_0px_rgba(0,0,0,0.4)]"
-            >
-              Save Score
-            </button>
-          </form>
+          {/* Player profile */}
+          <div className="flex items-end gap-2.5 justify-center">
+            <div className="w-8 h-10 rounded-lg border border-stone-600 bg-stone-800 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 28" width="18" height="21" fill="none" aria-hidden>
+                <circle cx="12" cy="8" r="5" fill="#57534e" />
+                <path d="M2,26 C2,18 22,18 22,26" fill="#57534e" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-stone-400 text-[9px] uppercase tracking-widest leading-none mb-1">Guest</div>
+              <div className="text-white font-bold text-base leading-none">
+                {username.startsWith('Player#')
+                  ? <><span>Player</span><span className="text-stone-400 font-medium">{username.slice(6)}</span></>
+                  : username}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={onSubmit}
+            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400
+              text-amber-950 text-base font-extrabold active:scale-95 transition-all
+              shadow-[0_3px_0px_rgba(0,0,0,0.4)]"
+          >
+            Save Score
+          </button>
 
           <button
             onClick={onSkip}
-            className="text-stone-500 hover:text-stone-300 text-sm font-extrabold text-center transition-colors pb-1"
+            className="text-stone-400 hover:text-stone-300 text-[9px] uppercase tracking-widest text-center transition-colors pb-1 underline"
           >
-            No thanks
+            Skip
           </button>
         </div>
       </div>
