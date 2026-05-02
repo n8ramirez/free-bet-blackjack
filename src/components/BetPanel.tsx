@@ -33,7 +33,7 @@ type BetPanelProps = {
 
 function fmtDollars(cents: number): string {
   const d = cents / 100
-  return d % 1 === 0 ? `$${d.toLocaleString()}` : `$${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return d % 1 === 0 ? `${d.toLocaleString()}` : `${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 export function BetPanel({
@@ -81,7 +81,7 @@ export function BetPanel({
             ${pendingBetCents > 0 ? 'text-amber-400' : 'text-stone-600'}`}>
             {pendingBetCents > 0 ? fmtDollars(pendingBetCents) : '—'}
           </div>
-          {belowMin && <div className="text-red-400 text-xs mt-1">Min $5</div>}
+          {belowMin && <div className="text-red-400 text-xs mt-1">Min 5</div>}
         </div>
         <div className="text-center flex-1">
           <div className={`text-3xl font-bold transition-colors

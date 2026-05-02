@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export function useCountUp(target: number, duration = 700, delay = 0): [number, (value: number) => void] {
+export function useCountUp(target: number, duration = 700, delay = 0): [number, (value: number) => void, boolean] {
   const [displayed, setDisplayed] = useState(target)
+  const [isAnimating, setIsAnimating] = useState(false)
   const displayedRef = useRef(target)
   const rafRef       = useRef<number | null>(null)
   const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -13,6 +14,7 @@ export function useCountUp(target: number, duration = 700, delay = 0): [number, 
     timerRef.current = null
     displayedRef.current = value
     setDisplayed(value)
+    setIsAnimating(false)
   }, [])
 
   useEffect(() => {
@@ -24,6 +26,7 @@ export function useCountUp(target: number, duration = 700, delay = 0): [number, 
     if (timerRef.current !== null) clearTimeout(timerRef.current)
 
     const startAnimation = () => {
+      setIsAnimating(true)
       const start = performance.now()
       function tick(now: number) {
         const progress = Math.min((now - start) / duration, 1)
@@ -35,6 +38,7 @@ export function useCountUp(target: number, duration = 700, delay = 0): [number, 
           rafRef.current = requestAnimationFrame(tick)
         } else {
           rafRef.current = null
+          setIsAnimating(false)
         }
       }
       rafRef.current = requestAnimationFrame(tick)
@@ -53,5 +57,5 @@ export function useCountUp(target: number, duration = 700, delay = 0): [number, 
     }
   }, [target, duration, delay])
 
-  return [displayed, snapTo]
+  return [displayed, snapTo, isAnimating]
 }

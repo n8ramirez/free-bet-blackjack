@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import chipIcon from './assets/chips/chip-icon.svg'
 import { useGameState, STARTING_BANKROLL } from './hooks/useGameState'
 import { useClassicGameState } from './hooks/useClassicGameState'
 import { useSettings } from './hooks/useSettings'
@@ -200,8 +201,8 @@ export default function App() {
   const fmtDollars = (cents: number) => {
     const d = Math.abs(cents) / 100
     const s = d % 1 === 0
-      ? `$${d.toLocaleString()}`
-      : `$${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      ? `${d.toLocaleString()}`
+      : `${d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     return cents >= 0 ? s : `-${s}`
   }
   const formatNet = (cents: number) => (cents > 0 ? '+' : '') + fmtDollars(cents)
@@ -285,19 +286,12 @@ export default function App() {
 
       {/* ── Top bar + Marquee ───────────────────────────────────── */}
       <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative">
-        {/* Left — Avatar + Bankroll */}
-        <div className="flex items-center gap-2">
-          <button className="w-7 h-10 rounded-lg bg-stone-800 border border-stone-600 flex items-center justify-center flex-shrink-0">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" className="text-stone-500">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-            </svg>
-          </button>
-          <div>
-            <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
-            <div className="text-white font-bold text-base">
-              ${Math.round(animatedBankroll / 100).toLocaleString()}
-            </div>
+        {/* Left — Bankroll */}
+        <div>
+          <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
+          <div className="flex items-center gap-1 text-white font-bold text-base">
+            <img src={chipIcon} width="15" height="15" className="flex-shrink-0" />
+            {Math.round(animatedBankroll / 100).toLocaleString()}
           </div>
         </div>
 
@@ -337,13 +331,13 @@ export default function App() {
           <div className="absolute top-2 left-3 z-10 flex flex-col gap-0.5">
             <div className="text-white text-[9px] uppercase tracking-widest">Bet</div>
             <div className="text-amber-400 font-bold text-base">
-              ${(game.engine.playerHands[0].betCents / 100).toLocaleString()}
+              {(game.engine.playerHands[0].betCents / 100).toLocaleString()}
             </div>
             {isClassic && classicGame.lastLadyLuckBetCents > 0 && (
               <div className="flex items-center gap-1 mt-0.5">
                 <LadyLuckIcon className="w-4 h-4" />
                 <span className="text-pink-400 text-[10px] font-bold">
-                  ${(classicGame.lastLadyLuckBetCents / 100).toLocaleString()}
+                  {(classicGame.lastLadyLuckBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -351,7 +345,7 @@ export default function App() {
               <div className="flex items-center gap-1">
                 <BusterBlackjackIcon className="w-4 h-4" />
                 <span className="text-blue-400 text-[10px] font-bold">
-                  ${(classicGame.lastBusterBlackjackBetCents / 100).toLocaleString()}
+                  {(classicGame.lastBusterBlackjackBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -359,7 +353,7 @@ export default function App() {
               <div className="flex items-center gap-1">
                 <Wild7sIcon className="w-4 h-4" />
                 <span className="text-emerald-400 text-[10px] font-bold">
-                  ${(classicGame.lastWildSevensBetCents / 100).toLocaleString()}
+                  {(classicGame.lastWildSevensBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -367,7 +361,7 @@ export default function App() {
               <div className="flex items-center gap-1 mt-0.5">
                 <PotOfGoldIcon className="w-4 h-4" />
                 <span className="text-amber-400 text-[10px] font-bold">
-                  ${(game.lastPotOfGoldBetCents / 100).toLocaleString()}
+                  {(game.lastPotOfGoldBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -375,7 +369,7 @@ export default function App() {
               <div className="flex items-center gap-1">
                 <Push22Icon className="w-4 h-4" />
                 <span className="text-sky-400 text-[10px] font-bold">
-                  ${(game.lastPush22BetCents / 100).toLocaleString()}
+                  {(game.lastPush22BetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -383,7 +377,7 @@ export default function App() {
               <div className="flex items-center gap-1">
                 <HellraiserIcon className="w-4 h-4" />
                 <span className="text-orange-400 text-[10px] font-bold">
-                  ${(game.lastHellraiserBetCents / 100).toLocaleString()}
+                  {(game.lastHellraiserBetCents / 100).toLocaleString()}
                 </span>
               </div>
             )}
@@ -1021,7 +1015,7 @@ export default function App() {
             <div className="flex items-center gap-2 text-sm">
               <span className="text-stone-400 uppercase tracking-widest text-[10px]">Peak Bankroll</span>
               <span className="text-amber-400 font-medium">
-                ${(game.peakBankrollCents / 100).toLocaleString()}
+                {(game.peakBankrollCents / 100).toLocaleString()}
               </span>
             </div>
             <button
