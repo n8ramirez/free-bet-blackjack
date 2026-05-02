@@ -377,6 +377,10 @@ export function useClassicGameState() {
           bankrollCents:         s.bankrollCents + llPayout + w7Payout,
         }
 
+        if (playerBJ && sWithSideBets.lastBusterBlackjackBetCents === 0) {
+          // No Buster BJ bet: flip hole card and resolve immediately without dealer drawing
+          return { ...sWithSideBets, engine, phase: 'dealer-turn', dealerRevealed: true, dealerRevealCount: 2 }
+        }
         if (playerBJ || dealerBJ) return startDealerTurn(sWithSideBets, engine)
         return { ...sWithSideBets, engine, phase: 'player-turn' }
       })

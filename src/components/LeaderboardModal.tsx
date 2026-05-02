@@ -4,9 +4,10 @@ type Props = {
   entries: LeaderboardEntry[]
   highlightIndex?: number
   onClose: () => void
+  mode?: 'freebet' | 'classic'
 }
 
-export function LeaderboardModal({ entries, highlightIndex, onClose }: Props) {
+export function LeaderboardModal({ entries, highlightIndex, onClose, mode = 'freebet' }: Props) {
   const formatDollars = (cents: number) => {
     const d = cents / 100
     return d % 1 === 0
@@ -34,7 +35,9 @@ export function LeaderboardModal({ entries, highlightIndex, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-700">
           <div>
-            <div className="text-white text-[9px] uppercase tracking-widest">All Time</div>
+            <div className="text-white text-[9px] uppercase tracking-widest">
+              {mode === 'classic' ? 'Classic Mode · All Time' : 'Free Bet Pro · All Time'}
+            </div>
             <div className="text-amber-400 font-bold text-base">Peak Bankroll Leaderboard</div>
           </div>
           <button
