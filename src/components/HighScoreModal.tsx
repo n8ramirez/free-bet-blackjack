@@ -1,13 +1,17 @@
+import { PlayerIconAvatar } from './PlayerIconAvatar'
+
 type Props = {
   peakBankrollCents: number
   rank: number
   username: string
+  title: string
+  playerIcon: number
   onSubmit: () => void
   onSkip: () => void
   mode?: 'freebet' | 'classic'
 }
 
-export function HighScoreModal({ peakBankrollCents, rank, username, onSubmit, onSkip, mode = 'freebet' }: Props) {
+export function HighScoreModal({ peakBankrollCents, rank, username, title, playerIcon, onSubmit, onSkip, mode = 'freebet' }: Props) {
   const dollars = peakBankrollCents / 100
   const fmt = dollars % 1 === 0
     ? `${dollars.toLocaleString()}`
@@ -35,14 +39,9 @@ export function HighScoreModal({ peakBankrollCents, rank, username, onSubmit, on
 
           {/* Player profile */}
           <div className="flex items-end gap-2.5 justify-center">
-            <div className="w-8 h-10 rounded-lg border border-stone-600 bg-stone-800 flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 24 28" width="18" height="21" fill="none" aria-hidden>
-                <circle cx="12" cy="8" r="5" fill="#57534e" />
-                <path d="M2,26 C2,18 22,18 22,26" fill="#57534e" />
-              </svg>
-            </div>
+            <PlayerIconAvatar iconId={playerIcon} />
             <div>
-              <div className="text-stone-400 text-[9px] uppercase tracking-widest leading-none mb-1">Guest</div>
+              <div className={`text-[9px] uppercase tracking-widest leading-none mb-1 ${title === 'Guest' ? 'text-stone-400' : 'text-amber-400'}`}>{title}</div>
               <div className="text-white font-bold text-base leading-none">
                 {username.startsWith('Player#')
                   ? <><span>Player</span><span className="text-stone-400 font-medium">{username.slice(6)}</span></>

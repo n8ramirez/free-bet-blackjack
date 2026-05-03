@@ -21,6 +21,8 @@ import { HighScoreModal } from './components/HighScoreModal'
 import { UsernameModal } from './components/UsernameModal'
 import { ProfileModal } from './components/ProfileModal'
 import { useUsername } from './hooks/useUsername'
+import { useTitle } from './hooks/useTitle'
+import { usePlayerIcon } from './hooks/usePlayerIcon'
 import { handTotals, isBlackjack } from './engine'
 import { initSounds, setSoundEnabled, playSound, resumeAudio } from './sounds'
 import { TABLE_PALETTES } from './hooks/useSettings'
@@ -34,6 +36,8 @@ export default function App() {
   const classicGame = useClassicGameState()
   const settings    = useSettings()
   const { username, showPrompt: showUsernamePrompt, saveUsername, skipUsername } = useUsername()
+  const { title, saveTitle } = useTitle()
+  const { playerIcon } = usePlayerIcon()
   const isClassic   = settings.classicMode
   const game        = isClassic
     ? (classicGame as unknown as ReturnType<typeof useGameState>)
@@ -259,7 +263,10 @@ export default function App() {
           onClose={() => setShowProfile(false)}
           onBack={() => { setShowProfile(false); setShowMenu(true) }}
           username={username}
+          title={title}
+          playerIcon={playerIcon}
           onSaveUsername={saveUsername}
+          onSaveTitle={saveTitle}
         />
       )}
       {showMenu && (
@@ -272,6 +279,8 @@ export default function App() {
           onRestartGame={() => setShowRestartConfirm(true)}
           onShowProfile={() => setShowProfile(true)}
           username={username}
+          title={title}
+          playerIcon={playerIcon}
         />
       )}
       {showRestartConfirm && (
@@ -288,6 +297,8 @@ export default function App() {
           peakBankrollCents={game.peakBankrollCents}
           rank={qualifyingRank}
           username={username}
+          title={title}
+          playerIcon={playerIcon}
           onSubmit={handleHighScoreSubmit}
           onSkip={handleHighScoreSkip}
           mode={leaderboardMode}

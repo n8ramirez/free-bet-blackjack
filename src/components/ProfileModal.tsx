@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import { UsernameModal } from './UsernameModal'
+import { PlayerIconAvatar } from './PlayerIconAvatar'
+import { TITLES, type Title } from '../hooks/useTitle'
 
 type Props = {
   onClose:        () => void
   onBack:         () => void
   username:       string
+  title:          Title
+  playerIcon:     number
   onSaveUsername: (name: string) => void
+  onSaveTitle:    (title: Title) => void
 }
 
-type View = 'profile' | 'editProfile'
+type View = 'profile' | 'editProfile' | 'editTitle'
 
 function UsernameDisplay({ username }: { username: string }) {
   if (username.startsWith('Player#')) {
@@ -17,10 +22,12 @@ function UsernameDisplay({ username }: { username: string }) {
   return <>{username}</>
 }
 
-export function ProfileModal({ onClose, onBack, username, onSaveUsername }: Props) {
+export function ProfileModal({ onClose, onBack, username, title, playerIcon, onSaveUsername, onSaveTitle }: Props) {
   const [view, setView] = useState<View>('profile')
   const [showChangeUsername, setShowChangeUsername] = useState(false)
   const [showComingSoon, setShowComingSoon] = useState(false)
+
+  const titleColor = title === 'Guest' ? 'text-stone-400' : 'text-amber-400'
 
   return (
     <div
@@ -32,7 +39,31 @@ export function ProfileModal({ onClose, onBack, username, onSaveUsername }: Prop
           border border-stone-700 shadow-[0_8px_32px_rgba(0,0,0,0.8)]"
         onClick={e => e.stopPropagation()}
       >
-        {view === 'editProfile' ? (
+        {view === 'editTitle' ? (
+          <>
+            {/* Edit Title header */}
+            <div className="flex items-center px-5 py-4 border-b border-stone-700">
+              <button onClick={() => setView('editProfile')} className="text-stone-400 hover:text-white mr-3 text-lg leading-none">‹</button>
+              <div className="text-amber-400 font-bold text-base flex-1">Choose Title</div>
+              <button onClick={onClose} className="text-stone-400 hover:text-white text-xl leading-none px-2">✕</button>
+            </div>
+
+            {TITLES.map(t => (
+              <button
+                key={t}
+                onClick={() => onSaveTitle(t)}
+                className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors"
+              >
+                <span className="text-sm font-bold text-white">{t}</span>
+                {title === t && (
+                  <svg viewBox="0 0 16 16" width="14" height="14" className="text-amber-400 flex-shrink-0">
+                    <path d="M2 8 L6 12 L14 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </>
+        ) : view === 'editProfile' ? (
           <>
             {/* Edit Profile header */}
             <div className="flex items-center px-5 py-4 border-b border-stone-700">
@@ -49,48 +80,6 @@ export function ProfileModal({ onClose, onBack, username, onSaveUsername }: Prop
                 onSkip={() => setShowChangeUsername(false)}
               />
             )}
-
-            {/* Username row */}
-            <button
-              onClick={() => setShowChangeUsername(true)}
-              className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors">
-              <span className="text-[10px] uppercase tracking-widest font-extrabold text-white">Username</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-medium">
-                  {username.startsWith('Player#')
-                    ? <><span className="text-white">Player</span><span className="text-stone-400">{username.slice(6)}</span></>
-                    : <span className="text-stone-400">{username}</span>}
-                </span>
-                <span className="text-stone-600 text-base leading-none">›</span>
-              </div>
-            </button>
-
-            {/* Player Icon row */}
-            <button
-              onClick={() => setShowComingSoon(true)}
-              className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors">
-              <span className="text-[10px] uppercase tracking-widest font-extrabold text-white">Player Icon</span>
-              <div className="flex items-center gap-1.5">
-                <div className="w-8 h-10 rounded-lg border border-stone-600 bg-stone-800 flex items-center justify-center flex-shrink-0">
-                  <svg viewBox="0 0 24 28" width="18" height="21" fill="none" aria-hidden>
-                    <circle cx="12" cy="8" r="5" fill="#57534e" />
-                    <path d="M2,26 C2,18 22,18 22,26" fill="#57534e" />
-                  </svg>
-                </div>
-                <span className="text-stone-600 text-base leading-none">›</span>
-              </div>
-            </button>
-
-            {/* Title row */}
-            <button
-              onClick={() => setShowComingSoon(true)}
-              className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors">
-              <span className="text-[10px] uppercase tracking-widest font-extrabold text-white">Title</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-stone-400 text-sm font-medium">Guest</span>
-                <span className="text-stone-600 text-base leading-none">›</span>
-              </div>
-            </button>
 
             {showComingSoon && (
               <div
@@ -114,6 +103,43 @@ export function ProfileModal({ onClose, onBack, username, onSaveUsername }: Prop
                 </div>
               </div>
             )}
+
+            {/* Username row */}
+            <button
+              onClick={() => setShowChangeUsername(true)}
+              className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors">
+              <span className="text-[10px] uppercase tracking-widest font-extrabold text-white">Username</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-medium">
+                  {username.startsWith('Player#')
+                    ? <><span className="text-white">Player</span><span className="text-stone-400">{username.slice(6)}</span></>
+                    : <span className="text-stone-400">{username}</span>}
+                </span>
+                <span className="text-stone-600 text-base leading-none">›</span>
+              </div>
+            </button>
+
+            {/* Player Icon row */}
+            <button
+              onClick={() => setShowComingSoon(true)}
+              className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors">
+              <span className="text-[10px] uppercase tracking-widest font-extrabold text-white">Player Icon</span>
+              <div className="flex items-center gap-1.5">
+                <PlayerIconAvatar iconId={playerIcon} />
+                <span className="text-stone-600 text-base leading-none">›</span>
+              </div>
+            </button>
+
+            {/* Title row */}
+            <button
+              onClick={() => setView('editTitle')}
+              className="w-full flex items-center justify-between px-5 py-4 border-b border-stone-800 hover:bg-stone-800/50 transition-colors">
+              <span className="text-[10px] uppercase tracking-widest font-extrabold text-white">Title</span>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-sm font-medium ${titleColor}`}>{title}</span>
+                <span className="text-stone-600 text-base leading-none">›</span>
+              </div>
+            </button>
           </>
         ) : (
           <>
@@ -126,14 +152,9 @@ export function ProfileModal({ onClose, onBack, username, onSaveUsername }: Prop
 
             {/* Avatar section */}
             <div className="flex items-end gap-2.5 pl-3 pr-5 pt-4 pb-4 border-b border-stone-700">
-              <div className="w-8 h-10 rounded-lg border border-stone-600 bg-stone-800 flex items-center justify-center flex-shrink-0">
-                <svg viewBox="0 0 24 28" width="18" height="21" fill="none" aria-hidden>
-                  <circle cx="12" cy="8" r="5" fill="#57534e" />
-                  <path d="M2,26 C2,18 22,18 22,26" fill="#57534e" />
-                </svg>
-              </div>
+              <PlayerIconAvatar iconId={playerIcon} />
               <div className="flex-1">
-                <div className="text-stone-400 text-[9px] uppercase tracking-widest leading-none mb-1">Guest</div>
+                <div className={`text-[9px] uppercase tracking-widest leading-none mb-1 ${titleColor}`}>{title}</div>
                 <div className="text-white font-bold text-base leading-none">
                   <UsernameDisplay username={username} />
                 </div>
