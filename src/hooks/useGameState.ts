@@ -101,6 +101,31 @@ export type HellraiserResult = {
   payoutCents: number
 }
 
+export type SessionStats = {
+  handsPlayed:      number
+  handsWon:         number
+  handsLost:        number
+  handsPushed:      number
+  playerBlackjacks: number
+  dealerBlackjacks: number
+  busts:            number
+  freeSplits:       number
+  freeDoubles:      number
+  biggestWinCents:  number
+  biggestLossCents: number
+  sideBetRounds:    Record<string, number>
+}
+
+export function emptyStats(): SessionStats {
+  return {
+    handsPlayed: 0, handsWon: 0, handsLost: 0, handsPushed: 0,
+    playerBlackjacks: 0, dealerBlackjacks: 0, busts: 0,
+    freeSplits: 0, freeDoubles: 0,
+    biggestWinCents: 0, biggestLossCents: 0,
+    sideBetRounds: {},
+  }
+}
+
 function countPucks(hands: Hand[]): number {
   return hands.reduce((n, h) =>
     n + (h.freeSplit ? 1 : 0) + (h.doubled && h.freeDouble ? 1 : 0), 0)
@@ -168,6 +193,8 @@ export type UIState = {
   lastHellraiserBetCents:  number
   hellraiserResult:        HellraiserResult | null
   hellraiserBannerVisible: boolean
+  sessionStats:            SessionStats
+  roundStartBankrollCents: number
 }
 
 const BANKROLL_KEY = 'fbbj_bankroll'
@@ -221,6 +248,8 @@ function initial(): UIState {
     lastHellraiserBetCents:  0,
     hellraiserResult:        null,
     hellraiserBannerVisible: false,
+    sessionStats:            emptyStats(),
+    roundStartBankrollCents: 0,
   }
 }
 
@@ -280,6 +309,28 @@ function finishFromDealerTurn(base: UIState): UIState {
   else if (push22Wins)   playSound('side-bet-win')
   else                   playSound('push')
 
+  // Accumulate session stats
+  const prev      = base.sessionStats
+  const roundNet  = bankroll - base.roundStartBankrollCents
+  const sideRounds = { ...prev.sideBetRounds }
+  if (base.lastPotOfGoldBetCents  > 0) sideRounds['Pot of Gold'] = (sideRounds['Pot of Gold'] || 0) + 1
+  if (base.lastPush22BetCents     > 0) sideRounds['Push 22']     = (sideRounds['Push 22']     || 0) + 1
+  if (base.lastHellraiserBetCents > 0) sideRounds['Hellraiser']  = (sideRounds['Hellraiser']  || 0) + 1
+  const sessionStats: SessionStats = {
+    handsPlayed:      prev.handsPlayed + results.length,
+    handsWon:         prev.handsWon    + results.filter(r => r.result === 'win').length,
+    handsLost:        prev.handsLost   + results.filter(r => r.result === 'loss').length,
+    handsPushed:      prev.handsPushed + results.filter(r => r.result === 'push').length,
+    playerBlackjacks: prev.playerBlackjacks + results.filter(r => r.reason === 'blackjack' || r.reason === 'blackjack push' || r.reason === 'blackjack vs dealer 22').length,
+    dealerBlackjacks: prev.dealerBlackjacks + (results.some(r => r.reason === 'dealer blackjack' || r.reason === 'blackjack push') ? 1 : 0),
+    busts:            prev.busts       + results.filter(r => r.reason === 'bust').length,
+    freeSplits:       prev.freeSplits  + engine.playerHands.filter(h => h.freeSplit).length,
+    freeDoubles:      prev.freeDoubles + engine.playerHands.filter(h => h.doubled && h.freeDouble).length,
+    biggestWinCents:  roundNet > 0 ? Math.max(prev.biggestWinCents,  roundNet)  : prev.biggestWinCents,
+    biggestLossCents: roundNet < 0 ? Math.max(prev.biggestLossCents, -roundNet) : prev.biggestLossCents,
+    sideBetRounds:    sideRounds,
+  }
+
   return {
     ...base,
     phase:             'round-over',
@@ -289,6 +340,7 @@ function finishFromDealerTurn(base: UIState): UIState {
     dealerRevealed:    true,
     potOfGoldResult,
     push22Result,
+    sessionStats,
   }
 }
 
@@ -506,6 +558,7 @@ export function useGameState() {
         push22Result:            null,
         hellraiserResult:        null,
         hellraiserBannerVisible: false,
+        roundStartBankrollCents: s.bankrollCents,
       }
     })
   }, [])
@@ -585,6 +638,7 @@ export function useGameState() {
         lastHellraiserBetCents:  s.lastHellraiserBetCents,
         sideBetPanelOpen:        s.sideBetPanelOpen,
         selectedSideBet:         s.selectedSideBet,
+        sessionStats:            s.sessionStats,
       }
     })
   }, [])
@@ -618,6 +672,8 @@ export function useGameState() {
       lastHellraiserBetCents:  0,
       hellraiserResult:        null,
       hellraiserBannerVisible: false,
+      sessionStats:            emptyStats(),
+      roundStartBankrollCents: 0,
     }))
   }, [])
 
