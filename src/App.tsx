@@ -18,6 +18,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { GameplayModal } from './components/GameplayModal'
 import { RestartConfirmModal } from './components/RestartConfirmModal'
 import { HighScoreModal } from './components/HighScoreModal'
+import { GameSummaryModal } from './components/GameSummaryModal'
 import { UsernameModal } from './components/UsernameModal'
 import { ProfileModal } from './components/ProfileModal'
 import { useUsername } from './hooks/useUsername'
@@ -45,6 +46,7 @@ export default function App() {
   const [showRules, setShowRules] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showHighScoreEntry, setShowHighScoreEntry] = useState(false)
+  const [showGameSummary, setShowGameSummary] = useState(false)
   const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([])
   const [highlightIndex, setHighlightIndex] = useState<number | undefined>(undefined)
   const [highScoreHandled, setHighScoreHandled] = useState(false)
@@ -57,7 +59,7 @@ export default function App() {
   const [showModeConfirm, setShowModeConfirm]       = useState(false)
   const [showProfile, setShowProfile]               = useState(false)
 
-  // When game ends, fetch the leaderboard to check if the score qualifies
+  // When game ends, check if the score qualifies for the leaderboard
   useEffect(() => {
     if (game.isGameOver && !highScoreHandled) {
       setHighScoreHandled(true)
@@ -291,6 +293,14 @@ export default function App() {
       )}
       {showUsernamePrompt && (
         <UsernameModal onSubmit={saveUsername} onSkip={skipUsername} />
+      )}
+      {showGameSummary && (
+        <GameSummaryModal
+          stats={game.sessionStats}
+          peakBankrollCents={game.peakBankrollCents}
+          isClassic={isClassic}
+          onClose={() => setShowGameSummary(false)}
+        />
       )}
       {showHighScoreEntry && qualifyingRank !== null && (
         <HighScoreModal
@@ -1017,15 +1027,26 @@ export default function App() {
                 {(game.peakBankrollCents / 100).toLocaleString()}
               </span>
             </div>
-            <button
-              onClick={() => { playSound('click'); handleResetGame() }}
-              className="relative overflow-hidden w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500
-                text-white font-bold text-lg active:scale-95 transition-all
-                shadow-[0_4px_0px_#14532d]"
-            >
-              <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-              <span className="relative font-extrabold">New Game</span>
-            </button>
+            <div className="flex gap-2 w-full">
+              <button
+                onClick={() => { playSound('click'); setShowGameSummary(true) }}
+                className="relative overflow-hidden flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-500
+                  text-white text-lg font-bold active:scale-95 transition-all
+                  shadow-[0_4px_0px_#92400e] active:shadow-none active:translate-y-1"
+              >
+                <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+                <span className="relative font-extrabold">Game Summary</span>
+              </button>
+              <button
+                onClick={() => { playSound('click'); handleResetGame() }}
+                className="relative overflow-hidden flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500
+                  text-white font-bold text-lg active:scale-95 transition-all
+                  shadow-[0_4px_0px_#14532d]"
+              >
+                <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+                <span className="relative font-extrabold">New Game</span>
+              </button>
+            </div>
           </div>
         )}
 

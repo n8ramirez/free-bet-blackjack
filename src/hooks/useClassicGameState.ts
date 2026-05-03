@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { playSound } from '../sounds'
 import { getDebugShoePrefix } from '../debug'
+import { SessionStats, emptyStats } from './useGameState'
 import {
   GameState, Hand, HandResult,
   createGameState, dealInitial,
@@ -195,6 +196,8 @@ export type ClassicUIState = {
   lastWildSevensBetCents:       number
   wildSevensResult:             WildSevensResult | null
   wildSevensBannerVisible:      boolean
+  sessionStats:            SessionStats
+  roundStartBankrollCents: number
 }
 
 const BANKROLL_KEY = 'fbbj_classic_bankroll'
@@ -249,6 +252,8 @@ function initial(): ClassicUIState {
     lastWildSevensBetCents:       0,
     wildSevensResult:             null,
     wildSevensBannerVisible:      false,
+    sessionStats:            emptyStats(),
+    roundStartBankrollCents: 0,
   }
 }
 
@@ -288,6 +293,28 @@ function finishFromDealerTurn(base: ClassicUIState): ClassicUIState {
   else if (netCents < 0 && !llDealerBJ)   playSound('lose')
   else if (netCents === 0)                playSound('push')
 
+  // Accumulate session stats
+  const prev      = base.sessionStats
+  const roundNet  = bankroll - base.roundStartBankrollCents
+  const sideRounds = { ...prev.sideBetRounds }
+  if (base.lastLadyLuckBetCents        > 0) sideRounds['Lady Luck']        = (sideRounds['Lady Luck']        || 0) + 1
+  if (base.lastBusterBlackjackBetCents > 0) sideRounds['Buster Blackjack'] = (sideRounds['Buster Blackjack'] || 0) + 1
+  if (base.lastWildSevensBetCents      > 0) sideRounds['Wild 7s']          = (sideRounds['Wild 7s']          || 0) + 1
+  const sessionStats: SessionStats = {
+    handsPlayed:      prev.handsPlayed + results.length,
+    handsWon:         prev.handsWon    + results.filter(r => r.result === 'win').length,
+    handsLost:        prev.handsLost   + results.filter(r => r.result === 'loss').length,
+    handsPushed:      prev.handsPushed + results.filter(r => r.result === 'push').length,
+    playerBlackjacks: prev.playerBlackjacks + results.filter(r => r.reason === 'blackjack' || r.reason === 'blackjack push' || r.reason === 'blackjack vs dealer 22').length,
+    dealerBlackjacks: prev.dealerBlackjacks + (results.some(r => r.reason === 'dealer blackjack' || r.reason === 'blackjack push') ? 1 : 0),
+    busts:            prev.busts       + results.filter(r => r.reason === 'bust').length,
+    freeSplits:       0,
+    freeDoubles:      0,
+    biggestWinCents:  roundNet > 0 ? Math.max(prev.biggestWinCents,  roundNet)  : prev.biggestWinCents,
+    biggestLossCents: roundNet < 0 ? Math.max(prev.biggestLossCents, -roundNet) : prev.biggestLossCents,
+    sideBetRounds:    sideRounds,
+  }
+
   return {
     ...base,
     phase:                 'round-over',
@@ -296,6 +323,7 @@ function finishFromDealerTurn(base: ClassicUIState): ClassicUIState {
     results,
     dealerRevealed:        true,
     busterBlackjackResult: bbResult,
+    sessionStats,
   }
 }
 
@@ -528,6 +556,7 @@ export function useClassicGameState() {
         dealerRevealed:               false,
         revealCount:                  0,
         sideBetPanelOpen:             false,
+        roundStartBankrollCents:      s.bankrollCents,
       }
     })
   }, [])
@@ -599,6 +628,7 @@ export function useClassicGameState() {
         lastWildSevensBetCents:      s.lastWildSevensBetCents,
         sideBetPanelOpen:            s.sideBetPanelOpen,
         selectedSideBet:             s.selectedSideBet,
+        sessionStats:                s.sessionStats,
       }
     })
   }, [])
@@ -608,8 +638,10 @@ export function useClassicGameState() {
   const restartGame  = useCallback(() => {
     setState(s => ({
       ...initial(),
-      bankrollCents:     0,
-      peakBankrollCents: s.peakBankrollCents,
+      bankrollCents:           0,
+      peakBankrollCents:       s.peakBankrollCents,
+      sessionStats:            emptyStats(),
+      roundStartBankrollCents: 0,
     }))
   }, [])
 
