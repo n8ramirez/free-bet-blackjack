@@ -12,6 +12,47 @@ Deployed to Vercel. Production URL is on the main branch; staging has a persiste
 
 ---
 
+## Long-term product vision
+
+The goal is to ship this app on the **Apple App Store and Google Play Store**. The app will be free to download and play, with optional **"Pro"** features available via a one-time in-app purchase.
+
+### Pro features (planned, not yet gated)
+- Classic Blackjack Mode (rules variant already partially built)
+- Deck and card theme settings
+- Player titles
+
+### Future features
+- Lifetime game stats (cross-device, requires accounts)
+- Achievements that unlock deck themes, card themes, and player titles
+
+### Monetization & accounts
+- One-time IAP for Pro status (no subscription)
+- Users must be able to **restore their purchase** — a hard requirement from both Apple and Google
+- Purchase restoration requires persistent user accounts (not just localStorage)
+
+### Recommended implementation order
+
+The following phases should be completed in order. Do not skip ahead — each phase is foundational for the next.
+
+**Phase 1 — Capacitor integration**
+Wrap the existing Vite/React app in a Capacitor native shell to enable App Store and Play Store distribution. This is the prerequisite for any native IAP APIs.
+
+**Phase 2 — User authentication (Supabase Auth)**
+Migrate identity from localStorage (`fbbj_username`) to Supabase Auth (email/password or social login). This enables cross-device data, purchase restoration, and persistent stats. Existing localStorage data (bankroll, settings, username) should be migrated to the user's cloud record on first sign-in.
+
+**Phase 3 — In-app purchases**
+Wire StoreKit (iOS) and Google Play Billing (Android) via a Capacitor IAP plugin. Store Pro entitlement on the Supabase user record so it survives reinstalls and device switches. Implement the "Restore Purchase" flow.
+
+**Phase 4 — Pro feature gating**
+With accounts and IAP in place, add a `isPro` flag to the app state derived from the Supabase user record. Gate Pro features behind this flag. Pro features should be fully built before this phase; the gating logic should be the last thing wired up.
+
+**Phase 5 — Lifetime stats & achievements**
+Persist per-round stats to Supabase. Build an achievements engine that evaluates unlock conditions and writes earned achievements to the user record. Achievements drive cosmetic unlocks (themes, titles).
+
+> **Do not implement payment gating or Pro locks until Phase 4.** Build Pro features freely during earlier phases; the infrastructure to gate them doesn't exist yet and adding stubs now creates rework.
+
+---
+
 ## Key architectural decisions
 
 - **Frontend-only static app**: TypeScript + React + Vite. Deployed on Vercel with no backend.
@@ -162,12 +203,24 @@ Always confirm with the user before pushing or opening PRs. Wait for explicit go
 
 ### Recommended next tasks
 
-1. **Share**: implement a share flow (Web Share API with a score card image, or a shareable URL with peak bankroll encoded).
-2. **Leaderboard improvements**: the Supabase leaderboard is live, but could be extended — e.g. rate-limiting inserts, adding a `created_at`-based tiebreaker display, or adding a "play again" prompt after a top-10 finish.
-3. **CI**: add `.github/workflows/test.yml` to run `npm run test` on every push and PR.
-4. **Expanded tests**: cover Hellraiser edge cases, Push 22 with player bust, Pot of Gold with dealer BJ, and multi-split resolution order.
-5. **Music**: source audio and wire to the existing music toggle in Settings.
+Tasks are ordered by phase priority. Complete Phase 1 and 2 before building new Pro features.
+
+**Phase 1 — Capacitor**
+1. Install and configure Capacitor (`@capacitor/core`, `@capacitor/ios`, `@capacitor/android`).
+2. Validate that the existing Vite build runs correctly inside the Capacitor shell on both platforms.
+3. Configure app icons, splash screens, and bundle identifiers for both stores.
+
+**Phase 2 — Auth**
+4. Enable Supabase Auth and add sign-up / sign-in / guest flows to the app.
+5. Migrate `fbbj_username`, `fbbj_bankroll`, and `fbbj_settings` from localStorage to the authenticated user's Supabase record.
+6. Ensure anonymous/guest play still works; prompt sign-in when accessing Pro features or the leaderboard.
+
+**Near-term (can be done now, parallel to Phase 1/2)**
+7. **Share**: implement a share flow (Web Share API with a score card image, or a shareable URL with peak bankroll encoded).
+8. **CI**: add `.github/workflows/test.yml` to run `npm run test` on every push and PR.
+9. **Music**: source audio and wire to the existing music toggle in Settings.
+10. **Expanded tests**: cover Hellraiser edge cases, Push 22 with player bust, Pot of Gold with dealer BJ, and multi-split resolution order.
 
 ---
 
-Last updated: 2026-04-30
+Last updated: 2026-05-04
