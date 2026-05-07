@@ -1,10 +1,15 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { STARTING_BANKROLL } from './useGameState'
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_ANON_KEY as string,
-)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+
+let _supabase: SupabaseClient | null = null
+function getSupabase(): SupabaseClient | null {
+  if (!supabaseUrl || !supabaseKey) return null
+  if (!_supabase) _supabase = createClient(supabaseUrl, supabaseKey)
+  return _supabase
+}
 
 export type LeaderboardEntry = {
   id?: number
@@ -19,7 +24,10 @@ const MAX_ENTRIES = 10
 
 /** Fetch the current top-10 from Supabase, sorted highest first. */
 export async function getLeaderboard(table: LeaderboardTable = 'leaderboard'): Promise<LeaderboardEntry[]> {
-  const { data, error } = await supabase
+  const client = getSupabase()
+  if (!client) return []
+
+  const { data, error } = await client
     .from(table)
     .select('id, name, peak_bankroll_cents, created_at')
     .order('peak_bankroll_cents', { ascending: false })
@@ -55,12 +63,14 @@ export async function addToLeaderboard(
   peakBankrollCents: number,
   table: LeaderboardTable = 'leaderboard',
 ): Promise<{ entries: LeaderboardEntry[]; newIndex: number }> {
-  const { error } = await supabase
-    .from(table)
-    .insert({ name: name.trim() || 'Anonymous', peak_bankroll_cents: peakBankrollCents })
-
-  if (error) {
-    console.error('Failed to save score:', error.message)
+  const client = getSupabase()
+  if (client) {
+    const { error } = await client
+      .from(table)
+      .insert({ name: name.trim() || 'Anonymous', peak_bankroll_cents: peakBankrollCents })
+    if (error) {
+      console.error('Failed to save score:', error.message)
+    }
   }
 
   const entries = await getLeaderboard(table)
