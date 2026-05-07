@@ -316,7 +316,7 @@ export default function App() {
       )}
 
       {/* ── Top bar + Marquee ───────────────────────────────────── */}
-      <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative">
+      <div className="flex-none grid grid-cols-3 items-center pl-3 pr-5 py-3 bg-stone-900 border-b border-stone-700 shadow-[0_4px_16px_rgba(0,0,0,0.6)] z-10 relative" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}>
         {/* Left — Bankroll */}
         <div>
           <div className="text-white text-[9px] uppercase tracking-widest">Bankroll</div>
@@ -968,7 +968,7 @@ export default function App() {
       </div>
 
       {/* ── Bottom panel ────────────────────────────────────────── */}
-      <div className={`relative flex-none bg-stone-900 rounded-t-2xl shadow-[0_-6px_24px_rgba(0,0,0,0.6)] ${game.sideBetPanelOpen ? 'z-30' : ''}`}>
+      <div className={`relative flex-none bg-stone-900 rounded-t-2xl shadow-[0_-6px_24px_rgba(0,0,0,0.6)] ${game.sideBetPanelOpen ? 'z-30' : ''}`} style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 24px)' }}>
 
         {/* Side bet drawer — slides up from behind BetPanel */}
         {isClassic ? (
@@ -1019,7 +1019,7 @@ export default function App() {
 
         {/* Game over */}
         {isBetting && game.isGameOver && (
-          <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-8">
+          <div className="flex flex-col items-center gap-3 px-4 pt-6 pb-0">
             <div className="text-stone-300 text-lg">Out of chips!</div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-stone-400 uppercase tracking-widest text-[10px]">Peak Bankroll</span>
@@ -1070,7 +1070,7 @@ export default function App() {
 
         {/* Round-over phase */}
         {isOver && (
-          <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-6">
+          <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-0">
             {/* Net result summary */}
             <div className={`text-2xl font-medium ${netCents > 0 ? 'text-emerald-400' : netCents < 0 ? 'text-red-400' : 'text-stone-300'}`}>
               {netCents !== 0 ? formatNet(netCents) : 'Push'}

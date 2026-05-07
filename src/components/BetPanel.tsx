@@ -50,7 +50,7 @@ export function BetPanel({
   const showRebet     = !hasPendingBet && lastBetCents > 0 && lastBetCents <= bankrollCents
 
   return (
-    <div className="flex flex-col items-center gap-4 px-4 pt-3 pb-6">
+    <div className="flex flex-col items-center gap-4 px-4 pt-3 pb-0">
 
       {/* Tabs */}
       <div className="flex w-full border-b border-stone-700">
