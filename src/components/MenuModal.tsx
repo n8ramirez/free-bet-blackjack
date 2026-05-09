@@ -1,5 +1,3 @@
-import { PlayerIconAvatar } from './PlayerIconAvatar'
-
 type Props = {
   onClose:        () => void
   onHowToPlay:    () => void
@@ -10,7 +8,6 @@ type Props = {
   onShowProfile:  () => void
   username:       string
   title:          string
-  playerIcon:     number
 }
 
 type MenuItemProps = {
@@ -43,7 +40,7 @@ function MenuItem({ label, icon, onClick, disabled, comingSoon }: MenuItemProps)
   )
 }
 
-export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onGameplay, onRestartGame, onShowProfile, username, title, playerIcon }: Props) {
+export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onGameplay, onRestartGame, onShowProfile, username, title }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-[10dvh]"
@@ -55,19 +52,21 @@ export function MenuModal({ onClose, onHowToPlay, onLeaderboard, onSettings, onG
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between pl-3 pr-5 pt-3 pb-4 border-b border-stone-700">
+        <div className="flex items-start justify-between px-5 pt-3 pb-4 border-b border-stone-700">
           {/* Player avatar placeholder */}
           <div
             onClick={() => { onClose(); onShowProfile() }}
             className="flex items-end gap-2.5 cursor-pointer hover:opacity-80 transition-opacity active:opacity-60"
           >
-            <PlayerIconAvatar iconId={playerIcon} />
             <div>
               <div className={`text-[9px] uppercase tracking-widest leading-none mb-1 ${title === 'Guest' ? 'text-stone-400' : 'text-amber-400'}`}>{title}</div>
               <div className="text-white font-bold text-base leading-none">
-                {username.startsWith('Player#')
-                  ? <><span>Player</span><span className="text-stone-400 font-medium">{username.slice(6)}</span></>
-                  : username}
+                {(() => {
+                  const i = username.lastIndexOf('#')
+                  return i > 0
+                    ? <><span>{username.slice(0, i)}</span><span className="text-stone-400 font-medium">{username.slice(i)}</span></>
+                    : username
+                })()}
               </div>
             </div>
           </div>
