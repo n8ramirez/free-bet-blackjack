@@ -76,7 +76,12 @@ export function LeaderboardModal({ entries, highlightIndex, onClose, mode = 'fre
                     <div className="flex-1 min-w-0">
                       <div className={`font-semibold text-sm truncate
                         ${isHighlight ? 'text-amber-300' : 'text-stone-200'}`}>
-                        {entry.name}
+                        {(() => {
+                          const i = entry.name.lastIndexOf('#')
+                          return i > 0
+                            ? <><span>{entry.name.slice(0, i)}</span><span className="text-stone-400 font-medium">{entry.name.slice(i)}</span></>
+                            : entry.name
+                        })()}
                       </div>
                     </div>
                     <div className={`font-bold text-sm flex-shrink-0

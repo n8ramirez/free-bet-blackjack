@@ -1,30 +1,45 @@
 import { useState } from 'react'
 import filter from 'leo-profanity'
 import chipIconAmber from '../assets/chips/chip-icon-amber.svg'
+import { registerUsername } from '../hooks/useUsername'
 
 filter.addWhitelist(['ass', 'butt'])
 
 type Props = {
-  onSubmit:      (name: string) => void
+  onSubmit:      (displayName: string) => void
   onSkip:        () => void
   mode?:         'create' | 'change'
   initialValue?: string
 }
 
+type Step = 'input' | 'registering'
+
 export function UsernameModal({ onSubmit, onSkip, mode = 'create', initialValue = '' }: Props) {
-  const [name, setName] = useState(initialValue)
+  const [name, setName]               = useState(initialValue)
+  const [step, setStep]     = useState<Step>('input')
+  const [regError, setRegError] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))
   }
 
   const isBadLength = name.length === 1 || name.length > 18
-  const check   = name.length >= 2 && filter.check(name)
-  const isInvalid   = isBadLength || check
+  const hasProfanity = name.length >= 2 && filter.check(name)
+  const isInvalid    = isBadLength || hasProfanity
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (name.length >= 2 && name.length <= 18 && !filter.check(name)) onSubmit(name)
+    if (name.length < 2 || isInvalid) return
+
+    setStep('registering')
+    setRegError(false)
+    try {
+      const display = await registerUsername(name)
+      onSubmit(display)
+    } catch {
+      setRegError(true)
+      setStep('input')
+    }
   }
 
   return (
@@ -44,7 +59,7 @@ export function UsernameModal({ onSubmit, onSkip, mode = 'create', initialValue 
 
         <div className="px-5 py-5 flex flex-col gap-4">
           <div className="text-white text-xs">
-            Username will appear on your player profile and leaderboard. 
+            Username will appear on your player profile and leaderboard.
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -54,25 +69,26 @@ export function UsernameModal({ onSubmit, onSkip, mode = 'create', initialValue 
               onChange={handleChange}
               placeholder="Username"
               autoFocus
+              disabled={step === 'registering'}
               className="w-full px-4 py-3 rounded-xl bg-stone-800 border border-stone-600
                 text-white placeholder-stone-500 text-base
-                focus:outline-none focus:border-amber-500 transition-colors"
+                focus:outline-none focus:border-amber-500 transition-colors
+                disabled:opacity-50"
             />
-            {check && (
-              <div className="text-red-400 text-xs text-center">
-                Invalid username.
-              </div>
+            {hasProfanity && (
+              <div className="text-red-400 text-xs text-center">Invalid username.</div>
             )}
-            {isBadLength && !check && (
-              <div className="text-red-400 text-xs text-center">
-                Username must contain 2-18 characters.
-              </div>
+            {isBadLength && !hasProfanity && (
+              <div className="text-red-400 text-xs text-center">Username must contain 2–18 characters.</div>
+            )}
+            {regError && (
+              <div className="text-red-400 text-xs text-center">Could not register username. Please try again.</div>
             )}
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => setName('')}
-                disabled={name.length === 0}
+                disabled={name.length === 0 || step === 'registering'}
                 className="relative overflow-hidden py-4 rounded-xl font-extrabold text-base text-white
                   bg-amber-600 hover:bg-amber-500 shadow-[0_4px_0px_#92400e]
                   active:scale-[0.97] active:shadow-none active:translate-y-[3px] transition-all
@@ -83,21 +99,24 @@ export function UsernameModal({ onSubmit, onSkip, mode = 'create', initialValue 
               </button>
               <button
                 type="submit"
-                disabled={name.length < 2 || isInvalid}
+                disabled={name.length < 2 || isInvalid || step === 'registering'}
                 className="relative overflow-hidden py-4 rounded-xl font-extrabold text-base text-white
                   bg-emerald-600 hover:bg-emerald-500 shadow-[0_4px_0px_#14532d]
                   active:scale-[0.97] active:shadow-none active:translate-y-[3px] transition-all
                   disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100 disabled:active:translate-y-0"
               >
                 <div className="absolute inset-x-0 top-0 h-3 rounded-t-xl bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
-                <span className="relative">Done</span>
+                <span className="relative">
+                  {step === 'registering' ? 'Checking…' : 'Done'}
+                </span>
               </button>
             </div>
           </form>
 
           <button
             onClick={onSkip}
-            className="text-stone-400 hover:text-stone-300 text-[9px] uppercase tracking-widest text-center transition-colors pb-1 underline"
+            disabled={step === 'registering'}
+            className="text-stone-400 hover:text-stone-300 text-[9px] uppercase tracking-widest text-center transition-colors pb-1 underline disabled:opacity-30"
           >
             {mode === 'change' ? 'Cancel' : 'Skip'}
           </button>

@@ -43,9 +43,12 @@ export function HighScoreModal({ peakBankrollCents, rank, username, title, playe
             <div>
               <div className={`text-[9px] uppercase tracking-widest leading-none mb-1 ${title === 'Guest' ? 'text-stone-400' : 'text-amber-400'}`}>{title}</div>
               <div className="text-white font-bold text-base leading-none">
-                {username.startsWith('Player#')
-                  ? <><span>Player</span><span className="text-stone-400 font-medium">{username.slice(6)}</span></>
-                  : username}
+                {(() => {
+                  const i = username.lastIndexOf('#')
+                  return i > 0
+                    ? <><span>{username.slice(0, i)}</span><span className="text-stone-400 font-medium">{username.slice(i)}</span></>
+                    : username
+                })()}
               </div>
             </div>
           </div>
