@@ -1,15 +1,5 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { STARTING_BANKROLL } from './useGameState'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-
-let _supabase: SupabaseClient | null = null
-function getSupabase(): SupabaseClient | null {
-  if (!supabaseUrl || !supabaseKey) return null
-  if (!_supabase) _supabase = createClient(supabaseUrl, supabaseKey)
-  return _supabase
-}
+import { getSupabase } from '../lib/supabase'
 
 export type LeaderboardEntry = {
   id?: number

@@ -22,32 +22,46 @@ The goal is to ship this app on the **Apple App Store and Google Play Store**. T
 - Player titles
 
 ### Future features
-- Lifetime game stats (cross-device, requires accounts)
+- Lifetime game stats (cross-device, Pro users only — backed by Supabase profile)
 - Achievements that unlock deck themes, card themes, and player titles
+- Stats and achievements are Phase 5; they depend on IAP profiles being in place
 
 ### Monetization & accounts
 - One-time IAP for Pro status (no subscription)
 - Users must be able to **restore their purchase** — a hard requirement from both Apple and Google
-- Purchase restoration requires persistent user accounts (not just localStorage)
+- **No email/password required at any point.** Purchase restoration is handled by Apple ID (StoreKit) and Google Account (Play Billing) — the platforms own the identity layer. We never ask users to create a login.
+- Free users: device-local data only (localStorage). Data does not sync across devices.
+- Pro users: Sign in with Apple / Google happens at purchase time. A Supabase profile is created silently and tied to their platform ID. This enables cross-device sync and purchase restoration without any email prompt.
+
+### User identity model
+- Usernames use a Discord-style `Name#XXXX` uniqueness system. When a user picks "N8", we check the Supabase `usernames` table and assign the next available suffix (e.g., `N8#0000`, `N8#0001`). The suffix is visible in the UI and on the leaderboard.
+- Free users: username stored in localStorage (`fbbj_username`) and registered in the Supabase `usernames` table for global uniqueness.
+- Pro users: username + bankroll + settings stored in a Supabase `profiles` table, keyed by their Apple/Google platform ID.
 
 ### Recommended implementation order
 
 The following phases should be completed in order. Do not skip ahead — each phase is foundational for the next.
 
-**Phase 1 — Capacitor integration**
+**Phase 1 — Capacitor integration** ✅ Complete
 Wrap the existing Vite/React app in a Capacitor native shell to enable App Store and Play Store distribution. This is the prerequisite for any native IAP APIs.
 
-**Phase 2 — User authentication (Supabase Auth)**
-Migrate identity from localStorage (`fbbj_username`) to Supabase Auth (email/password or social login). This enables cross-device data, purchase restoration, and persistent stats. Existing localStorage data (bankroll, settings, username) should be migrated to the user's cloud record on first sign-in.
+**Phase 2 — Username uniqueness system**
+Replace the current random-code username fallback with a global Discord-style `Name#XXXX` system backed by Supabase. No auth required — just a public `usernames` table. The existing "Create a Username" modal flow is preserved; uniqueness is enforced at registration time. No login modal, no email, no password.
+
+Key tasks:
+1. Create a `usernames` table in Supabase (public, no RLS auth required for reads; insert validates uniqueness).
+2. Update `useUsername.ts` to register the chosen username in Supabase and resolve the `#XXXX` suffix before saving to localStorage.
+3. Update the `UsernameModal` to show the assigned suffix after the user confirms their name.
+4. Ensure the leaderboard displays the full `Name#XXXX` format.
 
 **Phase 3 — In-app purchases**
-Wire StoreKit (iOS) and Google Play Billing (Android) via a Capacitor IAP plugin. Store Pro entitlement on the Supabase user record so it survives reinstalls and device switches. Implement the "Restore Purchase" flow.
+Wire StoreKit (iOS) and Google Play Billing (Android) via a Capacitor IAP plugin. At purchase time, trigger Sign in with Apple (iOS) or Google Sign-In (Android) to create a Supabase profile silently — no UI prompt, just platform auth. Store Pro entitlement and username/bankroll/settings on the profile. Implement the "Restore Purchase" flow (re-authenticates with Apple/Google, retrieves profile).
 
 **Phase 4 — Pro feature gating**
-With accounts and IAP in place, add a `isPro` flag to the app state derived from the Supabase user record. Gate Pro features behind this flag. Pro features should be fully built before this phase; the gating logic should be the last thing wired up.
+With IAP and profile sync in place, add an `isPro` flag derived from the Supabase profile. Gate Pro features behind this flag. Pro features should be fully built before this phase; the gating logic should be the last thing wired up.
 
 **Phase 5 — Lifetime stats & achievements**
-Persist per-round stats to Supabase. Build an achievements engine that evaluates unlock conditions and writes earned achievements to the user record. Achievements drive cosmetic unlocks (themes, titles).
+Persist per-round stats to Supabase (Pro users only). Build an achievements engine that evaluates unlock conditions and writes earned achievements to the user profile. Achievements drive cosmetic unlocks (themes, titles).
 
 > **Do not implement payment gating or Pro locks until Phase 4.** Build Pro features freely during earlier phases; the infrastructure to gate them doesn't exist yet and adding stubs now creates rework.
 
@@ -203,23 +217,28 @@ Always confirm with the user before pushing or opening PRs. Wait for explicit go
 
 ### Recommended next tasks
 
-Tasks are ordered by phase priority. Complete Phase 1 and 2 before building new Pro features.
+Tasks are ordered by phase priority.
 
-**Phase 1 — Capacitor**
-1. Install and configure Capacitor (`@capacitor/core`, `@capacitor/ios`, `@capacitor/android`).
-2. Validate that the existing Vite build runs correctly inside the Capacitor shell on both platforms.
-3. Configure app icons, splash screens, and bundle identifiers for both stores.
+**Phase 1 — Capacitor** ✅ Complete
+iOS and Android Capacitor shells are set up. Safe-area layout is correct on iPhone (including Dynamic Island). Both platforms build and run.
 
-**Phase 2 — Auth**
-4. Enable Supabase Auth and add sign-up / sign-in / guest flows to the app.
-5. Migrate `fbbj_username`, `fbbj_bankroll`, and `fbbj_settings` from localStorage to the authenticated user's Supabase record.
-6. Ensure anonymous/guest play still works; prompt sign-in when accessing Pro features or the leaderboard.
+**Phase 2 — Username uniqueness system** ← current
+1. Create `usernames` table in Supabase (columns: `id`, `username` text unique, `display` text, `base` text, `suffix` int, `created_at`).
+2. Update `useUsername.ts`: on save, query Supabase for existing `base#XXXX` entries, assign next suffix, write full `Name#XXXX` to localStorage.
+3. Update `UsernameModal` to display the assigned `#XXXX` suffix in the confirmation step.
+4. Update leaderboard display to show full `Name#XXXX` usernames.
 
-**Near-term (can be done now, parallel to Phase 1/2)**
-7. **Share**: implement a share flow (Web Share API with a score card image, or a shareable URL with peak bankroll encoded).
-8. **CI**: add `.github/workflows/test.yml` to run `npm run test` on every push and PR.
-9. **Music**: source audio and wire to the existing music toggle in Settings.
-10. **Expanded tests**: cover Hellraiser edge cases, Push 22 with player bust, Pot of Gold with dealer BJ, and multi-split resolution order.
+**Phase 3 — In-app purchases**
+5. Integrate `@capacitor-community/in-app-purchases-2` (or equivalent).
+6. At purchase time: trigger Sign in with Apple (iOS) / Google Sign-In (Android) → create Supabase profile silently.
+7. Store `is_pro`, username, bankroll, settings on the profile.
+8. Implement Restore Purchase flow (re-auth → profile fetch).
+
+**Near-term (can be done in parallel with Phase 2)**
+9. **Share**: implement a share flow (Web Share API with a score card image, or a shareable URL with peak bankroll encoded).
+10. **CI**: add `.github/workflows/test.yml` to run `npm run test` on every push and PR.
+11. **Music**: source audio and wire to the existing music toggle in Settings.
+12. **Expanded tests**: cover Hellraiser edge cases, Push 22 with player bust, Pot of Gold with dealer BJ, and multi-split resolution order.
 
 ---
 

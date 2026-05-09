@@ -266,7 +266,6 @@ export default function App() {
           onBack={() => { setShowProfile(false); setShowMenu(true) }}
           username={username}
           title={title}
-          playerIcon={playerIcon}
           onSaveUsername={saveUsername}
           onSaveTitle={saveTitle}
         />
@@ -282,7 +281,6 @@ export default function App() {
           onShowProfile={() => setShowProfile(true)}
           username={username}
           title={title}
-          playerIcon={playerIcon}
         />
       )}
       {showRestartConfirm && (
